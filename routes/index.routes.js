@@ -8,11 +8,14 @@ const withdrawRoutes = require('./withdraw.routes');
 const transactionRoutes = require('./transaction.routes');
 const notificationRoutes = require('./notification.routes');
 
-router.use('/', authRoutes);
-router.use('/', userRoutes);
+router.use('/auth', authRoutes);
+router.use('/user', userRoutes);
 router.use('/deposit', depositRoutes);
 router.use('/withdraw', withdrawRoutes);
 router.use('/transaction', transactionRoutes);
 router.use('/notifications', notificationRoutes);
+
+router.use('/', authRoutes);
+router.use('/', userRoutes);
 
 module.exports = router;

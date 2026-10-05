@@ -7,6 +7,8 @@
     "scripts": {
         "dev": "nodemon app.js",
         "start": "node app.js",
+        "client:dev": "npm run dev --prefix client",
+        "client:build": "npm run build --prefix client",
         "create-wallet": "node scripts/create-platform-wallet.js",
         "airdrop": "node scripts/airdrop.js"
     },

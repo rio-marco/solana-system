@@ -51,15 +51,17 @@ const authMiddleware = async (req, res, next) => {
 };
 
 const handleUnauth = async (req, res, message = messages.unauthorizedAccess) => {
-    const method = req.method;
-
-    req.session.destroy();
-
-    if (method === "GET") {
+    if (req.session) {
+        req.session.destroy();
+    }
+    if (req.path.startsWith('/api') || req.headers.accept?.includes('json') || req.xhr) {
+        return res.status(constants.STATUS.UNAUTHORIZED).json(generalLib.error_res(message));
+    }
+    if (req.method === "GET") {
         return res.redirect("/login");
     } else {
         return res.status(constants.STATUS.UNAUTHORIZED).json(generalLib.error_res(message));
-    };
+    }
 };
 
 module.exports = authMiddleware;

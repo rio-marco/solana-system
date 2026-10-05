@@ -32,6 +32,7 @@ const upload = multer({
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
 });
 
+router.get('/me', authMiddleware, userController.getMe);
 router.get('/', authMiddleware, userController.getDashboardPage);
 
 router.post('/profile/update', authMiddleware, upload.single('profilePhoto'), userController.updateProfile);

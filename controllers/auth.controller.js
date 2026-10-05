@@ -255,11 +255,17 @@ const verifyOtp = async (req, res, next) => {
 
             req.session.user = { _id: user._id.toString(), authToken: sessionDetails?.authToken };
 
-            return res.status(constants.STATUS.OK).json(generalLib.success_res("OTP verified successfully!", {
-                redirectUrl: "/",
-                recoveryPhrase: isFirstVerification ? user.recoveryPhrase : null,
-                isFirstVerification,
-            }));
+            return req.session.save((saveErr) => {
+                if (saveErr) {
+                    generalLib.log1(["Error saving session in verifyOtp----->", saveErr]);
+                    return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(generalLib.error_res(messages.unexpectedDataError));
+                }
+                return res.status(constants.STATUS.OK).json(generalLib.success_res("OTP verified successfully!", {
+                    redirectUrl: "/",
+                    recoveryPhrase: isFirstVerification ? user.recoveryPhrase : null,
+                    isFirstVerification,
+                }));
+            });
         };
 
         return res.status(constants.STATUS.OK).json(generalLib.success_res("Please verify your 2FA code.", { redirectUrl: "/verify-2fa" }));
@@ -512,7 +518,12 @@ const postVerify2FACode = async (req, res) => {
 
         req.session.user = { _id: user._id.toString(), authToken: sessionDetails?.authToken };
 
-        return res.status(constants.STATUS.OK).json(generalLib.success_res("Sign in successfully."));
+        return req.session.save((saveErr) => {
+            if (saveErr) {
+                return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(generalLib.error_res(messages.unexpectedDataError));
+            }
+            return res.status(constants.STATUS.OK).json(generalLib.success_res("Sign in successfully."));
+        });
     } catch (error) {
         errorLog(["Error in postVerify2FACode ----->", error]);
         return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(generalLib.error_res(messages.unexpectedDataError));

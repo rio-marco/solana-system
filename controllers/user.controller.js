@@ -104,8 +104,31 @@ const postSignOut = async (req, res) => {
     };
 };
 
+const getMe = async (req, res) => {
+    try {
+        const user = req.user;
+        return res.json(generalLib.success_res("User fetched successfully", {
+            user: {
+                _id: user._id,
+                email: user.email,
+                fullName: user.fullName,
+                profilePhoto: user.profilePhoto || "",
+                memo: user.memo,
+                is2FAEnabled: user.is2FAEnabled || false,
+                depositWalletAddress: user.depositWalletAddress || "",
+            },
+            network: process.env.SOLANA_NETWORK || 'devnet',
+            rpcUrl: process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com',
+        }));
+    } catch (error) {
+        generalLib.log1(["Error in getMe----->", error]);
+        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(generalLib.error_res(messages.unexpectedDataError));
+    }
+};
+
 module.exports = {
     getDashboardPage,
+    getMe,
     updateProfile,
     postSignOut,
 };

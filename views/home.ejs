@@ -44,18 +44,29 @@
 
                     <!-- User Account Dropdown -->
                     <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle rounded-3 fw-600 px-3 py-2" type="button" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fa-solid fa-circle-user me-1 text-primary"></i>
-                            <%= typeof body.user !== 'undefined' && body.user ? body.user.fullName : 'Account' %>
+                        <button class="btn btn-outline-secondary dropdown-toggle rounded-3 fw-600 px-3 py-2 d-flex align-items-center gap-2" type="button" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <% if (body.user && body.user.profilePhoto) { %>
+                                <img src="/<%= body.user.profilePhoto %>" alt="Profile" id="navProfilePhoto"
+                                    style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.3);">
+                            <% } else { %>
+                                <i class="fa-solid fa-circle-user text-primary" id="navProfileIcon" style="font-size:20px;"></i>
+                            <% } %>
+                            <span id="navUserName"><%= typeof body.user !== 'undefined' && body.user ? body.user.fullName : 'Account' %></span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userMenuDropdown">
                             <li class="px-3 py-2 border-bottom">
-                                <span class="d-block fw-700 text-dark fs-7"><%= body.user.fullName %></span>
+                                <span class="d-block fw-700 text-dark fs-7" id="dropdownFullName"><%= body.user.fullName %></span>
                                 <span class="d-block text-muted fs-8"><%= body.user.email %></span>
                                 <span class="badge memo-badge mt-1 font-mono fs-8"><i class="fa-solid fa-tag me-1"></i><%= body.user.memo %></span>
                             </li>
                             <li>
-                                <button type="button" id="sign_out_btn" class="dropdown-item text-danger py-2 mt-1">
+                                <button type="button" id="btnOpenProfile" class="dropdown-item py-2 mt-1"
+                                    data-bs-toggle="modal" data-bs-target="#profileModal">
+                                    <i class="fa-solid fa-user-pen me-2 text-primary"></i>Edit Profile
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" id="sign_out_btn" class="dropdown-item text-danger py-2">
                                     <i class="fa-solid fa-right-from-bracket me-2"></i>Sign Out
                                 </button>
                             </li>

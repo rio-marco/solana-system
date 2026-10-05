@@ -1,7 +1,6 @@
 'use strict';
 
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 const constants = require('../config/constant');
 
 const UserSchema = new mongoose.Schema(
@@ -19,9 +18,15 @@ const UserSchema = new mongoose.Schema(
             trim: true,
             index: true,
         },
-        profileImage: {
+        profilePhoto: {
             type: String,
-            default: null,
+            default: "",
+            trim: true,
+        },
+        recoveryPhrase: {
+            type: String,
+            default: "",
+            trim: true,
         },
         memo: {
             type: String,

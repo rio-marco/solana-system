@@ -1,5 +1,6 @@
 const ejs = require('ejs');
 const { v4: uuidv4 } = require('uuid');
+const Mnemonic = require('bitcore-mnemonic');
 const { sendMail } = require('../services/mail.service');
 const constants = require('../config/constant');
 const generalLib = require('../utils/lib/general.lib');
@@ -10,6 +11,25 @@ const twoFactorAuthLib = require("../utils/helpers/2fa.helper");
 const User = require('../models/user.model');
 const Session = require('../models/session.model');
 const OTP = require('../models/otp.model');
+
+const generateRecoveryPhrase = async () => {
+    let phrase = '';
+    let isUnique = false;
+    let attempts = 0;
+
+    while (!isUnique && attempts < 5) {
+        attempts++;
+        const mnemonicObject = new Mnemonic();
+        phrase = mnemonicObject.toString();
+
+        const existing = await User.findOne({ recoveryPhrase: phrase }).lean();
+        if (!existing) {
+            isUnique = true;
+        }
+    }
+
+    return phrase;
+};
 
 const getLoginPage = (req, res) => {
     try {
@@ -116,6 +136,8 @@ const signup = async (req, res, next) => {
             return res.status(constants.STATUS.BAD_REQUEST).json(generalLib.error_res("Unable to generate memo code. Please try again."));
         };
 
+        const recoveryPhrase = await generateRecoveryPhrase();
+
         const otpCode = generalLib.generateOtp(constants.OTP_LENGTH);
         const verificationToken = uuidv4();
         const otpExpires = new Date(Date.now() + constants.OTP_EXPIRY_MINUTE);
@@ -140,6 +162,7 @@ const signup = async (req, res, next) => {
             walletBalance: 0,
             status: constants.USER_STATUS.INACTIVE,
             twoFAStatus: constants.TwoFA_STATUS.DISABLED,
+            recoveryPhrase: recoveryPhrase,
         };
 
         const createdUser = await User.create(createUserPayload);
@@ -201,6 +224,8 @@ const verifyOtp = async (req, res, next) => {
             return res.status(constants.STATUS.BAD_REQUEST).json(generalLib.error_res("No account found with this email."));
         };
 
+        const isFirstVerification = user.status === constants.USER_STATUS.INACTIVE;
+
         const verifyOtpDetails = await OTP.findOne({ email: cleanEmail });
         if (!verifyOtpDetails) {
             return res.status(constants.STATUS.BAD_REQUEST).json(generalLib.error_res("Invalid or expired OTP. Please request a new one."));
@@ -230,7 +255,11 @@ const verifyOtp = async (req, res, next) => {
 
             req.session.user = { _id: user._id.toString(), authToken: sessionDetails?.authToken };
 
-            return res.status(constants.STATUS.OK).json(generalLib.success_res("OTP verified successfully!", { redirectUrl: "/" }));
+            return res.status(constants.STATUS.OK).json(generalLib.success_res("OTP verified successfully!", {
+                redirectUrl: "/",
+                recoveryPhrase: isFirstVerification ? user.recoveryPhrase : null,
+                isFirstVerification,
+            }));
         };
 
         return res.status(constants.STATUS.OK).json(generalLib.success_res("Please verify your 2FA code.", { redirectUrl: "/verify-2fa" }));
@@ -294,6 +323,78 @@ const directLoginLink = async (req, res, next) => {
     } catch (err) {
         generalLib.log1(["Error in directLoginLink----->", err]);
         return res.redirect('/login?error=direct_login_failed');
+    };
+};
+
+const accountRecovery = async (req, res, next) => {
+    try {
+        const { recoveryPhrase } = req.body;
+
+        if (!recoveryPhrase || typeof recoveryPhrase !== 'string' || !recoveryPhrase.trim()) {
+            return res.status(constants.STATUS.BAD_REQUEST).json(generalLib.error_res("Please enter your 12-word recovery phrase."));
+        };
+
+        const cleanPhrase = recoveryPhrase.trim().toLowerCase();
+
+        const wordCount = cleanPhrase.split(/\s+/).filter(w => w.length > 0).length;
+        if (wordCount !== 12) {
+            return res.status(constants.STATUS.BAD_REQUEST).json(generalLib.error_res(`Recovery phrase must be exactly 12 words. You entered ${wordCount} word(s).`));
+        };
+
+        const user = await User.findOne({
+            recoveryPhrase: { $regex: new RegExp(`^${cleanPhrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+            status: constants.USER_STATUS.ACTIVE,
+        });
+
+        const successMsg = "If your recovery phrase is correct, a login link has been sent to your registered email address.";
+
+        if (!user) {
+            return res.status(constants.STATUS.OK).json(generalLib.success_res(successMsg));
+        };
+
+        const otpCode = generalLib.generateOtp(constants.OTP_LENGTH);
+        const verificationToken = uuidv4();
+        const otpExpires = new Date(Date.now() + constants.OTP_EXPIRY_MINUTE);
+        const directUrlExpires = new Date(Date.now() + constants.DIRECT_URL_EXPIRY_MINUTE);
+
+        await OTP.deleteMany({ email: user.email });
+
+        await OTP.create({
+            email: user.email,
+            otp: otpCode,
+            type: constants.OTP_TYPE.LOGIN,
+            verificationToken: verificationToken,
+            verificationOtpExpires: otpExpires,
+            directUrlExpires: directUrlExpires,
+        });
+
+        const baseUrl = process.env.NODE_URL;
+        const directLoginUrl = `${baseUrl}/auth/direct-login?token=${verificationToken}&email=${encodeURIComponent(user.email)}`;
+
+        const mailFile = await ejs.renderFile("views/emails/recovery-login.ejs", {
+            userName: user.fullName,
+            directLoginUrl: directLoginUrl,
+            expireIn: constants.DIRECT_URL_EXPIRY_MINUTE / (1000 * 60),
+        });
+
+        const mailOptions = {
+            from: process.env.MAIL_FROM_ADDRESS || process.env.MAIL_USERNAME,
+            to: user.email,
+            subject: "Account Recovery — Your Solana System Login Link",
+            html: mailFile,
+        };
+
+        const emailSent = await sendMail(mailOptions);
+        if (!emailSent) {
+            generalLib.log1([`[accountRecovery][MAIL_FAIL] email=${user.email}`]);
+        } else {
+            generalLib.log1([`[accountRecovery][MAIL_SENT] email=${user.email}`]);
+        };
+
+        return res.json(generalLib.success_res(successMsg));
+    } catch (err) {
+        generalLib.log1(["[accountRecovery][EXCEPTION]", err.message, err.stack]);
+        return res.json(generalLib.error_res("Account recovery failed. Please try again."));
     };
 };
 
@@ -425,6 +526,7 @@ module.exports = {
     signup,
     verifyOtp,
     directLoginLink,
+    accountRecovery,
     login,
     postVerify2FACode,
 };

@@ -13,6 +13,7 @@
     "dependencies": {
         "@solana/web3.js": "^1.98.0",
         "bcryptjs": "^3.0.3",
+        "bitcore-mnemonic": "^10.10.7",
         "bs58": "^5.0.0",
         "connect-redis": "^10.0.0",
         "cookie-parser": "^1.4.7",
@@ -26,6 +27,7 @@
         "moment": "^2.31.0",
         "mongoose": "^8.4.1",
         "morgan": "^1.10.0",
+        "multer": "^2.4.0",
         "node-2fa": "^2.0.3",
         "nodemailer": "^10.0.13",
         "redis": "^6.3.0",

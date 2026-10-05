@@ -16,4 +16,6 @@ router.get('/auth/direct-login', authController.directLoginLink);
 
 router.post("/verify-2fa-code", noAuthMiddleware, authController.postVerify2FACode);
 
+router.post('/account-recovery', authController.accountRecovery);
+
 module.exports = router;

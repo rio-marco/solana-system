@@ -139,6 +139,7 @@ const signup = async (req, res, next) => {
             memo: uniqueMemo,
             walletBalance: 0,
             status: constants.USER_STATUS.INACTIVE,
+            twoFAStatus: constants.TwoFA_STATUS.DISABLED,
         };
 
         const createdUser = await User.create(createUserPayload);
@@ -213,27 +214,26 @@ const verifyOtp = async (req, res, next) => {
             return res.status(constants.STATUS.BAD_REQUEST).json(generalLib.error_res("OTP code has expired. Please request a new one."));
         };
 
-        await User.findOneAndUpdate({ _id: user._id }, { status: constants.USER_STATUS.ACTIVE }, { new: true });
-
-        const ip = generalLib.getIp(req);
-
-        const sessionDetails = await sessionHelper.generateAndStoreSession(req, ip, user._id);
-        if (!sessionDetails) {
-            return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(generalLib.error_res(messages.unexpectedDataError));
+        if (verifyOtpDetails?.type === constants.OTP_TYPE.SIGNUP) {
+            await User.findOneAndUpdate({ _id: user._id }, { status: constants.USER_STATUS.ACTIVE }, { new: true });
         };
-
-        req.session.user = { _id: user._id.toString(), authToken: sessionDetails?.authToken };
 
         await OTP.deleteMany({ email: cleanEmail });
 
-        return req.session.save((saveErr) => {
-            if (saveErr) {
-                generalLib.log1([`[verifyOtp][SESSION_SAVE_FAIL] email=${cleanEmail}`, saveErr.message]);
-                return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(generalLib.error_res("Session could not be saved. Please try again."));
+        const ip = generalLib.getIp(req);
+
+        if (user.twoFAStatus === constants.TwoFA_STATUS.DISABLED) {
+            const sessionDetails = await sessionHelper.generateAndStoreSession(req, ip, user._id);
+            if (!sessionDetails) {
+                return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(generalLib.error_res(messages.unexpectedDataError));
             };
 
-            return res.status(constants.STATUS.OK).json(generalLib.success_res("Email verified successfully! Redirecting to dashboard..."));
-        });
+            req.session.user = { _id: user._id.toString(), authToken: sessionDetails?.authToken };
+
+            return res.status(constants.STATUS.OK).json(generalLib.success_res("OTP verified successfully!", { redirectUrl: "/" }));
+        };
+
+        return res.status(constants.STATUS.OK).json(generalLib.success_res("Please verify your 2FA code.", { redirectUrl: "/verify-2fa" }));
     } catch (err) {
         generalLib.log1(["Error in verifyOtp----->", err]);
         return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(generalLib.error_res(messages.unexpectedDataError));

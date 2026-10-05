@@ -19,6 +19,10 @@ const UserSchema = new mongoose.Schema(
             trim: true,
             index: true,
         },
+        profileImage: {
+            type: String,
+            default: null,
+        },
         memo: {
             type: String,
             required: true,
@@ -31,6 +35,15 @@ const UserSchema = new mongoose.Schema(
             type: Number,
             default: 0,
             min: 0,
+        },
+        twoFASecret: {
+            type: String,
+            default: null,
+        },
+        twoFAStatus: {
+            type: Number,
+            enum: Object.values(constants.TwoFA_STATUS),
+            default: constants.TwoFA_STATUS.DISABLED,
         },
         status: {
             type: Number,

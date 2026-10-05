@@ -51,7 +51,7 @@ $(document).on("click", "#btnVerifySubmit", function (e) {
 
         if (response.flag === 1) {
             setTimeout(() => {
-                window.location.href = "/";
+                window.location.href = response?.data?.redirectUrl || "/";
             }, 1000);
         };
     });

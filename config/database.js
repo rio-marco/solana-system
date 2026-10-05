@@ -1,6 +1,7 @@
 'use strict';
 
 const mongoose = require('mongoose');
+const Generallib = require('../utils/lib/general.lib');
 
 const connectDatabase = async () => {
     try {
@@ -10,9 +11,9 @@ const connectDatabase = async () => {
             serverSelectionTimeoutMS: 5000,
         });
 
-        console.log("Database Connected Successfully");
+        Generallib.log1(["Database Connected Successfully"]);
     } catch (error) {
-        console.error(`[MongoDB Error] Failed to connect: ${error.message}`);
+        Generallib.log1([`[MongoDB Error] Failed to connect: ${error.message}`]);
         console.warn(`[MongoDB Warning] Please ensure MongoDB is running locally or MONGODB_URI is correctly set in .env`);
     };
 };

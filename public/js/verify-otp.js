@@ -1,5 +1,17 @@
 $(document).ready(function () { });
 
+$(document).on('submit', '#verifyOtpForm', function (e) {
+    e.preventDefault();
+    $('#btnVerifySubmit').trigger('click');
+});
+
+$(document).on('keypress', '#otpInput, #emailVisible', function (e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        $('#btnVerifySubmit').trigger('click');
+    };
+});
+
 $(document).on("click", "#btnVerifySubmit", function (e) {
     e.preventDefault();
 
@@ -16,7 +28,7 @@ $(document).on("click", "#btnVerifySubmit", function (e) {
 
     for (const [condition, message] of validations) {
         if (condition) {
-            showToast(false, message);
+            showToast(0, message);
             return;
         };
     };
@@ -30,14 +42,14 @@ $(document).on("click", "#btnVerifySubmit", function (e) {
     $('#verifyBtnText').addClass('d-none');
     $('#verifyBtnSpinner').removeClass('d-none');
 
-    postAjaxCall("/api/auth/verify-otp", payload, function (response) {
-        showToast(response.success, response.message);
+    postAjaxCall("/verify-otp", payload, function (response) {
+        showToast(response.flag, response.msg);
 
         $btn.prop('disabled', false);
         $('#verifyBtnText').removeClass('d-none');
         $('#verifyBtnSpinner').addClass('d-none');
 
-        if (response.flag == 1) {
+        if (response.flag === 1) {
             setTimeout(() => {
                 window.location.href = "/";
             }, 1000);

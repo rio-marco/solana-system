@@ -1,8 +1,7 @@
-'use strict';
-
 const bs58 = require('bs58');
 const { connection, MEMO_PROGRAM_ID } = require('../config/solana');
 const { solToLamports } = require('../utils/validation');
+const Generallib = require('../utils/lib/general.lib');
 const Deposit = require('../models/deposit.model');
 
 const verifyDepositTransaction = async ({
@@ -31,7 +30,7 @@ const verifyDepositTransaction = async ({
             commitment: process.env.SOLANA_COMMITMENT || 'confirmed',
         });
     } catch (err) {
-        console.error(`[Verification Error] RPC error fetching transaction: ${err.message}`);
+        Generallib.log1(["[Verification Error] RPC error fetching transaction:------->", err.message]);
 
         return {
             isValid: false,
@@ -158,8 +157,6 @@ const verifyDepositTransaction = async ({
             actualMemo: cleanFoundMemo,
         };
     };
-
-    console.log(`[Verification Service] Transaction successfully verified!`);
 
     return {
         isValid: true,

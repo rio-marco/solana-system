@@ -23,7 +23,12 @@
                 <p class="text-white fs-7">Sign in to manage your SOL deposits and withdrawals</p>
             </div>
 
-            <div id="authAlert" class="alert display-none mb-3" role="alert"></div>
+            <% if (body.errorMessage) { %>
+                <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                    <%= errorMessage %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <% } %>
 
             <form id="loginForm" novalidate>
                 <div class="mb-3">
@@ -31,14 +36,6 @@
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
                         <input type="email" class="form-control" id="email" placeholder="name@example.com" required>
-                    </div>
-                </div>
-
-                <div class="mb-4">
-                    <label for="password" class="form-label text-light fs-7 fw-600">Password</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                        <input type="password" class="form-control" id="password" placeholder="••••••••" required>
                     </div>
                 </div>
 

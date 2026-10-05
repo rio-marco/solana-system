@@ -86,22 +86,21 @@ class General {
     };
 
     generateUniqueMemo = async () => {
-        let memo = '';
-        let isUnique = false;
-        let attempts = 0;
+        while (true) {
+            try {
+                const memo = crypto.randomInt(10000000, 100000000).toString();
 
-        while (!isUnique && attempts < 10) {
-            attempts++;
-            const randomHex = crypto.randomBytes(4).toString('hex').toUpperCase();
-            memo = `MEMO-${randomHex}`;
+                const existingMemo = await User.exists({ memo });
 
-            const existing = await User.findOne({ memo });
-            if (!existing) {
-                isUnique = true;
-            }
-        }
+                if (!existingMemo) {
+                    return memo;
+                };
 
-        return memo;
+            } catch (error) {
+                this.log1(["Error in generateUniqueMemo----->", error]);
+                throw error;
+            };
+        };
     };
 
     generateAuthToken = async (payload) => {

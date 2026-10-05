@@ -1,13 +1,13 @@
-'use strict';
-
 const { v4: uuidv4 } = require('uuid');
-const { sendSuccess, sendError } = require('../utils/response');
 const { validateMemo, validateAmount } = require('../utils/validation');
 const { hasPlatformAddress, generateNewPlatformAddress, getPlatformReceivingAddress, getOnChainBalance, executeDepositTransaction } = require('../services/solana.service');
 const { verifyDepositTransaction } = require('../services/transaction-verification.service');
 const Deposit = require('../models/deposit.model');
 const User = require('../models/user.model');
 const Notification = require('../models/notification.model');
+const Generallib = require('../utils/lib/general.lib');
+const messages = require('../utils/messages');
+const constants = require("../config/constant");
 
 const getAddress = async (req, res, next) => {
     try {
@@ -16,32 +16,32 @@ const getAddress = async (req, res, next) => {
 
         if (shouldForceGenerate) {
             const newPubKey = await generateNewPlatformAddress();
-            return sendSuccess(res, {
+
+            return res.status(constants.STATUS.OK).json(Generallib.success_res('New platform receiving address generated successfully!', {
                 exists: true,
                 address: newPubKey.toBase58(),
                 network: process.env.SOLANA_NETWORK || 'devnet',
-                message: 'New platform receiving address generated successfully!',
-            });
-        }
+            }));
+        };
 
         if (isSet) {
             const platformPubKey = await getPlatformReceivingAddress(true);
-            return sendSuccess(res, {
+
+            return res.status(constants.STATUS.OK).json(Generallib.success_res('successfully!', {
                 exists: true,
                 address: platformPubKey.toBase58(),
                 network: process.env.SOLANA_NETWORK || 'devnet',
-            });
-        }
+            }));
+        };
 
-        return sendSuccess(res, {
+        return res.status(constants.STATUS.OK).json(Generallib.success_res('Platform receiving address is not generated yet.', {
             exists: false,
             address: null,
             network: process.env.SOLANA_NETWORK || 'devnet',
-            message: 'Platform receiving address is not generated yet.',
-        });
+        }));
     } catch (err) {
-        console.error("getAddress Error----------->", err.message);
-        return sendError(res, "Something went Wrong, please try again later.", 500);
+        Generallib.log1(["getAddress Error----------->", err.message]);
+        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
     }
 };
 
@@ -49,15 +49,14 @@ const generateAddress = async (req, res, next) => {
     try {
         const newPubKey = await generateNewPlatformAddress();
 
-        return sendSuccess(res, {
+        return res.status(constants.STATUS.OK).json(Generallib.success_res('Brand new platform deposit address generated successfully!', {
             exists: true,
             address: newPubKey.toBase58(),
             network: process.env.SOLANA_NETWORK || 'devnet',
-            message: 'Brand new platform deposit address generated successfully!',
-        });
+        }));
     } catch (err) {
-        console.error("generateAddress Error----------->", err.message);
-        return sendError(res, "Something went Wrong, please try again later.", 500);
+        Generallib.log1(["generateAddress Error----------->", err.message]);
+        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
     }
 };
 
@@ -66,15 +65,15 @@ const getBalance = async (req, res, next) => {
         const platformPubKey = await getPlatformReceivingAddress(true);
         const balanceData = await getOnChainBalance(platformPubKey);
 
-        return sendSuccess(res, {
+        return res.status(constants.STATUS.OK).json(Generallib.success_res('get balance successfully!', {
             address: platformPubKey.toBase58(),
             balance: balanceData.balance,
             lamports: balanceData.lamports,
             currency: balanceData.currency,
-        });
+        }));
     } catch (err) {
-        console.error("getBalance Error----------->", err.message);
-        return sendError(res, "Something went Wrong, please try again later.", 500);
+        Generallib.log1(["getBalance Error----------->", err.message]);
+        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
     }
 };
 
@@ -84,13 +83,13 @@ const createDeposit = async (req, res, next) => {
 
         const memoVal = validateMemo(memo);
         if (!memoVal.isValid) {
-            return sendError(res, memoVal.error, 400);
-        }
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res(memoVal.error));
+        };
 
         const amountVal = validateAmount(amount);
         if (!amountVal.isValid) {
-            return sendError(res, amountVal.error, 400);
-        }
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res(amountVal.error));
+        };
 
         const platformPubKey = await getPlatformReceivingAddress(true);
         const platformAddressStr = platformPubKey.toBase58();
@@ -126,9 +125,9 @@ const createDeposit = async (req, res, next) => {
             deposit.failureReason = txErr.message;
             await deposit.save();
 
-            console.error("createDeposit Error----------->", txErr.message);
-            return sendError(res, "Solana transaction failed", 400);
-        }
+            Generallib.log1(["createDeposit Error----------->", txErr.message]);
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Solana transaction failed"));
+        };
 
         const verification = await verifyDepositTransaction({
             signature: txResult.signature,
@@ -185,10 +184,10 @@ const createDeposit = async (req, res, next) => {
                     //     deposit,
                     //     newBalance: updatedUserBalance,
                     // });
-                }
-            }
+                };
+            };
 
-            return sendSuccess(res, {
+            return res.status(constants.STATUS.OK).json(Generallib.success_res('Deposit created and verified on Solana blockchain!', {
                 depositId: deposit.depositId,
                 signature: deposit.transactionSignature,
                 status: deposit.status,
@@ -197,20 +196,19 @@ const createDeposit = async (req, res, next) => {
                 confirmedAt: deposit.confirmedAt,
                 slot: deposit.slot,
                 updatedWalletBalance: updatedUserBalance,
-                message: 'Deposit created and verified on Solana blockchain!',
-            }, 201);
+            }));
         } else {
             deposit.status = 'FAILED';
             deposit.failureReason = verification.failureReason;
             await deposit.save();
 
-            console.error("createDeposit verification failureReason Error----------->", verification.failureReason);
-            return sendError(res, "Transaction created but on-chain verification failed", 400);
+            Generallib.log1(["createDeposit verification failureReason Error----------->", verification.failureReason]);
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Transaction created but on-chain verification failed"));
         }
     } catch (err) {
-        console.error("createDeposit Error Message----------->", err.message);
-        return sendError(res, "Internal server error", 500);
-    }
+        Generallib.log1(["createDeposit Error Message----------->", err.message]);
+        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
+    };
 };
 
 const verifyDeposit = async (req, res, next) => {
@@ -218,25 +216,25 @@ const verifyDeposit = async (req, res, next) => {
         const { depositId, signature } = req.body;
 
         if (!depositId && !signature) {
-            return sendError(res, 'Please provide either depositId or signature', 400);
-        }
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Please provide either depositId or signature"));
+        };
 
         let deposit;
         if (depositId) {
             deposit = await Deposit.findOne({ depositId });
         } else {
             deposit = await Deposit.findOne({ transactionSignature: signature });
-        }
+        };
 
         if (!deposit) {
-            return sendError(res, 'Deposit record not found', 404);
-        }
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Deposit record not found"));
+        };
 
         const targetSignature = signature || deposit.transactionSignature;
 
         if (!targetSignature) {
-            return sendError(res, 'Deposit record does not have a valid transaction signature', 400);
-        }
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Deposit record does not have a valid transaction signature"));
+        };
 
         const verification = await verifyDepositTransaction({
             signature: targetSignature,
@@ -291,10 +289,10 @@ const verifyDeposit = async (req, res, next) => {
                     //     deposit,
                     //     newBalance: updatedUserBalance,
                     // });
-                }
-            }
+                };
+            };
 
-            return sendSuccess(res, {
+            return res.status(constants.STATUS.OK).json(Generallib.success_res('Deposit verified on Solana blockchain!', {
                 depositId: deposit.depositId,
                 status: deposit.status,
                 signature: deposit.transactionSignature,
@@ -303,18 +301,18 @@ const verifyDeposit = async (req, res, next) => {
                 slot: deposit.slot,
                 confirmedAt: deposit.confirmedAt,
                 updatedWalletBalance: updatedUserBalance,
-            });
+            }));
         } else {
             deposit.status = 'FAILED';
             deposit.failureReason = verification.failureReason;
             await deposit.save();
 
-            console.error("verifyDeposit verification failureReason Error----------->", verification.failureReason);
-            return sendError(res, "On-chain verification failed", 400);
-        }
+            Generallib.log1(["verifyDeposit verification failureReason Error----------->", verification.failureReason]);
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("On-chain verification failed"));
+        };
     } catch (err) {
-        console.error("verifyDeposit Error----------->", err.message);
-        return sendError(res, "Something went Wrong, please try again later.", 500);
+        Generallib.log1(["verifyDeposit Error----------->", err.message]);
+        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
     }
 };
 
@@ -324,14 +322,16 @@ const getDepositById = async (req, res, next) => {
         const deposit = await Deposit.findOne({ depositId });
 
         if (!deposit) {
-            return sendError(res, 'Deposit record not found', 404);
-        }
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Deposit record not found"));
+        };
 
-        return sendSuccess(res, { deposit });
+        return res.status(constants.STATUS.OK).json(Generallib.success_res('Get Deposit details successfully!', {
+            deposit
+        }));
     } catch (err) {
-        console.error("getDepositById Error----------->", err.message);
-        return sendError(res, "Something went Wrong, please try again later.", 500);
-    }
+        Generallib.log1(["getDepositById Error----------->", err.message]);
+        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
+    };
 };
 
 module.exports = {

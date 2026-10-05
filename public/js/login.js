@@ -1,20 +1,26 @@
 $(document).ready(function () { });
 
-$(document).on("input", "#email, #password", function () {
+$(document).on("input", "#email", function () {
     const email = $("#email").val();
-    const password = $("#password").val();
 
-    if (email && password) {
+    if (email) {
         $("#login").attr("disabled", false);
     } else {
         $("#login").attr("disabled", true);
     };
 });
 
-$(document).on('keypress', '#email, #password', function (e) {
+// Block native form submit — pressing Enter inside a <form> causes a page GET reload without this
+$(document).on('submit', '#loginForm', function (e) {
+    e.preventDefault();
+    $('#btnLoginSubmit').trigger('click');
+});
+
+$(document).on('keypress', '#email', function (e) {
     if (e.key === "Enter") {
-        $('#btnLoginSubmit').click();
-    }
+        e.preventDefault();
+        $('#btnLoginSubmit').trigger('click');
+    };
 });
 
 $(document).on("click", "#btnLoginSubmit", function (e) {
@@ -23,15 +29,9 @@ $(document).on("click", "#btnLoginSubmit", function (e) {
     const $btn = $(this);
 
     const email = $('#email').val().trim();
-    const password = $('#password').val();
 
     if (!email) {
         showToast(0, "Please enter your email");
-        return;
-    };
-
-    if (!password) {
-        showToast(0, "Please enter your password");
         return;
     };
 
@@ -41,10 +41,9 @@ $(document).on("click", "#btnLoginSubmit", function (e) {
 
     const payload = {
         email: email,
-        password: password,
     };
 
-    postAjaxCall("/api/auth/login", payload, function (response) {
+    postAjaxCall("/login", payload, function (response) {
         showToast(response.flag, response.msg);
 
         $btn.prop('disabled', false);
@@ -53,10 +52,14 @@ $(document).on("click", "#btnLoginSubmit", function (e) {
 
         const redirectUrl = response?.data?.redirectUrl;
 
-        if (response.flag == 1 || (response?.data?.unverified === true || response?.data?.unverified === "true")) {
+        if (response.flag === 1) {
             setTimeout(() => {
                 window.location.href = redirectUrl || "/";
             }, 1000);
+        } else if (response.flag === 0 && (response?.data?.unverified === true || response?.data?.unverified === "true")) {
+            setTimeout(() => {
+                window.location.href = redirectUrl || "/verify-otp";
+            }, 1500);
         };
     });
 });

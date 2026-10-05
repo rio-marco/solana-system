@@ -168,13 +168,13 @@ $(document).ready(function () {
             method: 'GET',
             dataType: 'json',
             success: function (response) {
-                if (response.success && response.exists && response.address) {
-                    currentPlatformAddress = response.address;
-                    $('#platformAddress').text(response.address);
+                if (response.flag === 1) {
+                    currentPlatformAddress = response.data.address;
+                    $('#platformAddress').text(response.data.address);
                     clearAlert();
                 } else {
                     $('#platformAddress').text('No address generated yet.');
-                }
+                };
             },
             error: function (xhr) {
                 const err = xhr.responseJSON ? xhr.responseJSON.message : 'Error contacting server';
@@ -221,11 +221,11 @@ $(document).ready(function () {
             method: 'GET',
             dataType: 'json',
             success: function (response) {
-                if (response.success && response.balance !== undefined) {
-                    const formattedBalance = Number(response.balance).toFixed(6);
+                if (response.flag === 1) {
+                    const formattedBalance = Number(response.data.balance).toFixed(6);
                     $('#platformBalanceDisplay').text(`${formattedBalance} SOL`);
                 } else {
-                    console.error("fetchPlatformBalance Error message-------->", response.message);
+                    console.error("fetchPlatformBalance Error message-------->", response.msg);
                     showAlert("Failed to retrieve platform balance");
                 }
             },
@@ -294,18 +294,18 @@ $(document).ready(function () {
             }),
             dataType: 'json',
             success: function (response) {
-                if (response.success && response.status === 'CONFIRMED') {
-                    $('#resAmount').text(`${Number(response.amount).toFixed(4)} SOL`);
-                    $('#resMemo').text(response.memo);
-                    $('#resDepositId').text(response.depositId);
+                if (response.flag === 1) {
+                    $('#resAmount').text(`${Number(response.data.amount).toFixed(4)} SOL`);
+                    $('#resMemo').text(response.data.memo);
+                    $('#resDepositId').text(response.data.depositId);
 
-                    if (response.updatedWalletBalance !== undefined) {
-                        const formatted = Number(response.updatedWalletBalance).toFixed(6);
+                    if (response.data.updatedWalletBalance !== undefined) {
+                        const formatted = Number(response.data.updatedWalletBalance).toFixed(6);
                         $('#userWalletBalance').text(`${formatted} SOL`);
                         $('.userWalletBalanceDisplay').text(`${formatted} SOL`);
                     }
 
-                    const signature = response.signature || '--';
+                    const signature = response.data.signature || '--';
                     const shortSig = signature.length > 20
                         ? signature.substring(0, 10) + '...' + signature.substring(signature.length - 10)
                         : signature;
@@ -321,11 +321,11 @@ $(document).ready(function () {
                     // showAlert('Deposit transaction confirmed and added to your wallet balance!', 'success');
 
                     // Trigger Native Desktop Notification
-                    sendBrowserDesktopNotification('Deposit Confirmed!', `Successfully deposited ${response.amount} SOL.`);
+                    sendBrowserDesktopNotification('Deposit Confirmed!', `Successfully deposited ${response.data.amount} SOL.`);
 
                     fetchPlatformBalance();
                 } else {
-                    console.error("response Error message-------->", response.message);
+                    console.error("response Error message-------->", response.msg);
                     showAlert("Deposit verification failed.");
                 }
             },
@@ -409,18 +409,18 @@ $(document).ready(function () {
             data: JSON.stringify(validatedData),
             dataType: 'json',
             success: function (response) {
-                if (response.success && response.signature) {
-                    $('#withdrawResAmount').text(`${Number(response.amount).toFixed(4)} SOL`);
-                    $('#withdrawResMemo').text(response.memo);
-                    $('#withdrawResWithdrawalId').text(response.withdrawId);
+                if (response.flag === 1) {
+                    $('#withdrawResAmount').text(`${Number(response.data.amount).toFixed(4)} SOL`);
+                    $('#withdrawResMemo').text(response.data.memo);
+                    $('#withdrawResWithdrawalId').text(response.data.withdrawId);
 
-                    if (response.updatedWalletBalance !== undefined) {
-                        const formatted = Number(response.updatedWalletBalance).toFixed(6);
+                    if (response.data.updatedWalletBalance !== undefined) {
+                        const formatted = Number(response.data.updatedWalletBalance).toFixed(6);
                         $('#userWalletBalance').text(`${formatted} SOL`);
                         $('.userWalletBalanceDisplay').text(`${formatted} SOL`);
                     }
 
-                    const signature = response.signature || '--';
+                    const signature = response.data.signature || '--';
                     const shortSig = signature.length > 20
                         ? signature.substring(0, 10) + '...' + signature.substring(signature.length - 10)
                         : signature;
@@ -442,8 +442,8 @@ $(document).ready(function () {
                         $('#withdrawMemoInput').val(window.USER_MEMO);
                     }
                 } else {
-                    console.error("response Error message-------->", response.message);
-                    showAlert(response.message || "Withdrawal failed.", 'danger');
+                    console.error("response Error message-------->", response.msg);
+                    showAlert(response.msg || "Withdrawal failed.", 'danger');
                 }
             },
             error: function (xhr) {
@@ -471,8 +471,8 @@ $(document).ready(function () {
                 const $tbody = $('#withdrawListTbody');
                 $tbody.empty();
 
-                if (response.success && response.withdrawals && response.withdrawals.length > 0) {
-                    response.withdrawals.forEach(function (item) {
+                if (response.flag === 1 && response.data.withdrawals && response.data.withdrawals.length > 0) {
+                    response.data.withdrawals.forEach(function (item) {
                         const sig = item.transactionSignature || item.withdrawId || 'N/A';
                         const explorerUrl = sig !== 'N/A'
                             ? `https://explorer.solana.com/tx/${sig}?cluster=${solanaNetwork}`
@@ -508,7 +508,7 @@ $(document).ready(function () {
                         '#withdrawPaginationContainer',
                         '#withdrawPaginationInfo',
                         '#withdrawPaginationUl',
-                        response.pagination,
+                        response.data.pagination,
                         function (newPage) { fetchWithdrawList(newPage, limit); }
                     );
                 } else {
@@ -540,16 +540,16 @@ $(document).ready(function () {
                 const $container = $('#notificationsList');
                 $container.empty();
 
-                if (response.success) {
-                    const pagination = response.pagination || {};
+                if (response.flag === 1) {
+                    const pagination = response.data.pagination || {};
                     if (pagination.unreadCount > 0) {
                         $('#unreadBadgeCount').removeClass('display-none').text(pagination.unreadCount);
                     } else {
                         $('#unreadBadgeCount').addClass('display-none');
                     }
 
-                    if (response.notifications && response.notifications.length > 0) {
-                        response.notifications.forEach(function (n) {
+                    if (response.data.notifications && response.data.notifications.length > 0) {
+                        response.data.notifications.forEach(function (n) {
                             const iconClass = n.type === 'DEPOSIT'
                                 ? 'fa-arrow-down-to-bracket text-success'
                                 : 'fa-arrow-up-from-bracket text-primary';
@@ -681,12 +681,12 @@ $(document).ready(function () {
             data: JSON.stringify({ transactionId: txId }),
             dataType: 'json',
             success: function (response) {
-                if (response.success && response.transaction) {
-                    const jsonStr = JSON.stringify(response.transaction, null, 2);
+                if (response.flag === 1 && response.data.transaction) {
+                    const jsonStr = JSON.stringify(response.data.transaction, null, 2);
                     $('#decodedJsonCode').text(jsonStr);
                     $('#decodedJsonContainer').removeClass('display-none').hide().slideDown(300);
                 } else {
-                    showAlert(response.message || 'Could not decode transaction.');
+                    showAlert(response.msg || 'Could not decode transaction.');
                     $('#decodedJsonContainer').addClass('display-none');
                 }
             },

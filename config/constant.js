@@ -8,6 +8,7 @@ module.exports = {
     OTP_LENGTH: 6,
 
     OTP_EXPIRY_MINUTE: 1000 * 60 * 10, // in minute
+    DIRECT_URL_EXPIRY_MINUTE: 1000 * 60 * process.env.LOGIN_URL_EXPIRY_IN_MINUTE, // in minute
     REDIS_OTP_EXPIRY_SECOND: 900, // 15 * 60 (in second)
 
     DEFAULT_ITEM_PER_PAGE: 10,
@@ -16,6 +17,19 @@ module.exports = {
     BCRYPT_SALT: 10,
 
     SESSION_MAX_AGE: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
+
+    FULL_NAME_REGEX: /^[a-zA-Z\s]{2,60}$/, // Only letters and spaces
+    EMAIL_REGEX: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/, // Email format
+
+    OTP_TYPE: {
+        SIGNUP: 1,
+        LOGIN: 2,
+    },
+
+    TwoFA_STATUS: {
+        DISABLED: 0,
+        ENABLED: 1,
+    },
 
     STATUS: {
         OK: 200,
@@ -27,7 +41,7 @@ module.exports = {
     },
 
     USER_STATUS: {
-        InACTIVE: 1,
+        INACTIVE: 1,
         ACTIVE: 2,
         SUSPENDED: 3,
     },

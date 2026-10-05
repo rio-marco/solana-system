@@ -1,7 +1,7 @@
-'use strict';
-
 const Notification = require('../models/notification.model');
-const { sendSuccess, sendError } = require('../utils/response');
+const Generallib = require('../utils/lib/general.lib');
+const messages = require('../utils/messages');
+const constants = require("../config/constant");
 
 const getNotifications = async (req, res, next) => {
     try {
@@ -21,7 +21,7 @@ const getNotifications = async (req, res, next) => {
 
         const totalPages = Math.ceil(total / limit) || 1;
 
-        return sendSuccess(res, {
+        const responsePayload = {
             notifications,
             pagination: {
                 total,
@@ -30,21 +30,25 @@ const getNotifications = async (req, res, next) => {
                 totalPages,
                 unreadCount,
             },
-        });
+        };
+
+        return res.status(constants.STATUS.OK).json(Generallib.success_res("Notification list get successfully!", responsePayload));
     } catch (err) {
-        console.error('[Get Notifications Error]:', err.message);
-        return sendError(res, 'Failed to fetch notifications.', 500);
+        Generallib.log1(['[Get Notifications Error]:', err.message]);
+        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
     }
 };
 
 const markAllAsRead = async (req, res, next) => {
     try {
         const userId = req.user._id;
+
         await Notification.updateMany({ userId, isRead: false }, { $set: { isRead: true } });
-        return sendSuccess(res, { message: 'All notifications marked as read.' });
+
+        return res.status(constants.STATUS.OK).json(Generallib.success_res("All notifications marked as read."));
     } catch (err) {
-        console.error('[Mark Read Notifications Error]:', err.message);
-        return sendError(res, 'Failed to mark notifications as read.', 500);
+        Generallib.log1(['[Mark Read Notifications Error]:', err.message]);
+        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
     }
 };
 

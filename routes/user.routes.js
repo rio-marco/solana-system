@@ -4,6 +4,6 @@ const userController = require('../controllers/user.controller');
 const authMiddleware = require('../middleware/auth.middleware');
 
 router.get('/', authMiddleware, userController.getDashboardPage);
-router.get('/logout', authMiddleware, userController.logout);
+router.post('/sign-out', authMiddleware, userController.postSignOut);
 
 module.exports = router;

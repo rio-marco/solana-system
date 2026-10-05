@@ -46,15 +46,19 @@
                     <div class="dropdown">
                         <button class="btn btn-outline-secondary dropdown-toggle rounded-3 fw-600 px-3 py-2" type="button" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fa-solid fa-circle-user me-1 text-primary"></i>
-                            <%= typeof body.user !== 'undefined' && body.user ? body.user.name : 'Account' %>
+                            <%= typeof body.user !== 'undefined' && body.user ? body.user.fullName : 'Account' %>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userMenuDropdown">
                             <li class="px-3 py-2 border-bottom">
-                                <span class="d-block fw-700 text-dark fs-7"><%= body.user.name %></span>
+                                <span class="d-block fw-700 text-dark fs-7"><%= body.user.fullName %></span>
                                 <span class="d-block text-muted fs-8"><%= body.user.email %></span>
                                 <span class="badge memo-badge mt-1 font-mono fs-8"><i class="fa-solid fa-tag me-1"></i><%= body.user.memo %></span>
                             </li>
-                            <li><a class="dropdown-item text-danger py-2 mt-1" href="/logout"><i class="fa-solid fa-right-from-bracket me-2"></i>Sign Out</a></li>
+                            <li>
+                                <button type="button" id="sign_out_btn" class="dropdown-item text-danger py-2 mt-1">
+                                    <i class="fa-solid fa-right-from-bracket me-2"></i>Sign Out
+                                </button>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -483,5 +487,6 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script src="/js/deposit.js"></script>
+        <script src="/js/common.js"></script>
     </body>
 </html>

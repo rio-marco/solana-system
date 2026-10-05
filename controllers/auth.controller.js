@@ -1,16 +1,14 @@
-'use strict';
-
-const path = require('path');
 const ejs = require('ejs');
 const { v4: uuidv4 } = require('uuid');
-const { sendSuccess, sendError } = require('../utils/response');
 const { sendMail } = require('../services/mail.service');
 const constants = require('../config/constant');
 const Generallib = require('../utils/lib/general.lib');
 const messages = require('../utils/messages');
 const sessionHelper = require('../utils/helpers/session.helper');
+const customValidation = require('../utils/helpers/validator.helper');
 const User = require('../models/user.model');
 const Session = require('../models/session.model');
+const OTP = require('../models/otp.model');
 
 const getLoginPage = (req, res) => {
     try {
@@ -18,16 +16,28 @@ const getLoginPage = (req, res) => {
             return res.redirect('/');
         };
 
+        const { error } = req.query;
+
+        const errorMessages = {
+            invalid_direct_login: "Invalid or incomplete login link.",
+            user_not_found: "User account was not found.",
+            expired_direct_login: "This direct login link has expired. Please request a new login link or verify using OTP.",
+            session_failed: "Unable to create your login session. Please try again.",
+            direct_login_failed: "Unable to complete direct login. Please try again."
+        };
+
         return res.render("login", {
             header: {},
-            body: {},
+            body: {
+                errorMessage: error ? errorMessages[error] || null : null,
+            },
             footer: {
                 js: ["login.js"],
             },
         });
     } catch (error) {
         Generallib.log1(["Error in getLoginPage----->", error]);
-        return res.json(Generallib.error_res(messages.unexpectedDataError));
+        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
     };
 };
 
@@ -46,7 +56,7 @@ const getSignupPage = (req, res) => {
         });
     } catch (error) {
         Generallib.log1(["Error in getSignupPage----->", error]);
-        return res.json(Generallib.error_res(messages.unexpectedDataError));
+        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
     };
 };
 
@@ -73,64 +83,277 @@ const getVerifyOtpPage = (req, res) => {
         });
     } catch (error) {
         Generallib.log1(["Error in getVerifyOtpPage----->", error]);
-        return res.json(Generallib.error_res(messages.unexpectedDataError));
+        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
     };
 };
 
 const signup = async (req, res, next) => {
     try {
-        const { name, email, password } = req.body;
+        const { fullName, email } = req.body;
 
-        if (!name || typeof name !== 'string' || !name.trim()) {
-            return res.json(Generallib.error_res("Name is required."));
+        const validation = await customValidation(req.body, "auth.signUp");
+        if (!validation.flag === 0) {
+            return res.status(constants.STATUS.BAD_REQUEST).json(validation);
+        } else if (!(constants.FULL_NAME_REGEX).test(fullName)) {
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Full name must be 2–60 characters long and contain only letters and spaces."));
+        } else if (!(constants.EMAIL_REGEX).test(email)) {
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Please provide a valid email address."));
         };
 
-        if (!email || typeof email !== 'string' || !email.trim()) {
-            return res.json(Generallib.error_res("Email is required."));
-        };
+        const cleanEmail = email.trim().toLowerCase();
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email.trim())) {
-            return res.json(Generallib.error_res("Please provide a valid email address."));
-        };
-
-        if (!password || typeof password !== 'string' || password.length < 6) {
-            return res.json(Generallib.error_res("Password must be at least 6 characters long."));
-        };
-
-        const existingUser = await User.findOne({ email: email.trim().toLowerCase() });
+        const existingUser = await User.findOne({ email: cleanEmail });
         if (existingUser) {
-            return res.json(Generallib.error_res("An account with this email address already exists."));
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("An account with this email address already exists."));
         };
 
-        const uniqueMemo = await Generallib.generateUniqueMemo();
+        let uniqueMemo;
+        try {
+            uniqueMemo = await Generallib.generateUniqueMemo();
+        } catch (error) {
+            Generallib.log1(["Failed to generate referral code----->", error]);
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Unable to generate memo code. Please try again."));
+        };
+
         const otpCode = Generallib.generateOtp(constants.OTP_LENGTH);
         const verificationToken = uuidv4();
-        const otpExpires = new Date(Date.now() + constants.OTP_EXPIRY_MINUTE); // 10 minutes
+        const otpExpires = new Date(Date.now() + constants.OTP_EXPIRY_MINUTE);
+        const directUrlExpires = new Date(Date.now() + constants.DIRECT_URL_EXPIRY_MINUTE);
 
-        const user = new User({
-            name: name.trim(),
-            email: email.trim().toLowerCase(),
-            password: password,
+        await OTP.deleteMany({ email: cleanEmail, type: constants.OTP_TYPE.SIGNUP });
+
+        const otpPayload = {
+            email: cleanEmail,
+            otp: otpCode,
+            type: constants.OTP_TYPE.SIGNUP,
+            verificationToken: verificationToken,
+            verificationOtpExpires: otpExpires,
+            directUrlExpires: directUrlExpires,
+        };
+        await OTP.create(otpPayload);
+
+        const createUserPayload = {
+            fullName: fullName.trim(),
+            email: cleanEmail,
             memo: uniqueMemo,
             walletBalance: 0,
-            isVerified: false,
-            verificationOtp: otpCode,
-            verificationOtpExpires: otpExpires,
-            verificationToken: verificationToken,
+            status: constants.USER_STATUS.INACTIVE,
+        };
+
+        const createdUser = await User.create(createUserPayload);
+        if (!createdUser) {
+            return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
+        };
+
+        const baseUrl = process.env.NODE_URL;
+        const directLoginUrl = `${baseUrl}/auth/direct-login?token=${verificationToken}&email=${encodeURIComponent(createdUser.email)}`;
+
+        const mailFile = await ejs.renderFile("views/emails/otp-verification.ejs", {
+            title: "New Register OTP",
+            userName: createdUser.fullName,
+            otpCode: otpCode,
+            directLoginUrl: directLoginUrl,
+            expireIn: constants.OTP_EXPIRY_MINUTE / (1000 * 60),
         });
 
-        await user.save();
+        const mailOptions = {
+            from: process.env.MAIL_FROM_ADDRESS || process.env.MAIL_USERNAME,
+            to: createdUser.email,
+            subject: `${otpCode} is your Solana System verification code`,
+            html: mailFile,
+        };
+
+        const emailSent = await sendMail(mailOptions);
+        if (!emailSent) {
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Failed to send OTP email. Please try again."));
+        };
+
+        return res.status(constants.STATUS.OK).json(Generallib.success_res("OTP verification code has been sent to your email. Please verify OTP.", {
+            email: createdUser.email,
+            redirectUrl: `/verify-otp?email=${encodeURIComponent(createdUser.email)}`,
+        }));
+    } catch (err) {
+        Generallib.log1(["Error in signup----->", err]);
+        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
+    };
+};
+
+const verifyOtp = async (req, res, next) => {
+    try {
+        const { email, otp } = req.body;
+
+        const validation = await customValidation(req.body, "auth.verify_otp");
+        if (!validation.flag === 0) {
+            return res.status(constants.STATUS.BAD_REQUEST).json(validation);
+        } else if (!(constants.EMAIL_REGEX).test(email)) {
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Please provide a valid email address."));
+        } else if (otp.toString().trim().length !== constants.OTP_LENGTH) {
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Please provide a valid 6-digit OTP code."));
+        };
+
+        const cleanEmail = email.trim().toLowerCase();
+        const cleanOtp = otp.toString().trim();
+
+        const user = await User.findOne({ email: cleanEmail });
+        if (!user) {
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("No account found with this email."));
+        };
+
+        const verifyOtpDetails = await OTP.findOne({ email: cleanEmail });
+        if (!verifyOtpDetails) {
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Invalid or expired OTP. Please request a new one."));
+        };
+
+        if (verifyOtpDetails.otp !== cleanOtp) {
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Invalid OTP code. Please check and try again."));
+        };
+
+        if (verifyOtpDetails.verificationOtpExpires && verifyOtpDetails.verificationOtpExpires < new Date()) {
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("OTP code has expired. Please request a new one."));
+        };
+
+        await User.findOneAndUpdate({ _id: user._id }, { status: constants.USER_STATUS.ACTIVE }, { new: true });
+
+        const ip = Generallib.getIp(req);
+
+        const sessionDetails = await sessionHelper.generateAndStoreSession(req, ip, user._id);
+        if (!sessionDetails) {
+            return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
+        };
+
+        req.session.user = { _id: user._id.toString(), authToken: sessionDetails?.authToken };
+
+        await OTP.deleteMany({ email: cleanEmail });
+
+        return req.session.save((saveErr) => {
+            if (saveErr) {
+                Generallib.log1([`[verifyOtp][SESSION_SAVE_FAIL] email=${cleanEmail}`, saveErr.message]);
+                return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res("Session could not be saved. Please try again."));
+            };
+
+            return res.status(constants.STATUS.OK).json(Generallib.success_res("Email verified successfully! Redirecting to dashboard..."));
+        });
+    } catch (err) {
+        Generallib.log1(["Error in verifyOtp----->", err]);
+        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
+    };
+};
+
+const directLoginLink = async (req, res, next) => {
+    try {
+        const { token, email } = req.query;
+
+        if (!token || !email) {
+            return res.redirect('/login?error=invalid_direct_login');
+        };
+
+        const cleanEmail = email.trim().toLowerCase();
+
+        const user = await User.findOne({ email: cleanEmail });
+
+        if (!user) {
+            return res.redirect('/login?error=user_not_found');
+        };
+
+        const verifyOtpDetails = await OTP.findOne({
+            email: cleanEmail,
+            verificationToken: token,
+        });
+        if (!verifyOtpDetails) {
+            return res.redirect('/login?error=invalid_direct_login');
+        };
+
+        if (verifyOtpDetails.directUrlExpires && verifyOtpDetails.directUrlExpires < new Date()) {
+            return res.redirect(
+                `/login?error=expired_direct_login&email=${encodeURIComponent(user.email)}`
+            );
+        };
+
+        await User.findOneAndUpdate({ _id: user._id }, { status: constants.USER_STATUS.ACTIVE }, { new: true });
+
+        const ip = Generallib.getIp(req);
+
+        const sessionDetails = await sessionHelper.generateAndStoreSession(req, ip, user._id);
+        if (!sessionDetails) {
+            return res.redirect('/login?error=session_failed');
+        };
+
+        req.session.user = { _id: user._id.toString(), authToken: sessionDetails?.authToken };
+
+        await OTP.deleteMany({ email: cleanEmail });
+
+        return req.session.save((saveErr) => {
+            if (saveErr) {
+                Generallib.log1([`[directLoginLink][SESSION_SAVE_FAIL] email=${cleanEmail}`, saveErr.message]);
+                return res.redirect('/login?error=session_failed');
+            };
+
+            return res.redirect('/');
+        });
+    } catch (err) {
+        Generallib.log1(["Error in directLoginLink----->", err]);
+        return res.redirect('/login?error=direct_login_failed');
+    };
+};
+
+const login = async (req, res, next) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Email is required."));
+        };
+
+        const cleanEmail = email.trim().toLowerCase();
+        const user = await User.findOne({ email: cleanEmail });
+
+        const otpExpires = new Date(Date.now() + constants.OTP_EXPIRY_MINUTE);
+        const directUrlExpires = new Date(Date.now() + constants.DIRECT_URL_EXPIRY_MINUTE);
+
+        if (!user) {
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("No account found with this email address."));
+        } else if (user.status === constants.USER_STATUS.INACTIVE) {
+            await OTP.findOneAndUpdate({ email: cleanEmail },
+                {
+                    verificationOtpExpires: otpExpires,
+                    directUrlExpires: directUrlExpires,
+                },
+                { new: true },
+            );
+
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Your account is not verified. Please complete the verification process.", {
+                unverified: true,
+                redirectUrl: `/verify-otp?email=${encodeURIComponent(user.email)}`,
+            }));
+        } else if (user.status === constants.USER_STATUS.SUSPENDED) {
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Your account has been suspended. Please contact support."));
+        };
+
+        await OTP.deleteMany({ email: cleanEmail });
+
+        const otpCode = Generallib.generateOtp(constants.OTP_LENGTH);
+        const verificationToken = uuidv4();
+
+        const otpPayload = {
+            email: cleanEmail,
+            otp: otpCode,
+            type: constants.OTP_TYPE.LOGIN,
+            verificationToken: verificationToken,
+            verificationOtpExpires: otpExpires,
+            directUrlExpires: directUrlExpires,
+        };
+
+        await OTP.create(otpPayload);
 
         const baseUrl = process.env.NODE_URL;
         const directLoginUrl = `${baseUrl}/auth/direct-login?token=${verificationToken}&email=${encodeURIComponent(user.email)}`;
 
         const mailFile = await ejs.renderFile("views/emails/otp-verification.ejs", {
-            title: "New Register OTP",
-            userName: user.name,
+            title: "Login OTP",
+            userName: user.fullName,
             otpCode: otpCode,
             directLoginUrl: directLoginUrl,
-            expireIn: constants.OTP_EXPIRY_MINUTE / (1000 * 60), // Convert milliseconds to minutes
+            expireIn: constants.OTP_EXPIRY_MINUTE / (1000 * 60),
         });
 
         const mailOptions = {
@@ -142,190 +365,16 @@ const signup = async (req, res, next) => {
 
         const emailSent = await sendMail(mailOptions);
         if (!emailSent) {
-            return res.json(Generallib.error_res("Failed to send OTP."));
+            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Failed to send OTP email. Please try again."));
         };
 
-        return res.json(Generallib.success_res("Registration successful! Verification email sent.", {
+        return res.status(constants.STATUS.OK).json(Generallib.success_res("OTP verification code has been sent to your email. Please verify OTP.", {
             email: user.email,
             redirectUrl: `/verify-otp?email=${encodeURIComponent(user.email)}`,
         }));
     } catch (err) {
-        Generallib.log1(["Error in signup----->", err]);
-        return res.json(Generallib.error_res("Registration failed. Please try again."));
-    };
-};
-
-const verifyOtp = async (req, res, next) => {
-    try {
-        const { email, otp } = req.body;
-
-        if (!email || !otp) {
-            return res.json(Generallib.error_res("Email and 6-digit OTP code are required."));
-        };
-
-        const cleanEmail = email.trim().toLowerCase();
-        const cleanOtp = otp.toString().trim();
-
-        const user = await User.findOne({ email: cleanEmail });
-        if (!user) {
-            return res.json(Generallib.error_res("User not found."));
-        };
-
-        if (user.verificationOtp !== cleanOtp) {
-            return res.json(Generallib.error_res("Invalid OTP code."));
-        };
-
-        if (user.verificationOtpExpires && user.verificationOtpExpires < new Date()) {
-            return res.json(Generallib.error_res("OTP code has expired. Please request a new one."));
-        };
-
-        user.isVerified = true;
-        user.verificationOtp = null;
-        user.verificationOtpExpires = null;
-        user.verificationToken = null;
-        user.status = constants.USER_STATUS.ACTIVE;
-
-        await user.save();
-
-        const ip = await Generallib.getIp(req);
-
-        const sessionDetails = await sessionHelper.generateAndStoreSession(req, ip, user._id);
-
-        if (!sessionDetails) {
-            return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
-        };
-
-        req.session.user = { _id: user._id.toString(), authToken: sessionDetails?.authToken };
-
-        return res.json(Generallib.success_res("Email verified successfully! Redirecting to dashboard..."));
-    } catch (err) {
-        Generallib.log1(["Error in verifyOtp----->", err]);
-        return res.json(Generallib.error_res("OTP verification failed. Please try again."));
-    }
-};
-
-const directLoginLink = async (req, res, next) => {
-    try {
-        const { token, email } = req.query;
-
-        if (!token || !email) {
-            return res.redirect('/login');
-        };
-
-        const cleanEmail = email.trim().toLowerCase();
-        const user = await User.findOne({ email: cleanEmail });
-
-        if (!user) {
-            return res.redirect('/login');
-        };
-
-        if (user.verificationToken && user.verificationToken === token) {
-            user.isVerified = true;
-            user.verificationOtp = null;
-            user.verificationOtpExpires = null;
-            user.verificationToken = null;
-            user.status = constants.USER_STATUS.ACTIVE;
-            await user.save();
-        } else if (!user.isVerified) {
-            return res.redirect('/login');
-        };
-
-        const ip = await Generallib.getIp(req);
-
-        const sessionDetails = await sessionHelper.generateAndStoreSession(req, ip, user._id);
-
-        if (!sessionDetails) {
-            return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
-        };
-
-        req.session.user = { _id: user._id.toString(), authToken: sessionDetails?.authToken };
-
-        return res.redirect('/');
-    } catch (err) {
-        Generallib.log1(["Error in directLoginLink----->", err]);
-        return res.redirect('/login');
-    };
-};
-
-const login = async (req, res, next) => {
-    try {
-        const { email, password } = req.body;
-
-        if (!email || !password) {
-            return res.json(Generallib.error_res("Email and password are required."));
-        };
-
-        const cleanEmail = email.trim().toLowerCase();
-        const user = await User.findOne({ email: cleanEmail });
-
-        if (!user) {
-            return res.json(Generallib.error_res("Invalid email or password."));
-        } else if (user.status === constants.USER_STATUS.SUSPENDED) {
-            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Your account has been suspended. Please contact support."));
-        };
-
-        const isMatch = await user.comparePassword(password);
-        if (!isMatch) {
-            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Invalid credentials."));
-        };
-
-        if (!user.isVerified) {
-            const otpCode = Generallib.generateOtp(constants.OTP_LENGTH);
-            const verificationToken = uuidv4();
-            user.verificationOtp = otpCode;
-            user.verificationOtpExpires = new Date(Date.now() + constants.OTP_EXPIRY_MINUTE); // 10 minutes
-            user.verificationToken = verificationToken;
-
-            await user.save();
-
-            try {
-                const baseUrl = process.env.NODE_URL;
-                const directLoginUrl = `${baseUrl}/auth/direct-login?token=${verificationToken}&email=${encodeURIComponent(user.email)}`;
-
-                const mailFile = await ejs.renderFile("views/emails/otp-verification.ejs", {
-                    title: "New Register OTP",
-                    userName: user.name,
-                    otpCode: otpCode,
-                    directLoginUrl: directLoginUrl,
-                    expireIn: constants.OTP_EXPIRY_MINUTE / (1000 * 60), // Convert milliseconds to minutes
-                });
-
-                const mailOptions = {
-                    from: process.env.MAIL_FROM_ADDRESS || process.env.MAIL_USERNAME,
-                    to: user.email,
-                    subject: `${otpCode} is your Solana System verification code`,
-                    html: mailFile,
-                };
-
-                const emailSent = await sendMail(mailOptions);
-                if (!emailSent) {
-                    return res.json(Generallib.error_res("Failed to send OTP"));
-                };
-            } catch (mailErr) {
-                console.error('[Login Re-send OTP Warning]:', mailErr.message);
-                return res.json(Generallib.error_res("Failed to send OTP"));
-            };
-
-            return res.json(Generallib.error_res("Please verify your email address first. A new OTP verification code has been sent to your email.", {
-                unverified: true,
-                redirectUrl: `/verify-otp?email=${encodeURIComponent(user.email)}`,
-            }));
-        };
-
-        const ip = await Generallib.getIp(req);
-
-        const sessionDetails = await sessionHelper.generateAndStoreSession(req, ip, user._id);
-
-        if (!sessionDetails) {
-            return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
-        };
-
-        req.session.user = { _id: user._id.toString(), authToken: sessionDetails?.authToken };
-
-        return res.status(constants.STATUS.OK).json(Generallib.success_res("Login successful! Redirecting to dashboard...", { redirectUrl: "/" }));
-    } catch (err) {
         Generallib.log1(["Error in Login----->", err]);
-        return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Login failed. Please try again."));
+        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
     };
 };
 

@@ -1,8 +1,11 @@
+const mongoose = require("mongoose");
 const constants = require('../config/constant');
 const Generallib = require('../utils/lib/general.lib');
 const messages = require('../utils/messages');
 const User = require('../models/user.model');
 const Session = require('../models/session.model');
+
+const { ObjectId } = mongoose.Types;
 
 const getDashboardPage = (req, res) => {
     try {
@@ -25,7 +28,7 @@ const getDashboardPage = (req, res) => {
     };
 };
 
-const logout = async (req, res) => {
+const postSignOut = async (req, res) => {
     try {
         const userId = req.userId;
         const authToken = req.session?.user?.authToken;
@@ -36,12 +39,12 @@ const logout = async (req, res) => {
 
         return res.status(constants.STATUS.OK).json(Generallib.success_res("Sign out successfully."));
     } catch (error) {
-        Generallib.log1(["Error in logout----->", error]);
+        Generallib.log1(["Error in postSignOut----->", error]);
         return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
     };
 };
 
 module.exports = {
     getDashboardPage,
-    logout,
+    postSignOut,
 };

@@ -12,6 +12,7 @@ const { Server } = require('socket.io');
 const constants = require('./config/constant');
 const connectDatabase = require('./config/database');
 const indexRouter = require('./routes/index.routes');
+const Generallib = require('./utils/lib/general.lib');
 
 const app = express();
 const server = http.createServer(app);
@@ -37,6 +38,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const parsedUrl = new URL(process.env.NODE_URL);
+const hostname = parsedUrl.hostname;
+const isIpAddress = /^(\d{1,3}\.){3}\d{1,3}$/.test(hostname);
 
 const sessionConfig = {
     name: constants.PLATFORM_NAME,
@@ -46,7 +49,7 @@ const sessionConfig = {
     saveUninitialized: false,
     cookie: {
         secure: process.env.NODE_ENV !== "local",
-        domain: parsedUrl.hostname,
+        ...(isIpAddress ? {} : { domain: hostname }),
         sameSite: "Lax",
         maxAge: constants.SESSION_MAX_AGE,
     },
@@ -60,15 +63,8 @@ if (process.env.NODE_ENV !== 'live') {
 
 app.use("/", indexRouter);
 
-app.use((req, res) => {
-    if (req.accepts('html')) {
-        return res.status(404).render('login', { error: 'Page not found' });
-    }
-    res.status(404).json({ success: false, message: 'Route not found' });
-});
-
 app.use((err, req, res, next) => {
-    console.error('[Global Error]', err.message);
+    Generallib.log1(["[Global Error]------->", err.message]);
     res.status(err.status || 500).json({
         success: false,
         message: err.message || 'Internal server error',
@@ -78,7 +74,7 @@ app.use((err, req, res, next) => {
 (async () => {
     await connectDatabase();
     server.listen(PORT, () => {
-        console.log(`Solana System running on ${process.env.NODE_URL || 'http://localhost:' + PORT}`);
+        Generallib.log1(["Solana System running on------->", process.env.NODE_URL]);
     });
 })();
 

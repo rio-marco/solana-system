@@ -1,18 +1,15 @@
 $(document).ready(function () { });
 
-$(document).on("click", ".toggle-password.login", function () {
-    const container = $(this).closest(".form-group");
-    const passwordInput = container.find(".password-input");
-    const toggleIcon = $(this).find("i");
-    const type = passwordInput.attr("type");
+$(document).on("click", "#sign_out_btn", function () {
+    postAjaxCall("/sign-out", {}, function (res) {
+        showToast(res.success, res.message);
 
-    if (type === "password") {
-        passwordInput.attr("type", "text");
-        toggleIcon.removeClass("ti-eye-off").addClass("ti-eye");
-    } else {
-        passwordInput.attr("type", "password");
-        toggleIcon.removeClass("ti-eye").addClass("ti-eye-off");
-    }
+        if (res.flag === 1) {
+            setTimeout(() => {
+                window.location.href = "/login";
+            }, 500);
+        };
+    });
 });
 
 function showToast(flag, val, time) {
@@ -59,11 +56,20 @@ function AjaxCall(url, callback, method = "GET") {
                 window.location.reload();
             } else {
                 callback(response);
-            }
+            };
         },
-        error: function (err) {
-            console.error("Error:", err);
-        }
+        error: function (xhr) {
+            console.error(xhr);
+
+            if (xhr.responseJSON) {
+                callback(xhr.responseJSON);
+            } else {
+                callback({
+                    flag: 0,
+                    msg: "Something went Wrong, please try again later."
+                });
+            };
+        },
     });
 };
 
@@ -78,6 +84,18 @@ function postAjaxCall(url, data, callback) {
             } else {
                 callback(response);
             }
+        },
+        error: function (xhr) {
+            console.error(xhr);
+
+            if (xhr.responseJSON) {
+                callback(xhr.responseJSON);
+            } else {
+                callback({
+                    flag: 0,
+                    msg: "Something went Wrong, please try again later."
+                });
+            };
         },
     });
 }
@@ -96,8 +114,17 @@ function postFileCall(url, formData, callback) {
                 callback(response);
             }
         },
-        error: function (err) {
-            console.error("Error:", err);
+        error: function (xhr) {
+            console.error(xhr);
+
+            if (xhr.responseJSON) {
+                callback(xhr.responseJSON);
+            } else {
+                callback({
+                    flag: 0,
+                    msg: "Something went Wrong, please try again later."
+                });
+            };
         },
     });
 };

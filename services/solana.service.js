@@ -22,7 +22,7 @@ const {
 const { solToLamports, lamportsToSol } = require('../utils/validation');
 const Wallet = require('../models/wallet.model');
 const Setting = require('../models/setting.model');
-const Generallib = require('../utils/lib/general.lib');
+const generalLib = require('../utils/lib/general.lib');
 
 const ESTIMATED_TX_FEE_LAMPORTS = BigInt(5000);
 
@@ -89,7 +89,7 @@ const getOnChainBalance = async (address) => {
             currency: 'SOL',
         };
     } catch (err) {
-        Generallib.log1(["[Solana RPC Error] Failed to fetch balance:", err.message]);
+        generalLib.log1(["[Solana RPC Error] Failed to fetch balance:", err.message]);
         throw new Error(`Failed to retrieve blockchain balance: ${err.message}`);
     };
 };

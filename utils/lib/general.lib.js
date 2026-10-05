@@ -113,6 +113,38 @@ class General {
             return null;
         };
     };
+
+    encryptText = async (text) => {
+        try {
+            const ciphering = process.env.CIPHERING;
+            const secret_key = process.env.SECRET_KEY;
+            const encryption_iv = process.env.ENCRYPTION_IV;
+
+            const encryptor = crypto.createCipheriv(ciphering, secret_key, encryption_iv);
+            const encrypted = encryptor.update(text, 'utf8', 'base64') + encryptor.final('base64');
+
+            return encrypted;
+        } catch (error) {
+            this.log1(["Error in encryptText ----->", error]);
+            return null;
+        };
+    };
+
+    decryptCipher = async (cipher) => {
+        try {
+            const ciphering = process.env.CIPHERING;
+            const secret_key = process.env.SECRET_KEY;
+            const encryption_iv = process.env.ENCRYPTION_IV;
+
+            const decryptor = crypto.createDecipheriv(ciphering, secret_key, encryption_iv);
+            const decrypted = decryptor.update(cipher, 'base64', 'utf8') + decryptor.final('utf8');
+
+            return decrypted;
+        } catch (error) {
+            this.log1(["Error in decryptCipher ----->", error]);
+            return null;
+        };
+    };
 }
 
 module.exports = new General();

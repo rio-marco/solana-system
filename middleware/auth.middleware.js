@@ -2,7 +2,7 @@
 
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
-const Generallib = require('../utils/lib/general.lib');
+const generalLib = require('../utils/lib/general.lib');
 const constants = require('../config/constant');
 const messages = require('../utils/messages');
 const User = require('../models/user.model');
@@ -45,7 +45,7 @@ const authMiddleware = async (req, res, next) => {
         next();
 
     } catch (error) {
-        Generallib.log1(["Error in authMiddleware ----->", error]);
+        generalLib.log1(["Error in authMiddleware ----->", error]);
         return handleUnauth(req, res);
     };
 };
@@ -58,7 +58,7 @@ const handleUnauth = async (req, res, message = messages.unauthorizedAccess) => 
     if (method === "GET") {
         return res.redirect("/login");
     } else {
-        return res.status(constants.STATUS.UNAUTHORIZED).json(Generallib.error_res(message));
+        return res.status(constants.STATUS.UNAUTHORIZED).json(generalLib.error_res(message));
     };
 };
 

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const constants = require('../config/constant');
-const Generallib = require('../utils/lib/general.lib');
+const generalLib = require('../utils/lib/general.lib');
 const messages = require('../utils/messages');
 const User = require('../models/user.model');
 const Session = require('../models/session.model');
@@ -23,8 +23,8 @@ const getDashboardPage = (req, res) => {
             },
         });
     } catch (error) {
-        Generallib.log1(["Error in getDashboardPage----->", error]);
-        return res.json(Generallib.error_res(messages.unexpectedDataError));
+        generalLib.log1(["Error in getDashboardPage----->", error]);
+        return res.json(generalLib.error_res(messages.unexpectedDataError));
     };
 };
 
@@ -37,10 +37,10 @@ const postSignOut = async (req, res) => {
 
         req.session.destroy();
 
-        return res.status(constants.STATUS.OK).json(Generallib.success_res("Sign out successfully."));
+        return res.status(constants.STATUS.OK).json(generalLib.success_res("Sign out successfully."));
     } catch (error) {
-        Generallib.log1(["Error in postSignOut----->", error]);
-        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
+        generalLib.log1(["Error in postSignOut----->", error]);
+        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(generalLib.error_res(messages.unexpectedDataError));
     };
 };
 

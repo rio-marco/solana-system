@@ -1,5 +1,5 @@
 const Validator = require("validatorjs");
-const Generallib = require('../lib/general.lib');
+const generalLib = require('../lib/general.lib');
 
 const validateRules = {
     auth: {
@@ -20,7 +20,6 @@ const validateRules = {
         },
         verify2FACode: {
             email: "required|email",
-            password: "required",
             twoFACode: "required",
         },
     },
@@ -56,10 +55,10 @@ const customValidation = async (data, rules, customMessages = {}) => {
 
         error = error.replace("The ", "").replace(" field", "");
 
-        return Generallib.error_res(error);
+        return generalLib.error_res(error);
     };
 
-    return Generallib.success_res("Success");
+    return generalLib.success_res("Success");
 };
 
 const getRules = (rules) => {

@@ -1,7 +1,7 @@
 const { PublicKey } = require('@solana/web3.js');
 const { v4: uuidv4 } = require('uuid');
 const constants = require("../config/constant");
-const Generallib = require('../utils/lib/general.lib');
+const generalLib = require('../utils/lib/general.lib');
 const messages = require('../utils/messages');
 const { validateMemo, validateAmount } = require('../utils/validation');
 const { executeWithdrawalTransaction } = require('../services/solana.service');
@@ -14,33 +14,33 @@ const createWithdrawal = async (req, res, next) => {
         const { toAddress, memo, amount } = req.body;
 
         if (!toAddress || typeof toAddress !== 'string' || !toAddress.trim()) {
-            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Target Solana 'To Address' is required."));
+            return res.status(constants.STATUS.BAD_REQUEST).json(generalLib.error_res("Target Solana 'To Address' is required."));
         };
 
         try {
             new PublicKey(toAddress.trim());
         } catch (err) {
-            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Invalid Solana public key in 'To Address'."));
+            return res.status(constants.STATUS.BAD_REQUEST).json(generalLib.error_res("Invalid Solana public key in 'To Address'."));
         };
 
         const memoVal = validateMemo(memo);
         if (!memoVal.isValid) {
-            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res(memoVal.error));
+            return res.status(constants.STATUS.BAD_REQUEST).json(generalLib.error_res(memoVal.error));
         };
 
         const amountVal = validateAmount(amount);
         if (!amountVal.isValid) {
-            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res(amountVal.error));
+            return res.status(constants.STATUS.BAD_REQUEST).json(generalLib.error_res(amountVal.error));
         };
 
         const user = await User.findById(req.user._id);
         if (!user) {
-            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("User session not found."));
+            return res.status(constants.STATUS.BAD_REQUEST).json(generalLib.error_res("User session not found."));
         };
 
         const currentBalance = user.walletBalance || 0;
         if (amountVal.numericAmount > currentBalance) {
-            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res(`Insufficient wallet balance. Maximum withdrawable balance is ${currentBalance.toFixed(6)} SOL.`));
+            return res.status(constants.STATUS.BAD_REQUEST).json(generalLib.error_res(`Insufficient wallet balance. Maximum withdrawable balance is ${currentBalance.toFixed(6)} SOL.`));
         };
 
         const withdrawId = `WITH-${uuidv4().substring(0, 8).toUpperCase()}`;
@@ -106,18 +106,18 @@ const createWithdrawal = async (req, res, next) => {
                 updatedWalletBalance: user.walletBalance,
             };
 
-            return res.status(constants.STATUS.OK).json(Generallib.success_res("Withdrawal completed successfully on Solana blockchain!", responsePayload));
+            return res.status(constants.STATUS.OK).json(generalLib.success_res("Withdrawal completed successfully on Solana blockchain!", responsePayload));
         } catch (txErr) {
             withdrawal.status = 'FAILED';
             withdrawal.failureReason = txErr.message;
             await withdrawal.save();
 
-            Generallib.log1(["createWithdrawal Error----------->", txErr.message]);
-            return res.status(constants.STATUS.BAD_REQUEST).json(Generallib.error_res("Solana withdrawal transaction failed"));
+            generalLib.log1(["createWithdrawal Error----------->", txErr.message]);
+            return res.status(constants.STATUS.BAD_REQUEST).json(generalLib.error_res("Solana withdrawal transaction failed"));
         };
     } catch (err) {
-        Generallib.log1(["createWithdrawal Error Message----------->", err.message]);
-        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
+        generalLib.log1(["createWithdrawal Error Message----------->", err.message]);
+        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(generalLib.error_res(messages.unexpectedDataError));
     };
 };
 
@@ -150,10 +150,10 @@ const getWithdrawals = async (req, res, next) => {
             },
         };
 
-        return res.status(constants.STATUS.OK).json(Generallib.success_res("Withdrawal list get successfully!", responsePayload));
+        return res.status(constants.STATUS.OK).json(generalLib.success_res("Withdrawal list get successfully!", responsePayload));
     } catch (err) {
-        Generallib.log1(["getWithdrawals Error----------->", err.message]);
-        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
+        generalLib.log1(["getWithdrawals Error----------->", err.message]);
+        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(generalLib.error_res(messages.unexpectedDataError));
     };
 };
 

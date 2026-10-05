@@ -3,7 +3,7 @@
 const { Connection, PublicKey, Keypair } = require('@solana/web3.js');
 const bs58 = require('bs58');
 const Setting = require('../models/setting.model');
-const Generallib = require('../utils/lib/general.lib');
+const generalLib = require('../utils/lib/general.lib');
 
 const network = process.env.SOLANA_NETWORK || 'devnet';
 const rpcUrl = process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com';
@@ -31,7 +31,7 @@ const parseKeypair = (keyString) => {
             return Keypair.fromSecretKey(decoded);
         };
     } catch (err) {
-        Generallib.log1(["[Solana Config Error] Failed to parse keypair:", err.message]);
+        generalLib.log1(["[Solana Config Error] Failed to parse keypair:", err.message]);
         return null;
     };
 };

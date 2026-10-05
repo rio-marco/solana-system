@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Generallib = require('../lib/general.lib');
+const generalLib = require('../lib/general.lib');
 const Session = require('../../models/session.model');
 
 const { ObjectId } = mongoose.Types;
@@ -9,7 +9,7 @@ const sessionHelper = {
         const MAX_RETRIES = 3;
 
         try {
-            const authToken = await Generallib.generateAuthToken({ _id: userId.toString() });
+            const authToken = await generalLib.generateAuthToken({ _id: userId.toString() });
             if (!authToken) {
                 if (retryCount < MAX_RETRIES) {
                     return sessionHelper.generateAndStoreSession(
@@ -20,7 +20,7 @@ const sessionHelper = {
                     );
                 };
 
-                Generallib.log1(["Failed to generate auth token after retries", { userId, retryCount }]);
+                generalLib.log1(["Failed to generate auth token after retries", { userId, retryCount }]);
 
                 return null;
             };
@@ -45,14 +45,14 @@ const sessionHelper = {
                     );
                 };
 
-                Generallib.log1(["Failed to create session after retries", { userId, retryCount }]);
+                generalLib.log1(["Failed to create session after retries", { userId, retryCount }]);
 
                 return null;
             };
 
             return sessionDetails;
         } catch (error) {
-            Generallib.log1(["Error in generateAndStoreSession ----->", error]);
+            generalLib.log1(["Error in generateAndStoreSession ----->", error]);
             return null;
         };
     },

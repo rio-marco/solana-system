@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-const Generallib = require('../utils/lib/general.lib');
+const generalLib = require('../utils/lib/general.lib');
 
 const transporter = nodemailer.createTransport({
     host: process.env.MAIL_HOST,
@@ -15,10 +15,10 @@ const sendMail = async (mailOptions) => {
     return new Promise((resolve, reject) => {
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-                Generallib.log1(["[MailService] Error sending email------->", error]);
+                generalLib.log1(["[MailService] Error sending email------->", error]);
                 reject(error);
             } else {
-                Generallib.log1(["[MailService] Email sent successfully:", info.response]);
+                generalLib.log1(["[MailService] Email sent successfully:", info.response]);
                 resolve(info);
             };
         });

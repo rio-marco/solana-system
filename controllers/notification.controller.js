@@ -1,5 +1,5 @@
 const Notification = require('../models/notification.model');
-const Generallib = require('../utils/lib/general.lib');
+const generalLib = require('../utils/lib/general.lib');
 const messages = require('../utils/messages');
 const constants = require("../config/constant");
 
@@ -32,10 +32,10 @@ const getNotifications = async (req, res, next) => {
             },
         };
 
-        return res.status(constants.STATUS.OK).json(Generallib.success_res("Notification list get successfully!", responsePayload));
+        return res.status(constants.STATUS.OK).json(generalLib.success_res("Notification list get successfully!", responsePayload));
     } catch (err) {
-        Generallib.log1(['[Get Notifications Error]:', err.message]);
-        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
+        generalLib.log1(['[Get Notifications Error]:', err.message]);
+        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(generalLib.error_res(messages.unexpectedDataError));
     }
 };
 
@@ -45,10 +45,10 @@ const markAllAsRead = async (req, res, next) => {
 
         await Notification.updateMany({ userId, isRead: false }, { $set: { isRead: true } });
 
-        return res.status(constants.STATUS.OK).json(Generallib.success_res("All notifications marked as read."));
+        return res.status(constants.STATUS.OK).json(generalLib.success_res("All notifications marked as read."));
     } catch (err) {
-        Generallib.log1(['[Mark Read Notifications Error]:', err.message]);
-        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(Generallib.error_res(messages.unexpectedDataError));
+        generalLib.log1(['[Mark Read Notifications Error]:', err.message]);
+        return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(generalLib.error_res(messages.unexpectedDataError));
     }
 };
 

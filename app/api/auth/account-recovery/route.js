@@ -51,7 +51,7 @@ async function POST(req) {
         });
 
         const origin = req.nextUrl ? req.nextUrl.origin : (process.env.NODE_URL);
-        const loginUrl = `${origin}/api/auth/direct-login?email=${encodeURIComponent(user.email)}&token=${encodeURIComponent(token)}`;
+        const loginUrl = `${origin}/api/auth/direct-login?email=${encodeURIComponent(user.email)}&token=${encodeURIComponent(verificationToken)}`;
 
         try {
             await sendMail({

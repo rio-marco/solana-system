@@ -35,6 +35,7 @@ export const RecoveryModal = ({ isOpen, onClose }) => {
                 const succMsg = res.data.msg || res.data.message || 'Recovery email sent successfully. Please check your inbox.';
                 setMessage(succMsg);
                 toastSuccess(succMsg);
+                onClose();
             } else {
                 const errMsg = res.data?.msg || res.data?.message || 'Invalid recovery phrase.';
                 setError(errMsg);

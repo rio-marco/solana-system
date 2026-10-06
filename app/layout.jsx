@@ -1,6 +1,7 @@
 import './globals.css';
 import { AuthProvider } from '../context/AuthContext';
 import { SocketProvider } from '../context/SocketContext';
+import { ToastProvider } from '../context/ToastContext';
 
 export const metadata = {
     title: 'Solana SOL Deposit & Withdrawal System',
@@ -19,11 +20,13 @@ export default function RootLayout({ children }) {
                 />
             </head>
             <body>
-                <AuthProvider>
-                    <SocketProvider>
-                        {children}
-                    </SocketProvider>
-                </AuthProvider>
+                <ToastProvider>
+                    <AuthProvider>
+                        <SocketProvider>
+                            {children}
+                        </SocketProvider>
+                    </AuthProvider>
+                </ToastProvider>
             </body>
         </html>
     );

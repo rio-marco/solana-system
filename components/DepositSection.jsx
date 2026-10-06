@@ -4,10 +4,12 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { QrCode, Copy, Check, Send, AlertCircle, CheckCircle, Tag } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { copyTextToClipboard } from '../lib/clipboard';
 
 export const DepositSection = ({ onDepositSuccess }) => {
     const { user, updateUserData } = useAuth();
+    const { toastError, toastSuccess, toastInfo } = useToast();
     const [address, setAddress] = useState('');
     const [amount, setAmount] = useState('');
     const [copied, setCopied] = useState(false);
@@ -24,7 +26,9 @@ export const DepositSection = ({ onDepositSuccess }) => {
                 setAddress(res.data.data.address || '');
             };
         } catch (err) {
-            setError('Failed to fetch platform deposit address.');
+            const msg = 'Failed to fetch platform deposit address.';
+            setError(msg);
+            toastError(msg);
         } finally {
             setFetchingAddr(false);
         };
@@ -39,6 +43,7 @@ export const DepositSection = ({ onDepositSuccess }) => {
             const ok = await copyTextToClipboard(address);
             if (ok) {
                 setCopied(true);
+                toastInfo('Deposit address copied to clipboard!');
                 setTimeout(() => setCopied(false), 2000);
             };
         };
@@ -51,7 +56,9 @@ export const DepositSection = ({ onDepositSuccess }) => {
 
         const numAmount = parseFloat(amount);
         if (isNaN(numAmount) || numAmount <= 0) {
-            setError('Please enter a valid deposit amount.');
+            const msg = 'Please enter a valid deposit amount.';
+            setError(msg);
+            toastError(msg);
             return;
         };
 
@@ -63,7 +70,9 @@ export const DepositSection = ({ onDepositSuccess }) => {
             });
 
             if (res.data && res.data.flag) {
-                setSuccess(`Successfully deposited ${numAmount} SOL on Solana network!`);
+                const succMsg = res.data.msg || `Successfully deposited ${numAmount} SOL on Solana network!`;
+                setSuccess(succMsg);
+                toastSuccess(succMsg);
                 setAmount('');
 
                 if (res.data.data && res.data.data.updatedWalletBalance !== undefined) {
@@ -72,10 +81,14 @@ export const DepositSection = ({ onDepositSuccess }) => {
 
                 if (onDepositSuccess) onDepositSuccess();
             } else {
-                setError(res.data.message || 'Deposit failed.');
+                const errMsg = res.data?.msg || res.data?.message || 'Deposit failed.';
+                setError(errMsg);
+                toastError(errMsg);
             };
         } catch (err) {
-            setError(err.response?.data?.message || 'Deposit transaction failed on Solana network.');
+            const errMsg = err.response?.data?.msg || err.response?.data?.message || 'Deposit transaction failed on Solana network.';
+            setError(errMsg);
+            toastError(errMsg);
         } finally {
             setLoading(false);
         };

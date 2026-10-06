@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { User, Mail, UserPlus, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 
 export default function SignupPage() {
     const [fullName, setFullName] = useState('');
@@ -13,6 +14,7 @@ export default function SignupPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const { user, loading: authLoading } = useAuth();
+    const { toastError, toastSuccess } = useToast();
     const router = useRouter();
 
     useEffect(() => {
@@ -26,7 +28,9 @@ export default function SignupPage() {
         setError(null);
 
         if (!fullName.trim() || !email.trim()) {
-            setError('Full name and email address are required.');
+            const msg = 'Full name and email address are required.';
+            setError(msg);
+            toastError(msg);
             return;
         };
 
@@ -38,12 +42,17 @@ export default function SignupPage() {
             });
 
             if (res.data && res.data.flag) {
+                toastSuccess(res.data.msg || 'Account registered! Verification code sent.');
                 router.push(`/verify-otp?email=${encodeURIComponent(email.trim())}`);
             } else {
-                setError(res.data.message || 'Registration failed.');
+                const msg = res.data?.msg || res.data?.message || 'Registration failed.';
+                setError(msg);
+                toastError(msg);
             };
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to create account.');
+            const msg = err.response?.data?.msg || err.response?.data?.message || 'Failed to create account.';
+            setError(msg);
+            toastError(msg);
         } finally {
             setLoading(false);
         };

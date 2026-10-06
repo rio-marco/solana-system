@@ -4,9 +4,11 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { ArrowUpRight, Send, AlertCircle, CheckCircle, Tag, Wallet } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 export const WithdrawSection = ({ onWithdrawSuccess }) => {
     const { user, updateUserData } = useAuth();
+    const { toastError, toastSuccess } = useToast();
     const [toAddress, setToAddress] = useState('');
     const [amount, setAmount] = useState('');
     const [loading, setLoading] = useState(false);
@@ -20,12 +22,16 @@ export const WithdrawSection = ({ onWithdrawSuccess }) => {
 
         const numAmount = parseFloat(amount);
         if (!toAddress.trim()) {
-            setError('Target Solana wallet address is required.');
+            const msg = 'Target Solana wallet address is required.';
+            setError(msg);
+            toastError(msg);
             return;
         };
 
         if (isNaN(numAmount) || numAmount <= 0) {
-            setError('Please enter a valid SOL withdrawal amount.');
+            const msg = 'Please enter a valid SOL withdrawal amount.';
+            setError(msg);
+            toastError(msg);
             return;
         };
 
@@ -38,7 +44,9 @@ export const WithdrawSection = ({ onWithdrawSuccess }) => {
             });
 
             if (res.data && res.data.flag) {
-                setSuccess('Withdrawal transaction executed & confirmed on Solana!');
+                const succMsg = res.data.msg || 'Withdrawal transaction executed & confirmed on Solana!';
+                setSuccess(succMsg);
+                toastSuccess(succMsg);
                 setToAddress('');
                 setAmount('');
 
@@ -48,10 +56,14 @@ export const WithdrawSection = ({ onWithdrawSuccess }) => {
 
                 if (onWithdrawSuccess) onWithdrawSuccess();
             } else {
-                setError(res.data.message || 'Withdrawal failed.');
+                const errMsg = res.data?.msg || res.data?.message || 'Withdrawal failed.';
+                setError(errMsg);
+                toastError(errMsg);
             };
         } catch (err) {
-            setError(err.response?.data?.message || 'Error processing Solana withdrawal.');
+            const errMsg = err.response?.data?.msg || err.response?.data?.message || 'Error processing Solana withdrawal.';
+            setError(errMsg);
+            toastError(errMsg);
         } finally {
             setLoading(false);
         };

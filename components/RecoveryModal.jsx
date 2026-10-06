@@ -3,12 +3,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Key, Unlock, AlertCircle, CheckCircle, X } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
 
 export const RecoveryModal = ({ isOpen, onClose }) => {
     const [phrase, setPhrase] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState(null);
     const [error, setError] = useState(null);
+    const { toastError, toastSuccess } = useToast();
 
     if (!isOpen) return null;
 
@@ -20,7 +22,9 @@ export const RecoveryModal = ({ isOpen, onClose }) => {
         setMessage(null);
 
         if (wordCount !== 12) {
-            setError('Please enter all 12 words of your recovery phrase.');
+            const msg = 'Please enter all 12 words of your recovery phrase.';
+            setError(msg);
+            toastError(msg);
             return;
         };
 
@@ -28,12 +32,18 @@ export const RecoveryModal = ({ isOpen, onClose }) => {
             setLoading(true);
             const res = await axios.post('/api/auth/account-recovery', { recoveryPhrase: phrase.trim() });
             if (res.data && res.data.flag) {
-                setMessage(res.data.message || 'Recovery email sent successfully. Please check your inbox.');
+                const succMsg = res.data.msg || res.data.message || 'Recovery email sent successfully. Please check your inbox.';
+                setMessage(succMsg);
+                toastSuccess(succMsg);
             } else {
-                setError(res.data.message || 'Invalid recovery phrase.');
+                const errMsg = res.data?.msg || res.data?.message || 'Invalid recovery phrase.';
+                setError(errMsg);
+                toastError(errMsg);
             };
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to submit recovery phrase.');
+            const errMsg = err.response?.data?.msg || err.response?.data?.message || 'Failed to submit recovery phrase.';
+            setError(errMsg);
+            toastError(errMsg);
         } finally {
             setLoading(false);
         };

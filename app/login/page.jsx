@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Coins, Mail, LogIn, Key, AlertCircle, Info } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import { RecoveryModal } from '../../components/RecoveryModal';
 
 export default function LoginPage() {
@@ -14,6 +15,7 @@ export default function LoginPage() {
     const [error, setError] = useState(null);
     const [showRecovery, setShowRecovery] = useState(false);
     const { user, loading: authLoading } = useAuth();
+    const { toastError, toastSuccess } = useToast();
     const router = useRouter();
 
     useEffect(() => {
@@ -27,7 +29,9 @@ export default function LoginPage() {
         setError(null);
 
         if (!email || !email.trim()) {
-            setError('Please enter your email address.');
+            const msg = 'Please enter your email address.';
+            setError(msg);
+            toastError(msg);
             return;
         };
 
@@ -35,19 +39,24 @@ export default function LoginPage() {
             setLoading(true);
             const res = await axios.post('/api/auth/login', { email: email.trim() });
             if (res.data && res.data.flag) {
+                toastSuccess(res.data.msg || 'OTP sent to your email address.');
                 router.push(`/verify-otp?email=${encodeURIComponent(email.trim())}`);
             } else {
                 if (res.data && res.data.data && res.data.data.redirectUrl) {
                     router.push(res.data.data.redirectUrl);
                 } else {
-                    setError(res.data.message || 'Login request failed.');
+                    const msg = res.data?.msg || res.data?.message || 'Login request failed.';
+                    setError(msg);
+                    toastError(msg);
                 };
             };
         } catch (err) {
             if (err.response?.data?.data?.redirectUrl) {
                 router.push(err.response.data.data.redirectUrl);
             } else {
-                setError(err.response?.data?.message || 'Invalid login attempt.');
+                const msg = err.response?.data?.msg || err.response?.data?.message || 'Invalid login attempt.';
+                setError(msg);
+                toastError(msg);
             };
         } finally {
             setLoading(false);

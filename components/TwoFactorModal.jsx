@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { ShieldCheck, AlertCircle, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { useRouter } from 'next/navigation';
 
 export const TwoFactorModal = ({ isOpen, onClose, email, tempUserId }) => {
@@ -11,6 +12,7 @@ export const TwoFactorModal = ({ isOpen, onClose, email, tempUserId }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const { checkAuth } = useAuth();
+    const { toastError, toastSuccess } = useToast();
     const router = useRouter();
 
     if (!isOpen) return null;
@@ -20,7 +22,9 @@ export const TwoFactorModal = ({ isOpen, onClose, email, tempUserId }) => {
         setError(null);
 
         if (!code || code.length !== 6) {
-            setError('Please enter a 6-digit authenticator code.');
+            const msg = 'Please enter a 6-digit authenticator code.';
+            setError(msg);
+            toastError(msg);
             return;
         };
 
@@ -28,14 +32,19 @@ export const TwoFactorModal = ({ isOpen, onClose, email, tempUserId }) => {
             setLoading(true);
             const res = await axios.post('/api/auth/verify-2fa-code', { email, code, tempUserId });
             if (res.data && res.data.flag) {
+                toastSuccess(res.data.msg || '2FA Verification successful.');
                 await checkAuth();
                 onClose();
                 router.push('/');
             } else {
-                setError(res.data.message || 'Invalid 2FA authentication code.');
+                const errMsg = res.data?.msg || res.data?.message || 'Invalid 2FA authentication code.';
+                setError(errMsg);
+                toastError(errMsg);
             };
         } catch (err) {
-            setError(err.response?.data?.message || 'Verification failed. Try again.');
+            const errMsg = err.response?.data?.msg || err.response?.data?.message || 'Verification failed. Try again.';
+            setError(errMsg);
+            toastError(errMsg);
         } finally {
             setLoading(false);
         };

@@ -4,9 +4,11 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { User as UserIcon, Camera, Save, AlertCircle, CheckCircle, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 export const ProfileModal = ({ isOpen, onClose }) => {
     const { user, updateUserData } = useAuth();
+    const { toastError, toastSuccess } = useToast();
     const [fullName, setFullName] = useState(user?.fullName || '');
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState(user?.profilePhoto ? (user.profilePhoto.startsWith('/') ? user.profilePhoto : `/${user.profilePhoto}`) : null);
@@ -30,7 +32,9 @@ export const ProfileModal = ({ isOpen, onClose }) => {
         setSuccess(null);
 
         if (!fullName.trim()) {
-            setError('Full name is required.');
+            const msg = 'Full name is required.';
+            setError(msg);
+            toastError(msg);
             return;
         };
 
@@ -48,15 +52,21 @@ export const ProfileModal = ({ isOpen, onClose }) => {
 
             if (res.data && res.data.flag && res.data.data) {
                 updateUserData(res.data.data.user);
-                setSuccess('Profile updated successfully.');
+                const succMsg = res.data.msg || 'Profile updated successfully.';
+                setSuccess(succMsg);
+                toastSuccess(succMsg);
                 setTimeout(() => {
                     onClose();
                 }, 1200);
             } else {
-                setError(res.data.message || 'Failed to update profile.');
+                const errMsg = res.data?.msg || res.data?.message || 'Failed to update profile.';
+                setError(errMsg);
+                toastError(errMsg);
             };
         } catch (err) {
-            setError(err.response?.data?.message || 'Error updating profile.');
+            const errMsg = err.response?.data?.msg || err.response?.data?.message || 'Error updating profile.';
+            setError(errMsg);
+            toastError(errMsg);
         } finally {
             setLoading(false);
         };

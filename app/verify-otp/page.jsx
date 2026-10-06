@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { ShieldCheck, Check, AlertCircle, Copy, Key } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import { copyTextToClipboard } from '../../lib/clipboard';
 
 function VerifyOtpContent() {
@@ -19,6 +20,7 @@ function VerifyOtpContent() {
     const [copiedPhrase, setCopiedPhrase] = useState(false);
     const [confirmedCheck, setConfirmedCheck] = useState(false);
     const { checkAuth } = useAuth();
+    const { toastError, toastSuccess } = useToast();
     const router = useRouter();
 
     useEffect(() => {
@@ -32,7 +34,9 @@ function VerifyOtpContent() {
         setError(null);
 
         if (otp.length !== 6) {
-            setError('Please enter the complete 6-digit OTP code.');
+            const msg = 'Please enter the complete 6-digit OTP code.';
+            setError(msg);
+            toastError(msg);
             return;
         };
 
@@ -40,6 +44,7 @@ function VerifyOtpContent() {
             setLoading(true);
             const res = await axios.post('/api/auth/verify-otp', { email, otp });
             if (res.data && res.data.flag) {
+                toastSuccess(res.data.msg || 'OTP Verified successfully!');
                 if (res.data.data && res.data.data.recoveryPhrase) {
                     setRecoveryPhrase(res.data.data.recoveryPhrase);
                 } else {
@@ -47,10 +52,14 @@ function VerifyOtpContent() {
                     router.push('/');
                 };
             } else {
-                setError(res.data.message || 'OTP verification failed.');
+                const msg = res.data?.msg || res.data?.message || 'OTP verification failed.';
+                setError(msg);
+                toastError(msg);
             };
         } catch (err) {
-            setError(err.response?.data?.message || 'Invalid or expired OTP code.');
+            const msg = err.response?.data?.msg || err.response?.data?.message || 'Invalid or expired OTP code.';
+            setError(msg);
+            toastError(msg);
         } finally {
             setLoading(false);
         };

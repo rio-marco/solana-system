@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { ShieldCheck, Check, AlertCircle, Copy, Key } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { copyTextToClipboard } from '../utils/clipboard';
 
 export const VerifyOtpPage = () => {
   const [searchParams] = useSearchParams();
@@ -57,11 +58,13 @@ export const VerifyOtpPage = () => {
     navigate('/');
   };
 
-  const copyPhrase = () => {
+  const copyPhrase = async () => {
     if (recoveryPhrase) {
-      navigator.clipboard.writeText(recoveryPhrase);
-      setCopiedPhrase(true);
-      setTimeout(() => setCopiedPhrase(false), 2000);
+      const ok = await copyTextToClipboard(recoveryPhrase);
+      if (ok) {
+        setCopiedPhrase(true);
+        setTimeout(() => setCopiedPhrase(false), 2000);
+      }
     }
   };
 

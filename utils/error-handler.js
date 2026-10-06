@@ -13,7 +13,7 @@ const errorHandler = async (app) => {
             if (method === "GET") {
                 return res.render("error500", { layout: false });
             } else {
-                return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(errorResponse(messages.internalServerError));
+                return res.status(constants.STATUS.INTERNAL_SERVER_ERROR).json(generalLib.error_res(messages.internalServerError));
             };
         };
     });
@@ -25,7 +25,7 @@ const errorHandler = async (app) => {
         if (method === "GET") {
             return res.render("error404", { layout: false });
         } else {
-            return res.status(constants.STATUS.NOT_FOUND).json(errorResponse(messages.invalidEndpointOrMethod));
+            return res.status(constants.STATUS.NOT_FOUND).json(generalLib.error_res(messages.invalidEndpointOrMethod));
         };
     });
 };

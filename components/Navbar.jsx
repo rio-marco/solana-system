@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Coins, Bell, LogOut, Code } from 'lucide-react';
+import { Coins, Bell, LogOut, Code, Wallet } from 'lucide-react';
 import { ProfileModal } from './ProfileModal';
 import { NotificationsDrawer } from './NotificationsDrawer';
 import { TransactionDecoderModal } from './TransactionDecoderModal';
@@ -36,6 +36,26 @@ export const Navbar = () => {
                     {/* Right Action Menu */}
                     {user && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.4rem',
+                                    padding: '0.4rem 0.85rem',
+                                    borderRadius: '12px',
+                                    background: 'rgba(20, 241, 149, 0.08)',
+                                    border: '1px solid rgba(20, 241, 149, 0.25)',
+                                    boxShadow: '0 0 12px rgba(20, 241, 149, 0.08)',
+                                }}
+                                title="Wallet Balance"
+                            >
+                                <Wallet size={16} style={{ color: '#14F195' }} />
+                                <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>Balance:</span>
+                                <span style={{ fontSize: '0.85rem', color: '#14F195', fontWeight: 800, fontFamily: 'monospace' }}>
+                                    {(user.walletBalance || 0).toFixed(4)} SOL
+                                </span>
+                            </div>
+
                             <button
                                 onClick={() => setShowDecoder(true)}
                                 className="solana-btn-outline"

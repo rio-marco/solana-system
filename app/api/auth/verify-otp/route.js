@@ -74,7 +74,7 @@ async function POST(req) {
             responseData.recoveryPhrase = user.recoveryPhrase;
         };
 
-        const response = successResponse("Authentication successful.", responseData);
+        const response = successResponse("OTP verified successfully!.", responseData);
 
         const cookieOptions = {
             httpOnly: true,

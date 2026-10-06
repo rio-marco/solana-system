@@ -1,3 +1,4 @@
+const { v4: uuidv4 } = require('uuid');
 const constants = require('../../../../lib/constants');
 const messages = require('../../../../lib/messages');
 const User = require('../../../../lib/models/user.model');
@@ -75,7 +76,7 @@ async function POST(req) {
             return errorResponse(messages.unexpectedDataError);
         };
 
-        const origin = req.nextUrl ? req.nextUrl.origin : (process.env.NODE_URL || 'http://localhost:3000');
+        const origin = req.nextUrl ? req.nextUrl.origin : (process.env.NODE_URL);
         const loginUrl = `${origin}/api/auth/direct-login?email=${encodeURIComponent(createdUser.email)}&token=${encodeURIComponent(verificationToken)}`;
 
         try {

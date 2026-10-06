@@ -1,3 +1,4 @@
+const { v4: uuidv4 } = require('uuid');
 const constants = require('../../../../lib/constants');
 const messages = require('../../../../lib/messages');
 const User = require('../../../../lib/models/user.model');
@@ -60,7 +61,7 @@ async function POST(req) {
 
         await OTP.create(otpPayload);
 
-        const origin = req.nextUrl ? req.nextUrl.origin : (process.env.NODE_URL || 'http://localhost:3000');
+        const origin = req.nextUrl ? req.nextUrl.origin : (process.env.NODE_URL);
         const loginUrl = `${origin}/api/auth/direct-login?email=${encodeURIComponent(cleanEmail)}&token=${encodeURIComponent(verificationToken)}`;
 
         try {

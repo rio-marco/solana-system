@@ -39,7 +39,6 @@ nextApp.prepare().then(async () => {
         });
     });
 
-    // Dynamic CORS headers for Localhost & IP 192.168.0.131
     app.use((req, res, next) => {
         const origin = req.headers.origin;
         if (origin) {
@@ -57,11 +56,9 @@ nextApp.prepare().then(async () => {
     app.use(cookieParser());
 
 
-    // Static uploads directory for user profile images
     app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
     app.use(express.static(path.join(__dirname, 'public')));
 
-    // Delegate all page and API requests to Next.js handler
     app.all('*', (req, res) => {
         return nextHandler(req, res);
     });

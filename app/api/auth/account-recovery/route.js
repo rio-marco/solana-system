@@ -50,7 +50,7 @@ async function POST(req) {
             directUrlExpires: directUrlExpires,
         });
 
-        const origin = req.nextUrl ? req.nextUrl.origin : (process.env.NODE_URL || 'http://localhost:3000');
+        const origin = req.nextUrl ? req.nextUrl.origin : (process.env.NODE_URL);
         const loginUrl = `${origin}/api/auth/direct-login?email=${encodeURIComponent(user.email)}&token=${encodeURIComponent(token)}`;
 
         try {

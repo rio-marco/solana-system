@@ -4,9 +4,8 @@ const mongoose = require('mongoose');
 const { Connection, PublicKey, LAMPORTS_PER_SOL } = require('@solana/web3.js');
 require('dotenv').config();
 
-const connectDatabase = require('../config/database');
-const Setting = require('../models/setting.model');
-const generalLib = require('../utils/lib/general.lib');
+const connectDatabase = require('../lib/db');
+const Setting = require('../lib/models/setting.model');
 
 const DEVNET_RPCS = [
     process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com',
@@ -21,8 +20,8 @@ const DEVNET_RPCS = [
         const senderPubStr = (await Setting.getVal('SOLANA_SENDER_PUBLIC_KEY')) || process.env.SOLANA_SENDER_PUBLIC_KEY;
 
         if (!senderPubStr || senderPubStr.startsWith('YOUR_')) {
-            generalLib.log1(["❌ Error: SOLANA_SENDER_PUBLIC_KEY is not configured in Database setting."]);
-            generalLib.log1(['Please run "npm run create-wallet" first.']);
+            console.error("❌ Error: SOLANA_SENDER_PUBLIC_KEY is not configured in Database setting.");
+            console.log('Please run "npm run create-wallet" first.');
             await mongoose.disconnect();
             process.exit(1);
         };
@@ -44,8 +43,8 @@ const DEVNET_RPCS = [
                 }, 'confirmed');
 
                 const newBalance = await connection.getBalance(senderPubKey);
-                generalLib.log1(['\n✅ Airdrop Successful!']);
-                generalLib.log1([`New Sender Wallet Balance: ${newBalance / LAMPORTS_PER_SOL} SOL\n`]);
+                console.log('\n✅ Airdrop Successful!');
+                console.log(`New Sender Wallet Balance: ${newBalance / LAMPORTS_PER_SOL} SOL\n`);
                 success = true;
                 break;
             } catch (err) {
@@ -54,14 +53,14 @@ const DEVNET_RPCS = [
         };
 
         if (!success) {
-            generalLib.log1(['\n❌ All automatic RPC airdrop attempts failed (Public Devnet RPCs are rate-limited).']);
-            generalLib.log1([`You can manually request SOL at https://faucet.solana.com/ for sender address: ${senderPubStr}`]);
+            console.log('\n❌ All automatic RPC airdrop attempts failed (Public Devnet RPCs are rate-limited).');
+            console.log(`You can manually request SOL at https://faucet.solana.com/ for sender address: ${senderPubStr}`);
         };
 
         await mongoose.disconnect();
         process.exit(success ? 0 : 1);
     } catch (err) {
-        generalLib.log1(["❌ Error running airdrop script:", err.message]);
+        console.error("❌ Error running airdrop script:", err.message);
         process.exit(1);
     }
 })();

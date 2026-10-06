@@ -5,9 +5,8 @@ const { Keypair } = require('@solana/web3.js');
 const bs58 = require('bs58');
 require('dotenv').config();
 
-const connectDatabase = require('../config/database');
-const Setting = require('../models/setting.model');
-const generalLib = require('../utils/lib/general.lib');
+const connectDatabase = require('../lib/db');
+const Setting = require('../lib/models/setting.model');
 
 (async () => {
     try {
@@ -20,14 +19,14 @@ const generalLib = require('../utils/lib/general.lib');
             try {
                 const decoded = bs58.decode(platformPrivSetting.trim());
                 platformKeypair = Keypair.fromSecretKey(decoded);
-                generalLib.log1(["[Platform Wallet] Existing loaded:", platformKeypair.publicKey.toBase58()]);
+                console.log("[Platform Wallet] Existing loaded:", platformKeypair.publicKey.toBase58());
             } catch (e) {
                 platformKeypair = Keypair.generate();
-                generalLib.log1(["[Platform Wallet] NEW generated:", platformKeypair.publicKey.toBase58()]);
+                console.log("[Platform Wallet] NEW generated:", platformKeypair.publicKey.toBase58());
             };
         } else {
             platformKeypair = Keypair.generate();
-            generalLib.log1(["[Platform Wallet] NEW generated:", platformKeypair.publicKey.toBase58()]);
+            console.log("[Platform Wallet] NEW generated:", platformKeypair.publicKey.toBase58());
         };
 
         let senderPrivSetting = await Setting.getVal('SOLANA_SENDER_PRIVATE_KEY');
@@ -37,14 +36,14 @@ const generalLib = require('../utils/lib/general.lib');
             try {
                 const decoded = bs58.decode(senderPrivSetting.trim());
                 senderKeypair = Keypair.fromSecretKey(decoded);
-                generalLib.log1(["[Sender Wallet] Existing loaded:", senderKeypair.publicKey.toBase58()]);
+                console.log("[Sender Wallet] Existing loaded:", senderKeypair.publicKey.toBase58());
             } catch (e) {
                 senderKeypair = Keypair.generate();
-                generalLib.log1(["[Sender Wallet] NEW generated:", senderKeypair.publicKey.toBase58()]);
+                console.log("[Sender Wallet] NEW generated:", senderKeypair.publicKey.toBase58());
             };
         } else {
             senderKeypair = Keypair.generate();
-            generalLib.log1(["[Sender Wallet] NEW generated:", senderKeypair.publicKey.toBase58()]);
+            console.log("[Sender Wallet] NEW generated:", senderKeypair.publicKey.toBase58());
         };
 
         const platformPub = platformKeypair.publicKey.toBase58();
@@ -59,14 +58,14 @@ const generalLib = require('../utils/lib/general.lib');
         await Setting.setVal('SOLANA_SENDER_PUBLIC_KEY', senderPub, 'Demo sender wallet public key');
         await Setting.setVal('SOLANA_SENDER_PRIVATE_KEY', senderPriv, 'Demo sender wallet private key');
 
-        generalLib.log1(["\n✅ Keypairs generated and saved to MongoDB Setting table successfully!"]);
-        generalLib.log1(["Platform Public Key:", platformPub]);
-        generalLib.log1(["Sender Public Key:", senderPub]);
+        console.log("\n✅ Keypairs generated and saved to MongoDB Setting table successfully!");
+        console.log("Platform Public Key:", platformPub);
+        console.log("Sender Public Key:", senderPub);
 
         await mongoose.disconnect();
         process.exit(0);
     } catch (err) {
-        generalLib.log1(["❌ Error creating platform wallet:", err.message]);
+        console.error("❌ Error creating platform wallet:", err.message);
         process.exit(1);
     };
 })();

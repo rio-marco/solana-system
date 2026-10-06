@@ -1,0 +1,297 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --bg-dark: #07090e;
+    --bg-card: #0f1422;
+    --bg-card-hover: #161c2e;
+    --border-color: rgba(255, 255, 255, 0.08);
+    --border-glow: rgba(153, 69, 255, 0.35);
+
+    --solana-purple: #9945FF;
+    --solana-green: #14F195;
+    --solana-cyan: #00C2FF;
+    --solana-amber: #F59E0B;
+    --solana-gradient: linear-gradient(135deg, #9945FF 0%, #00C2FF 50%, #14F195 100%);
+    --solana-btn-gradient: linear-gradient(135deg, #9945FF 0%, #14F195 100%);
+
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    background-image:
+        radial-gradient(circle at 20% 10%, rgba(153, 69, 255, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 90%, rgba(20, 241, 149, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(0, 194, 255, 0.05) 0%, transparent 50%);
+    background-attachment: fixed;
+}
+
+.font-mono {
+    font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* Page Wrappers */
+.auth-page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+/* Glassmorphism Auth Card */
+.solana-auth-card {
+    max-width: 460px;
+    width: 100%;
+    background: rgba(15, 20, 34, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 2.5rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 30px rgba(153, 69, 255, 0.1);
+    transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.solana-auth-card:hover {
+    border-color: rgba(153, 69, 255, 0.3);
+}
+
+/* Header Badge */
+.solana-brand-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    border-radius: 30px;
+    background: rgba(153, 69, 255, 0.12);
+    border: 1px solid rgba(153, 69, 255, 0.3);
+    color: var(--solana-green);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* Form Input Group with Left Icon */
+.form-group-custom {
+    margin-bottom: 1.25rem;
+}
+
+.solana-input-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 0.45rem;
+    letter-spacing: 0.3px;
+}
+
+.solana-input-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.solana-input-icon-wrapper .input-svg-icon {
+    position: absolute;
+    left: 1.1rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    color: var(--solana-green);
+    pointer-events: none;
+    z-index: 5;
+}
+
+.solana-input-field {
+    width: 100%;
+    height: 48px;
+    background: rgba(7, 9, 14, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    padding: 0 1rem 0 3rem;
+    color: var(--text-main);
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.solana-input-field::placeholder {
+    color: var(--text-dim);
+    opacity: 0.8;
+}
+
+.solana-input-field:focus {
+    border-color: var(--solana-purple);
+    box-shadow: 0 0 15px rgba(153, 69, 255, 0.3);
+    background: rgba(7, 9, 14, 0.95);
+}
+
+/* OTP Code Box */
+.otp-input-field {
+    text-align: center !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 1.6rem !important;
+    letter-spacing: 0.6rem !important;
+    font-weight: 700 !important;
+    color: var(--solana-green) !important;
+    border-color: var(--solana-purple) !important;
+    padding: 0 1rem !important;
+}
+
+/* Primary Solana Action Button */
+.solana-btn-primary {
+    width: 100%;
+    height: 48px;
+    background: var(--solana-btn-gradient);
+    color: #05070a;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 20px rgba(20, 241, 149, 0.25);
+}
+
+.solana-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(153, 69, 255, 0.4);
+    opacity: 0.96;
+}
+
+.solana-btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Outline Secondary Button */
+.solana-btn-outline {
+    width: 100%;
+    height: 44px;
+    background: transparent;
+    color: var(--solana-amber);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    font-weight: 600;
+    font-size: 0.88rem;
+    border-radius: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.solana-btn-outline:hover {
+    background: rgba(245, 158, 11, 0.12);
+    border-color: var(--solana-amber);
+    color: #fff;
+}
+
+/* Alerts */
+.solana-alert-danger {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    color: #fca5a5;
+    padding: 0.85rem 1rem;
+    border-radius: 14px;
+    font-size: 0.85rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.solana-alert-success {
+    background: rgba(20, 241, 149, 0.12);
+    border: 1px solid rgba(20, 241, 149, 0.35);
+    color: #86efac;
+    padding: 0.85rem 1rem;
+    border-radius: 14px;
+    font-size: 0.85rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+/* Links */
+.solana-link {
+    color: var(--solana-cyan);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.solana-link:hover {
+    color: var(--solana-green);
+    text-decoration: underline;
+}
+
+/* Dashboard UI Layout */
+.dashboard-navbar {
+    background: rgba(15, 20, 34, 0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 1rem 2rem;
+}
+
+.dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+/* Modals */
+.solana-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.solana-modal-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+    padding: 2rem;
+}

@@ -9,6 +9,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const next = require('next');
 const connectDB = require('./lib/db');
+const { log1 } = require("./lib/general");
 
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const dev = process.env.NODE_ENV !== 'production';
@@ -66,11 +67,10 @@ nextApp.prepare().then(async () => {
     await connectDB();
 
     httpServer.listen(PORT, '0.0.0.0', () => {
-        console.log('Next.js System running on PORT ----->', PORT);
-        console.log('Local URL -----> http://localhost:' + PORT);
-        console.log('Network IP URL -----> http://192.168.0.131:' + PORT);
+        log1(['Next.js System running on PORT ----->', PORT]);
+        log1(['Next.js System URL -----> ', process.env.NODE_URL]);
     });
 }).catch((err) => {
-    console.error('Error starting Next.js server:', err);
+    log1('Error starting Next.js server:', err);
     process.exit(1);
 });

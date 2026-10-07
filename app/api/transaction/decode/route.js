@@ -1,6 +1,7 @@
 const { decodeTransactionDetails } = require('../../../../lib/services/solana.service');
-const messages = require('../../../../lib/messages');
 const { errorResponse, successResponse, log1 } = require("../../../../lib/general");
+
+const BASE58_REGEX = /^[1-9A-HJ-NP-Za-km-z]+$/;
 
 async function POST(req) {
     try {
@@ -11,12 +12,18 @@ async function POST(req) {
             return errorResponse("Transaction signature is required.");
         };
 
-        const decoded = await decodeTransactionDetails(signature.trim());
+        const cleanSig = signature.trim();
+
+        if (cleanSig.length < 80 || cleanSig.length > 95 || !BASE58_REGEX.test(cleanSig)) {
+            return errorResponse("Invalid Solana transaction signature format. Signature must be a valid Base58 string (80-90 characters).");
+        };
+
+        const decoded = await decodeTransactionDetails(cleanSig);
 
         return successResponse("Transaction decoded successfully.", decoded);
     } catch (err) {
         log1(['Error in transaction/decode API route:', err.message]);
-        return errorResponse(messages.unexpectedDataError);
+        return errorResponse("Could not decode transaction signature.");
     };
 };
 

@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Code, Search, AlertCircle, X } from 'lucide-react';
 
+const BASE58_REGEX = /^[1-9A-HJ-NP-Za-km-z]+$/;
+
 export const TransactionDecoderModal = ({ isOpen, onClose }) => {
     const [signature, setSignature] = useState('');
     const [loading, setLoading] = useState(false);
@@ -35,21 +37,30 @@ export const TransactionDecoderModal = ({ isOpen, onClose }) => {
         setError(null);
         setResult(null);
 
-        if (!signature.trim()) {
+        const cleanSig = signature.trim();
+
+        if (!cleanSig) {
             setError('Transaction signature is required.');
+            return;
+        };
+
+        // Frontend validation before calling API
+        if (cleanSig.length < 80 || cleanSig.length > 95 || !BASE58_REGEX.test(cleanSig)) {
+            setError('Invalid Solana transaction signature format. Signature must be a valid Base58 string (80-90 characters).');
             return;
         };
 
         try {
             setLoading(true);
-            const res = await axios.post('/api/transaction/decode', { signature: signature.trim() });
+            const res = await axios.post('/api/transaction/decode', { signature: cleanSig });
             if (res.data && res.data.flag && res.data.data) {
                 setResult(res.data.data);
             } else {
-                setError(res.data.message || 'Could not decode transaction.');
+                setError(res.data?.msg || res.data?.message || 'Could not decode transaction.');
             };
         } catch (err) {
-            setError(err.response?.data?.message || 'Error decoding transaction signature.');
+            const errMsg = err.response?.data?.msg || err.response?.data?.message || err.message || 'Error decoding transaction signature.';
+            setError(errMsg);
         } finally {
             setLoading(false);
         };
@@ -74,7 +85,7 @@ export const TransactionDecoderModal = ({ isOpen, onClose }) => {
 
                 {error && (
                     <div className="solana-alert-danger">
-                        <AlertCircle size={18} />
+                        <AlertCircle size={18} style={{ flexShrink: 0 }} />
                         <span>{error}</span>
                     </div>
                 )}

@@ -2,11 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { RefreshCw, ExternalLink, ListFilter } from 'lucide-react';
+import { RefreshCw, ExternalLink, ListFilter, Copy, Check } from 'lucide-react';
+import { copyTextToClipboard } from '../lib/clipboard';
 
 export const TransactionListTable = ({ refreshTrigger }) => {
     const [withdrawals, setWithdrawals] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [copiedId, setCopiedId] = useState(null);
 
     const fetchHistory = async () => {
         try {
@@ -25,6 +27,18 @@ export const TransactionListTable = ({ refreshTrigger }) => {
     useEffect(() => {
         fetchHistory();
     }, [refreshTrigger]);
+
+    const handleCopyHash = async (hash, id) => {
+        if (hash) {
+            const ok = await copyTextToClipboard(hash);
+            if (ok) {
+                setCopiedId(id);
+                setTimeout(() => {
+                    setCopiedId(null);
+                }, 2000);
+            };
+        };
+    };
 
     return (
         <div style={{ background: 'rgba(15, 20, 34, 0.85)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '24px', padding: '2rem', marginTop: '2rem', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}>
@@ -62,47 +76,83 @@ export const TransactionListTable = ({ refreshTrigger }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {withdrawals.map((w) => (
-                                <tr key={w._id || w.withdrawId} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                                    <td style={{ padding: '1rem 0.5rem' }}>
-                                        {w.transactionSignature ? (
-                                            <a
-                                                href={`https://explorer.solana.com/tx/${w.transactionSignature}?cluster=devnet`}
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                className="solana-link font-mono"
-                                                style={{ fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                            {withdrawals.map((w) => {
+                                const rowId = w._id || w.withdrawId;
+                                return (
+                                    <tr key={rowId} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                                        <td style={{ padding: '1rem 0.5rem' }}>
+                                            {w.transactionSignature ? (
+                                                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                    <a
+                                                        href={`https://explorer.solana.com/tx/${w.transactionSignature}?cluster=devnet`}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        className="solana-link font-mono"
+                                                        style={{ fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                                                        title="View on Solana Explorer"
+                                                    >
+                                                        <span>{w.transactionSignature.slice(0, 16)}...{w.transactionSignature.slice(-8)}</span>
+                                                        <ExternalLink size={12} />
+                                                    </a>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleCopyHash(w.transactionSignature, rowId)}
+                                                        style={{
+                                                            background: copiedId === rowId ? 'rgba(20,241,149,0.15)' : 'rgba(255, 255, 255, 0.06)',
+                                                            border: '1px solid ' + (copiedId === rowId ? 'rgba(20,241,149,0.3)' : 'rgba(255, 255, 255, 0.12)'),
+                                                            borderRadius: '6px',
+                                                            padding: '4px 8px',
+                                                            color: copiedId === rowId ? '#14F195' : '#94a3b8',
+                                                            cursor: 'pointer',
+                                                            display: 'inline-flex',
+                                                            alignItems: 'center',
+                                                            gap: '4px',
+                                                            fontSize: '0.75rem',
+                                                            transition: 'all 0.2s ease',
+                                                        }}
+                                                        title="Copy Full Transaction Hash"
+                                                    >
+                                                        {copiedId === rowId ? (
+                                                            <>
+                                                                <Check size={12} style={{ color: '#14F195' }} />
+                                                                <span style={{ fontSize: '0.7rem', color: '#14F195', fontWeight: 600 }}>Copied!</span>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Copy size={12} />
+                                                                <span style={{ fontSize: '0.7rem' }}>Copy</span>
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <span style={{ color: '#64748b' }} className="font-mono">-</span>
+                                            )}
+                                        </td>
+                                        <td className="font-mono" style={{ padding: '1rem 0.5rem', fontWeight: 700, color: '#fff' }}>{w.amount} SOL</td>
+                                        <td style={{ padding: '1rem 0.5rem' }}>
+                                            <span
+                                                style={{
+                                                    padding: '0.25rem 0.75rem',
+                                                    borderRadius: '20px',
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: 700,
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '0.5px',
+                                                    background: w.status === 'CONFIRMED' ? 'rgba(20,241,149,0.15)' : w.status === 'PENDING' ? 'rgba(245,158,11,0.15)' : 'rgba(239,68,68,0.15)',
+                                                    color: w.status === 'CONFIRMED' ? '#14F195' : w.status === 'PENDING' ? '#F59E0B' : '#ef4444',
+                                                    border: '1px solid ' + (w.status === 'CONFIRMED' ? 'rgba(20,241,149,0.3)' : w.status === 'PENDING' ? 'rgba(245,158,11,0.3)' : 'rgba(239,68,68,0.3)'),
+                                                }}
                                             >
-                                                <span>{w.transactionSignature.slice(0, 16)}...{w.transactionSignature.slice(-8)}</span>
-                                                <ExternalLink size={12} />
-                                            </a>
-                                        ) : (
-                                            <span style={{ color: '#64748b' }} className="font-mono">-</span>
-                                        )}
-                                    </td>
-                                    <td className="font-mono" style={{ padding: '1rem 0.5rem', fontWeight: 700, color: '#fff' }}>{w.amount} SOL</td>
-                                    <td style={{ padding: '1rem 0.5rem' }}>
-                                        <span
-                                            style={{
-                                                padding: '0.25rem 0.75rem',
-                                                borderRadius: '20px',
-                                                fontSize: '0.75rem',
-                                                fontWeight: 700,
-                                                textTransform: 'uppercase',
-                                                letterSpacing: '0.5px',
-                                                background: w.status === 'CONFIRMED' ? 'rgba(20,241,149,0.15)' : w.status === 'PENDING' ? 'rgba(245,158,11,0.15)' : 'rgba(239,68,68,0.15)',
-                                                color: w.status === 'CONFIRMED' ? '#14F195' : w.status === 'PENDING' ? '#F59E0B' : '#ef4444',
-                                                border: '1px solid ' + (w.status === 'CONFIRMED' ? 'rgba(20,241,149,0.3)' : w.status === 'PENDING' ? 'rgba(245,158,11,0.3)' : 'rgba(239,68,68,0.3)'),
-                                            }}
-                                        >
-                                            {w.status}
-                                        </span>
-                                    </td>
-                                    <td className="font-mono" style={{ padding: '1rem 0.5rem', color: '#94a3b8', fontSize: '0.8rem' }}>
-                                        {w.createdAt ? new Date(w.createdAt).toLocaleString() : '-'}
-                                    </td>
-                                </tr>
-                            ))}
+                                                {w.status}
+                                            </span>
+                                        </td>
+                                        <td className="font-mono" style={{ padding: '1rem 0.5rem', color: '#94a3b8', fontSize: '0.8rem' }}>
+                                            {w.createdAt ? new Date(w.createdAt).toLocaleString() : '-'}
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>

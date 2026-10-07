@@ -103,7 +103,7 @@ async function POST(req) {
         });
 
         return successResponse(
-            `Successfully withdrew ${amountVal.numericAmount} SOL to ${toAddress.trim()}!`,
+            `Successfully withdrew ${amountVal.numericAmount} SOL!`,
             {
                 withdrawId: withdrawal.withdrawId,
                 amount: withdrawal.amount,

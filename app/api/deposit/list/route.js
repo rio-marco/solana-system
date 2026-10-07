@@ -2,7 +2,7 @@ const constants = require('../../../../lib/constants');
 const messages = require('../../../../lib/messages');
 const { verifySession } = require('../../../../lib/session');
 const { errorResponse, successResponse, authErrorResponse, log1 } = require("../../../../lib/general");
-const Withdrawal = require('../../../../lib/models/withdrawal.model');
+const Deposit = require('../../../../lib/models/deposit.model');
 
 async function GET(req) {
     try {
@@ -16,24 +16,24 @@ async function GET(req) {
         const limit = Math.max(1, Math.min(100, parseInt(searchParams.get('limit') || '10', 10)));
         const skip = (page - 1) * limit;
 
-        const totalCount = await Withdrawal.countDocuments({ userId: sessionAuth.userId });
+        const totalCount = await Deposit.countDocuments({ userId: sessionAuth.userId });
         const totalPages = Math.ceil(totalCount / limit) || 1;
 
-        const withdrawals = await Withdrawal.find({ userId: sessionAuth.userId })
+        const deposits = await Deposit.find({ userId: sessionAuth.userId })
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)
             .lean();
 
-        return successResponse("Withdrawals fetched successfully.", {
-            withdrawals,
+        return successResponse("Deposits fetched successfully.", {
+            deposits,
             totalCount,
             totalPages,
             currentPage: page,
             limit,
         });
     } catch (err) {
-        log1(['Error in withdraw/list API route:', err.message]);
+        log1(['Error in deposit/list API route:', err.message]);
         return errorResponse(messages.unexpectedDataError);
     };
 };

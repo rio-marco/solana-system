@@ -111,8 +111,8 @@ export default function DashboardPage() {
                     )}
                 </div>
 
-                {/* Withdraw History List */}
-                <TransactionListTable refreshTrigger={refreshTrigger} />
+                {/* Tab-Aware History List: Deposit List when on Deposit tab, Withdraw List when on Withdraw tab */}
+                <TransactionListTable type={activeTab} refreshTrigger={refreshTrigger} />
             </main>
         </div>
     );

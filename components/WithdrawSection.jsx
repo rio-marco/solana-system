@@ -55,6 +55,8 @@ export const WithdrawSection = ({ onWithdrawSuccess }) => {
                 };
 
                 if (onWithdrawSuccess) onWithdrawSuccess();
+
+                setTimeout(() => setSuccess(null), 3000);
             } else {
                 const errMsg = res.data?.msg || res.data?.message || 'Withdrawal failed.';
                 setError(errMsg);

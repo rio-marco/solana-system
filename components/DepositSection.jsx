@@ -80,6 +80,8 @@ export const DepositSection = ({ onDepositSuccess }) => {
                 };
 
                 if (onDepositSuccess) onDepositSuccess();
+
+                setTimeout(() => setSuccess(null), 3000);
             } else {
                 const errMsg = res.data?.msg || res.data?.message || 'Deposit failed.';
                 setError(errMsg);

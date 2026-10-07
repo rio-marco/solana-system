@@ -1,18 +1,76 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { useSocket } from '../context/SocketContext';
+import { useToast } from '../context/ToastContext';
 import { Coins, Bell, LogOut, Code, Wallet } from 'lucide-react';
 import { ProfileModal } from './ProfileModal';
 import { NotificationsDrawer } from './NotificationsDrawer';
 import { TransactionDecoderModal } from './TransactionDecoderModal';
 
 export const Navbar = () => {
-    const { user, logout, config } = useAuth();
+    const { user, logout, config, refreshUser } = useAuth();
+    const socket = useSocket();
+    const { showPushNotification } = useToast();
+
     const [showProfile, setShowProfile] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
     const [showDecoder, setShowDecoder] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
+
+    const fetchUnreadCount = useCallback(async () => {
+        if (!user) return;
+
+        try {
+            const res = await axios.get('/api/notifications');
+            if (res.data && res.data.flag && res.data.data) {
+                const list = res.data.data.notifications || [];
+                const unread = list.filter((n) => !n.isRead).length;
+                setUnreadCount(unread);
+            };
+        } catch (e) {
+            // ignore
+        };
+    }, [user]);
+
+    useEffect(() => {
+        fetchUnreadCount();
+    }, [fetchUnreadCount]);
+
+    useEffect(() => {
+        if (socket && user) {
+            const handleNewNotification = (notif) => {
+                const title = notif.title || 'Notification';
+                const msg = notif.message || notif.content || '';
+
+                // Trigger top-center mobile push notification banner
+                showPushNotification({
+                    title: title,
+                    message: msg,
+                    type: 'success',
+                });
+
+                setUnreadCount((prev) => prev + 1);
+                refreshUser();
+            };
+
+            const handleBalanceUpdate = () => {
+                refreshUser();
+            };
+
+            socket.on('newNotification', handleNewNotification);
+            socket.on('deposit_confirmed', handleBalanceUpdate);
+            socket.on('withdrawal_confirmed', handleBalanceUpdate);
+
+            return () => {
+                socket.off('newNotification', handleNewNotification);
+                socket.off('deposit_confirmed', handleBalanceUpdate);
+                socket.off('withdrawal_confirmed', handleBalanceUpdate);
+            };
+        }
+    }, [socket, user, showPushNotification, refreshUser]);
 
     return (
         <>
@@ -57,6 +115,7 @@ export const Navbar = () => {
                             </div>
 
                             <button
+                                type="button"
                                 onClick={() => setShowDecoder(true)}
                                 className="solana-btn-outline"
                                 style={{ width: 'auto', padding: '0 0.85rem', height: '38px', fontSize: '0.8rem', color: '#00C2FF', borderColor: 'rgba(0,194,255,0.3)' }}
@@ -67,6 +126,7 @@ export const Navbar = () => {
                             </button>
 
                             <button
+                                type="button"
                                 onClick={() => setShowNotifications(true)}
                                 style={{ position: 'relative', padding: '0.5rem', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', cursor: 'pointer' }}
                             >
@@ -79,6 +139,7 @@ export const Navbar = () => {
                             </button>
 
                             <button
+                                type="button"
                                 onClick={() => setShowProfile(true)}
                                 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.35rem 0.85rem', borderRadius: '30px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', cursor: 'pointer' }}
                             >
@@ -97,6 +158,7 @@ export const Navbar = () => {
                             </button>
 
                             <button
+                                type="button"
                                 onClick={logout}
                                 style={{ padding: '0.5rem', borderRadius: '10px', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: '#fca5a5', cursor: 'pointer' }}
                                 title="Sign Out"

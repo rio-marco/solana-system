@@ -260,6 +260,21 @@ body {
     }
 }
 
+@keyframes slideDownFromTop {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -40px) scale(0.92);
+    }
+    60% {
+        opacity: 1;
+        transform: translate(-50%, 8px) scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1);
+    }
+}
+
 .solana-link:hover {
     color: var(--solana-green);
     text-decoration: underline;

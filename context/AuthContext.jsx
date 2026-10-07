@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext(null);
@@ -13,9 +13,12 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [config, setConfig] = useState({ network: 'devnet', rpcUrl: 'https://api.devnet.solana.com' });
 
-    const checkAuth = async () => {
+    const checkAuth = useCallback(async (showLoading = false) => {
         try {
-            setLoading(true);
+            if (showLoading && !user) {
+                setLoading(true);
+            };
+
             const res = await axios.get('/api/user/me');
             if (res.data && res.data.flag && res.data.data) {
                 setUser(res.data.data.user);
@@ -31,12 +34,25 @@ export const AuthProvider = ({ children }) => {
         } catch (err) {
             setUser(null);
         } finally {
-            setLoading(false);
+            if (showLoading) {
+                setLoading(false);
+            };
         };
-    };
+    }, [user]);
+
+    const refreshUser = useCallback(async () => {
+        try {
+            const res = await axios.get('/api/user/me');
+            if (res.data && res.data.flag && res.data.data) {
+                setUser(res.data.data.user);
+            };
+        } catch (e) {
+            // ignore
+        };
+    }, []);
 
     useEffect(() => {
-        checkAuth();
+        checkAuth(true);
     }, []);
 
     const login = (userData) => {
@@ -58,7 +74,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, setUser, loading, config, login, logout, checkAuth, updateUserData }}>
+        <AuthContext.Provider value={{ user, setUser, loading, config, login, logout, checkAuth, refreshUser, updateUserData }}>
             {children}
         </AuthContext.Provider>
     );

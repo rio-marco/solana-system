@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Bell, CheckCheck, X, Inbox } from 'lucide-react';
+import { Bell, X, Inbox } from 'lucide-react';
 import { useSocket } from '../context/SocketContext';
 
 export const NotificationsDrawer = ({ isOpen, onClose, onUnreadCountChange }) => {
@@ -28,6 +28,10 @@ export const NotificationsDrawer = ({ isOpen, onClose, onUnreadCountChange }) =>
     };
 
     useEffect(() => {
+        fetchNotifications();
+    }, []);
+
+    useEffect(() => {
         if (isOpen) {
             fetchNotifications();
         };
@@ -35,15 +39,14 @@ export const NotificationsDrawer = ({ isOpen, onClose, onUnreadCountChange }) =>
 
     useEffect(() => {
         if (socket) {
-            socket.on('newNotification', (notif) => {
+            const handleNewNotification = (notif) => {
                 setNotifications((prev) => [notif, ...prev]);
-                if (onUnreadCountChange) {
-                    onUnreadCountChange((prev) => prev + 1);
-                };
-            });
+            };
+
+            socket.on('newNotification', handleNewNotification);
 
             return () => {
-                socket.off('newNotification');
+                socket.off('newNotification', handleNewNotification);
             };
         };
     }, [socket]);
@@ -70,12 +73,13 @@ export const NotificationsDrawer = ({ isOpen, onClose, onUnreadCountChange }) =>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <button
+                            type="button"
                             onClick={handleMarkAllRead}
                             style={{ background: 'rgba(153,69,255,0.15)', border: '1px solid rgba(153,69,255,0.3)', color: '#14F195', fontSize: '0.75rem', fontWeight: 600, padding: '0.25rem 0.6rem', borderRadius: '8px', cursor: 'pointer' }}
                         >
                             Mark read
                         </button>
-                        <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
+                        <button type="button" onClick={onClose} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
                             <X size={20} />
                         </button>
                     </div>

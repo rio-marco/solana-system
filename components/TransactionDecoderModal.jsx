@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Code, Search, AlertCircle, X } from 'lucide-react';
 
@@ -10,7 +10,25 @@ export const TransactionDecoderModal = ({ isOpen, onClose }) => {
     const [result, setResult] = useState(null);
     const [error, setError] = useState(null);
 
+    // Reset state whenever modal opens or closes
+    useEffect(() => {
+        if (!isOpen) {
+            setSignature('');
+            setResult(null);
+            setError(null);
+            setLoading(false);
+        }
+    }, [isOpen]);
+
     if (!isOpen) return null;
+
+    const handleClose = () => {
+        setSignature('');
+        setResult(null);
+        setError(null);
+        setLoading(false);
+        onClose();
+    };
 
     const handleDecode = async (e) => {
         e.preventDefault();
@@ -45,7 +63,7 @@ export const TransactionDecoderModal = ({ isOpen, onClose }) => {
                         <Code style={{ color: '#00C2FF' }} size={20} />
                         <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#fff' }}>Solana Transaction Decoder</h3>
                     </div>
-                    <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
+                    <button type="button" onClick={handleClose} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
                         <X size={20} />
                     </button>
                 </div>

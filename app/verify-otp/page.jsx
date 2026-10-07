@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ShieldCheck, Check, AlertCircle, Copy, Key } from 'lucide-react';
+import { ShieldCheck, Check, AlertCircle, Copy, Key, Shield } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { copyTextToClipboard } from '../../lib/clipboard';
@@ -12,8 +12,13 @@ import { copyTextToClipboard } from '../../lib/clipboard';
 function VerifyOtpContent() {
     const searchParams = useSearchParams();
     const initialEmail = searchParams.get('email') || '';
+    const initialRequires2FA = searchParams.get('requires2FA') === 'true';
+
     const [email, setEmail] = useState(initialEmail);
     const [otp, setOtp] = useState('');
+    const [twoFACode, setTwoFACode] = useState('');
+    const [requires2FA, setRequires2FA] = useState(initialRequires2FA);
+    const [tempUserId, setTempUserId] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [recoveryPhrase, setRecoveryPhrase] = useState(null);
@@ -29,7 +34,7 @@ function VerifyOtpContent() {
         };
     }, [email, router]);
 
-    const handleSubmit = async (e) => {
+    const handleVerifyOtp = async (e) => {
         e.preventDefault();
         setError(null);
 
@@ -44,10 +49,15 @@ function VerifyOtpContent() {
             setLoading(true);
             const res = await axios.post('/api/auth/verify-otp', { email, otp });
             if (res.data && res.data.flag) {
-                toastSuccess(res.data.msg || 'OTP Verified successfully!');
-                if (res.data.data && res.data.data.recoveryPhrase) {
+                if (res.data.data && res.data.data.requires2FA) {
+                    setRequires2FA(true);
+                    setTempUserId(res.data.data.tempUserId || null);
+                    toastSuccess('Email verified. Please enter your 2FA code.');
+                } else if (res.data.data && res.data.data.recoveryPhrase) {
                     setRecoveryPhrase(res.data.data.recoveryPhrase);
+                    toastSuccess(res.data.msg || 'OTP Verified successfully!');
                 } else {
+                    toastSuccess(res.data.msg || 'OTP Verified successfully!');
                     await checkAuth();
                     router.push('/');
                 };
@@ -58,6 +68,43 @@ function VerifyOtpContent() {
             };
         } catch (err) {
             const msg = err.response?.data?.msg || err.response?.data?.message || 'Invalid or expired OTP code.';
+            setError(msg);
+            toastError(msg);
+        } finally {
+            setLoading(false);
+        };
+    };
+
+    const handleVerify2FA = async (e) => {
+        e.preventDefault();
+        setError(null);
+
+        if (twoFACode.length !== 6) {
+            const msg = 'Please enter the complete 6-digit 2FA code.';
+            setError(msg);
+            toastError(msg);
+            return;
+        };
+
+        try {
+            setLoading(true);
+            const res = await axios.post('/api/auth/verify-2fa-code', {
+                email,
+                code: twoFACode,
+                tempUserId,
+            });
+
+            if (res.data && res.data.flag) {
+                toastSuccess(res.data.msg || '2FA Verification successful!');
+                await checkAuth();
+                router.push('/');
+            } else {
+                const msg = res.data?.msg || res.data?.message || 'Invalid 2FA code.';
+                setError(msg);
+                toastError(msg);
+            };
+        } catch (err) {
+            const msg = err.response?.data?.msg || err.response?.data?.message || 'Invalid 2FA authentication code.';
             setError(msg);
             toastError(msg);
         } finally {
@@ -84,7 +131,66 @@ function VerifyOtpContent() {
 
     return (
         <div className="solana-auth-card">
-            {!recoveryPhrase ? (
+            {requires2FA ? (
+                /* 2FA Authenticator Code Form */
+                <>
+                    <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
+                        <div className="solana-brand-pill" style={{ marginBottom: '0.75rem', borderColor: 'rgba(153,69,255,0.4)', color: '#9945FF' }}>
+                            <Shield size={15} />
+                            <span>Two-Factor Authentication</span>
+                        </div>
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.35rem' }}>
+                            Enter 2FA Code
+                        </h2>
+                        <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
+                            Open your Authenticator app (Google Authenticator/Authy) and enter the 6-digit code for:<br />
+                            <strong className="font-mono" style={{ color: '#00C2FF' }}>{email}</strong>
+                        </p>
+                    </div>
+
+                    {error && (
+                        <div className="solana-alert-danger">
+                            <AlertCircle size={18} />
+                            <span>{error}</span>
+                        </div>
+                    )}
+
+                    <form onSubmit={handleVerify2FA}>
+                        <div className="form-group-custom">
+                            <label className="solana-input-label" style={{ textAlign: 'center' }}>6-Digit 2FA Code</label>
+                            <input
+                                type="text"
+                                className="solana-input-field otp-input-field"
+                                placeholder="000000"
+                                maxLength={6}
+                                value={twoFACode}
+                                onChange={(e) => setTwoFACode(e.target.value.replace(/\D/g, ''))}
+                                autoFocus
+                                required
+                            />
+                        </div>
+
+                        <button type="submit" disabled={loading} className="solana-btn-primary" style={{ marginTop: '0.75rem' }}>
+                            {loading ? (
+                                <span>Verifying 2FA Code...</span>
+                            ) : (
+                                <>
+                                    <Check size={18} />
+                                    <span>Verify 2FA & Sign In</span>
+                                </>
+                            )}
+                        </button>
+                    </form>
+
+                    <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: '0.85rem', color: '#94a3b8' }}>
+                        Having trouble?{' '}
+                        <Link href="/login" className="solana-link">
+                            Back to Login
+                        </Link>
+                    </div>
+                </>
+            ) : !recoveryPhrase ? (
+                /* Email OTP Code Form */
                 <>
                     <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
                         <div className="solana-brand-pill" style={{ marginBottom: '0.75rem' }}>
@@ -107,7 +213,7 @@ function VerifyOtpContent() {
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleVerifyOtp}>
                         <div className="form-group-custom">
                             <label className="solana-input-label" style={{ textAlign: 'center' }}>6-Digit OTP Code</label>
                             <input

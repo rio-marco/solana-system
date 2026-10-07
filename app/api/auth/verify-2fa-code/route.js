@@ -26,7 +26,7 @@ async function POST(req) {
         };
 
         const verified = twoFactor.verifyToken(user.twoFASecret, code.trim());
-        if (!verified || verified.delta !== 0) {
+        if (!verified) {
             return errorResponse("Invalid 2FA authentication code.");
         };
 

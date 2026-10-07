@@ -7,7 +7,8 @@ import { copyTextToClipboard } from '../lib/clipboard';
 
 export const TransactionListTable = ({ type = 'withdraw', refreshTrigger }) => {
     const [items, setItems] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [isFetchingPage, setIsFetchingPage] = useState(false);
     const [copiedId, setCopiedId] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -23,10 +24,11 @@ export const TransactionListTable = ({ type = 'withdraw', refreshTrigger }) => {
         setCurrentPage(1);
     }, [type, refreshTrigger]);
 
-    const fetchHistory = useCallback(async (pageToFetch = currentPage) => {
+    const fetchHistory = useCallback(async (pageToFetch) => {
+        const p = pageToFetch !== undefined ? pageToFetch : currentPage;
         try {
-            setLoading(true);
-            const res = await axios.get(`${endpoint}?page=${pageToFetch}&limit=${limit}`);
+            setIsFetchingPage(true);
+            const res = await axios.get(`${endpoint}?page=${p}&limit=${limit}`);
             if (res.data && res.data.flag && res.data.data) {
                 const list = isDeposit ? res.data.data.deposits : res.data.data.withdrawals;
                 setItems(list || []);
@@ -37,8 +39,9 @@ export const TransactionListTable = ({ type = 'withdraw', refreshTrigger }) => {
             // ignore
         } finally {
             setLoading(false);
+            setIsFetchingPage(false);
         };
-    }, [endpoint, isDeposit, currentPage]);
+    }, [endpoint, isDeposit]);
 
     useEffect(() => {
         fetchHistory(currentPage);
@@ -56,8 +59,10 @@ export const TransactionListTable = ({ type = 'withdraw', refreshTrigger }) => {
         };
     };
 
-    const handlePageChange = (newPage) => {
-        if (newPage >= 1 && newPage <= totalPages && newPage !== currentPage) {
+    const handlePageChange = (e, newPage) => {
+        if (e && e.preventDefault) e.preventDefault();
+        if (e && e.stopPropagation) e.stopPropagation();
+        if (newPage >= 1 && newPage <= totalPages && newPage !== currentPage && !isFetchingPage) {
             setCurrentPage(newPage);
         };
     };
@@ -78,12 +83,12 @@ export const TransactionListTable = ({ type = 'withdraw', refreshTrigger }) => {
                 </h2>
                 <button
                     type="button"
-                    onClick={() => fetchHistory(currentPage)}
-                    disabled={loading}
+                    onClick={(e) => { e.preventDefault(); fetchHistory(currentPage); }}
+                    disabled={loading || isFetchingPage}
                     className="solana-btn-outline"
                     style={{ width: 'auto', padding: '0 1rem', height: '38px', fontSize: '0.8rem' }}
                 >
-                    <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+                    <RefreshCw size={14} className={isFetchingPage ? 'animate-spin' : ''} />
                     <span>Refresh</span>
                 </button>
             </div>
@@ -106,7 +111,7 @@ export const TransactionListTable = ({ type = 'withdraw', refreshTrigger }) => {
                                     <th style={{ padding: '0.85rem 0.5rem', fontSize: '0.75rem', fontWeight: 700 }}>CREATED DATE</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody style={{ opacity: isFetchingPage ? 0.35 : 1, transition: 'opacity 0.2s ease', pointerEvents: isFetchingPage ? 'none' : 'auto' }}>
                                 {items.map((w) => {
                                     const rowId = w._id || w.withdrawId || w.depositId;
                                     return (
@@ -207,8 +212,8 @@ export const TransactionListTable = ({ type = 'withdraw', refreshTrigger }) => {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <button
                                 type="button"
-                                onClick={() => handlePageChange(currentPage - 1)}
-                                disabled={currentPage === 1 || loading}
+                                onClick={(e) => handlePageChange(e, currentPage - 1)}
+                                disabled={currentPage === 1 || loading || isFetchingPage}
                                 style={{
                                     display: 'flex',
                                     alignItems: 'center',
@@ -232,8 +237,8 @@ export const TransactionListTable = ({ type = 'withdraw', refreshTrigger }) => {
                                 <button
                                     key={pageNum}
                                     type="button"
-                                    onClick={() => handlePageChange(pageNum)}
-                                    disabled={loading}
+                                    onClick={(e) => handlePageChange(e, pageNum)}
+                                    disabled={loading || isFetchingPage}
                                     style={{
                                         minWidth: '32px',
                                         height: '32px',
@@ -255,8 +260,8 @@ export const TransactionListTable = ({ type = 'withdraw', refreshTrigger }) => {
 
                             <button
                                 type="button"
-                                onClick={() => handlePageChange(currentPage + 1)}
-                                disabled={currentPage >= totalPages || loading}
+                                onClick={(e) => handlePageChange(e, currentPage + 1)}
+                                disabled={currentPage >= totalPages || loading || isFetchingPage}
                                 style={{
                                     display: 'flex',
                                     alignItems: 'center',

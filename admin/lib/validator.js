@@ -3,10 +3,6 @@ const { errorResponse, successResponse, } = require('./general');
 
 const validateRules = {
     auth: {
-        signUp: {
-            fullName: "required|string|max:60",
-            email: "required|email",
-        },
         signIn: {
             email: "required|email",
         },
@@ -17,29 +13,6 @@ const validateRules = {
         direct_link: {
             email: "required|email",
             token: "required",
-        },
-        verify2FACode: {
-            email: "required|email",
-            twoFACode: "required",
-        },
-    },
-
-    user: {
-        updateProfile: {
-            documentNumber: "required",
-            dialCode: "required_with:phoneNumber",
-            phoneNumber: "required_with:dialCode",
-            profileImage: "required",
-        },
-        enableTwoFA: {
-            twoFASecret: "required",
-            twoFACode: "required",
-        },
-        disableTwoFA: {
-            twoFACode: "required",
-        },
-        verifyTwoFACode: {
-            twoFACode: "required",
         },
     },
 };

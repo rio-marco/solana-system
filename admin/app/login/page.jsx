@@ -7,22 +7,20 @@ import { useRouter } from 'next/navigation';
 import { Coins, Mail, LogIn, Key, AlertCircle, Info } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
-import { RecoveryModal } from '../../components/RecoveryModal';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [showRecovery, setShowRecovery] = useState(false);
-    const { user, loading: authLoading } = useAuth();
+    const { admin, loading: authLoading } = useAuth();
     const { toastError, toastSuccess } = useToast();
     const router = useRouter();
 
     useEffect(() => {
-        if (!authLoading && user) {
+        if (!authLoading && admin) {
             router.push('/');
         };
-    }, [user, authLoading, router]);
+    }, [admin, authLoading, router]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -78,7 +76,7 @@ export default function LoginPage() {
                 <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
                     <div className="solana-brand-pill" style={{ marginBottom: '0.75rem' }}>
                         <Coins size={15} />
-                        <span>Solana Platform</span>
+                        <span>Solana Admin Platform</span>
                     </div>
                     <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.35rem' }}>
                         Welcome Back
@@ -122,31 +120,7 @@ export default function LoginPage() {
                         )}
                     </button>
                 </form>
-
-                <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-                    <button
-                        type="button"
-                        onClick={() => setShowRecovery(true)}
-                        className="solana-btn-outline"
-                    >
-                        <Key size={16} />
-                        <span>Account Recovery</span>
-                    </button>
-                    <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.45)', textAlign: 'center', marginTop: '0.75rem', lineHeight: 1.4, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem' }}>
-                        <Info size={14} />
-                        <span>If registered, enter your 12-word seed phrase to receive a login link.</span>
-                    </p>
-                </div>
-
-                <div style={{ textAlign: 'center', marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: '0.85rem', color: '#94a3b8' }}>
-                    Don't have an account yet?{' '}
-                    <Link href="/signup" className="solana-link">
-                        Sign Up
-                    </Link>
-                </div>
             </div>
-
-            <RecoveryModal isOpen={showRecovery} onClose={() => setShowRecovery(false)} />
         </div>
     );
 };

@@ -9,7 +9,7 @@ const User = require('../../../../lib/models/user.model');
 async function GET(req) {
     try {
         const sessionAuth = await verifySession(req);
-        if (!sessionAuth || !sessionAuth.userId) {
+        if (!sessionAuth || !sessionAuth.adminId) {
             return authErrorResponse(messages.unauthorizedAccess);
         };
 
@@ -26,12 +26,12 @@ async function GET(req) {
             };
         };
 
-        // Total Users
         const totalUsers = await User.countDocuments();
 
         // Deposits Stats (matching addressStr if present, or all platform deposits)
         const depositMatchQuery = addressStr ? { platformAddress: addressStr } : {};
-        
+        const withdrawMatchQuery = addressStr ? { fromAddress: addressStr } : {};
+
         const depositAgg = await Deposit.aggregate([
             { $match: depositMatchQuery },
             {
@@ -69,6 +69,7 @@ async function GET(req) {
 
         // Withdrawal Stats
         const withdrawalAgg = await Withdrawal.aggregate([
+            { $match: withdrawMatchQuery },
             {
                 $group: {
                     _id: "$status",

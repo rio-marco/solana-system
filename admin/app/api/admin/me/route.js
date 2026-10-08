@@ -6,29 +6,25 @@ const { errorResponse, successResponse, authErrorResponse, log1 } = require("../
 async function GET(req) {
     try {
         const sessionAuth = await verifySession(req);
-        if (!sessionAuth || !sessionAuth.user) {
+        if (!sessionAuth || !sessionAuth.admin) {
             return authErrorResponse(messages.unauthorizedAccess);
         }
 
-        const { user } = sessionAuth;
+        const { admin } = sessionAuth;
 
-        return successResponse("User fetched successfully",
+        return successResponse("Admin details fetched successfully",
             {
-                user: {
-                    _id: user._id,
-                    email: user.email,
-                    fullName: user.fullName,
-                    profilePhoto: user.profilePhoto || "",
-                    memo: user.memo,
-                    walletBalance: user.walletBalance,
-                    is2FAEnabled: user.twoFAStatus === constants.TwoFA_STATUS.ENABLED,
+                admin: {
+                    _id: admin._id,
+                    email: admin.email,
+                    name: admin.name,
                 },
                 network: process.env.SOLANA_NETWORK || 'devnet',
                 rpcUrl: process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com',
             },
         );
     } catch (error) {
-        log1(['Error in user/me API route:', error.message]);
+        log1(['Error in admin/me API route:', error.message]);
         return errorResponse(messages.unexpectedDataError);
     };
 };

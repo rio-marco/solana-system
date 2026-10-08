@@ -7,7 +7,7 @@ const Withdrawal = require('../../../../lib/models/withdrawal.model');
 async function GET(req) {
     try {
         const sessionAuth = await verifySession(req);
-        if (!sessionAuth || !sessionAuth.userId) {
+        if (!sessionAuth || !sessionAuth.adminId) {
             return authErrorResponse(messages.unauthorizedAccess);
         };
 
@@ -16,10 +16,12 @@ async function GET(req) {
         const limit = Math.max(1, Math.min(100, parseInt(searchParams.get('limit') || '10', 10)));
         const skip = (page - 1) * limit;
 
-        const totalCount = await Withdrawal.countDocuments({ userId: sessionAuth.userId });
+        const pubKeyStr = (await Setting.getVal('SOLANA_PLATFORM_PUBLIC_KEY'));
+
+        const totalCount = await Withdrawal.countDocuments({ fromAddress: pubKeyStr });
         const totalPages = Math.ceil(totalCount / limit) || 1;
 
-        const withdrawals = await Withdrawal.find({ userId: sessionAuth.userId })
+        const withdrawals = await Withdrawal.find({ fromAddress: pubKeyStr })
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)

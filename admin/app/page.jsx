@@ -12,7 +12,7 @@ import { AdminTransactionTable } from '../components/AdminTransactionTable';
 import { Shield, RefreshCw } from 'lucide-react';
 
 export default function AdminDashboardPage() {
-    const { user, loading } = useAuth();
+    const { admin, loading } = useAuth();
     const router = useRouter();
     const { addToast } = useToast();
 
@@ -23,10 +23,10 @@ export default function AdminDashboardPage() {
     const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     useEffect(() => {
-        if (!loading && !user) {
+        if (!loading && !admin) {
             router.push('/login');
         };
-    }, [user, loading, router]);
+    }, [admin, loading, router]);
 
     const fetchAdminOverview = useCallback(async () => {
         setFetchingData(true);
@@ -52,10 +52,10 @@ export default function AdminDashboardPage() {
     }, [addToast]);
 
     useEffect(() => {
-        if (user) {
+        if (admin) {
             fetchAdminOverview();
         };
-    }, [user, fetchAdminOverview]);
+    }, [admin, fetchAdminOverview]);
 
     const handleGenerateWallet = async () => {
         setGeneratingWallet(true);
@@ -76,7 +76,7 @@ export default function AdminDashboardPage() {
         };
     };
 
-    if (loading || !user) {
+    if (loading || !admin) {
         return (
             <div className="min-h-screen bg-dark flex flex-col items-center justify-center text-purple-400 gap-3 font-mono text-sm">
                 <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />

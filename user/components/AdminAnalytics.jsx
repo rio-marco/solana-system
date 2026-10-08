@@ -81,34 +81,6 @@ export function AdminAnalytics({ statsData }) {
                     </div>
                 </div>
 
-                {/* Net Volume / Balance */}
-                <div
-                    style={{
-                        background: 'rgba(15, 20, 34, 0.75)',
-                        backdropFilter: 'blur(12px)',
-                        borderRadius: '20px',
-                        border: '1px solid rgba(56, 189, 248, 0.25)',
-                        padding: '1.25rem 1.5rem',
-                        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.25)',
-                    }}
-                >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                        <span style={{ color: '#94a3b8', fontSize: '0.85rem', fontWeight: 600 }}>Net Platform Transfer Volume</span>
-                        <div style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '0.4rem', borderRadius: '10px' }}>
-                            <DollarSign size={20} />
-                        </div>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem' }}>
-                        <span style={{ fontSize: '1.75rem', fontWeight: 900, color: netVolume >= 0 ? '#38bdf8' : '#ef4444' }}>
-                            {netVolume >= 0 ? `+${netVolume.toFixed(4)}` : netVolume.toFixed(4)}
-                        </span>
-                        <span style={{ color: '#38bdf8', fontWeight: 800 }}>SOL</span>
-                    </div>
-                    <div style={{ marginTop: '0.5rem', fontSize: '0.78rem', color: '#94a3b8' }}>
-                        Deposits minus Withdrawals
-                    </div>
-                </div>
-
                 {/* Total Users */}
                 <div
                     style={{

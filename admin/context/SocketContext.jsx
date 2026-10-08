@@ -8,18 +8,18 @@ const SocketContext = createContext(null);
 
 export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
-    const { user } = useAuth();
+    const { admin } = useAuth();
 
     useEffect(() => {
         let socketIo = null;
-        if (user && user._id) {
+        if (admin && admin._id) {
             socketIo = io(window.location.origin, {
                 transports: ['websocket', 'polling'],
                 withCredentials: true,
             });
 
             socketIo.on('connect', () => {
-                socketIo.emit('joinRoom', `user_${user._id}`);
+                socketIo.emit('joinRoom', `admin_${admin._id}`);
             });
 
             setSocket(socketIo);
@@ -27,15 +27,15 @@ export const SocketProvider = ({ children }) => {
             if (socket) {
                 socket.disconnect();
                 setSocket(null);
-            }
-        }
+            };
+        };
 
         return () => {
             if (socketIo) {
                 socketIo.disconnect();
-            }
+            };
         };
-    }, [user?._id]);
+    }, [admin?._id]);
 
     return (
         <SocketContext.Provider value={socket}>

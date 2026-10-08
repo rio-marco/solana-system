@@ -7,9 +7,6 @@ if (global._bitcore) {
 const { NextResponse } = require('next/server');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-const Mnemonic = require('bitcore-mnemonic');
-const constants = require('./constants');
-const User = require('./models/user.model');
 
 function errorResponse(msg = '', data = {}) {
     return NextResponse.json(
@@ -119,75 +116,6 @@ function generateAuthToken(payload) {
     };
 };
 
-async function generateUniqueMemo() {
-    while (true) {
-        try {
-            const memo = crypto.randomInt(10000000, 100000000).toString();
-
-            const existingMemo = await User.exists({ memo });
-
-            if (!existingMemo) {
-                return memo;
-            };
-
-        } catch (error) {
-            log1(["Error in generateUniqueMemo----->", error]);
-            throw error;
-        };
-    };
-};
-
-async function generateRecoveryPhrase(cipher) {
-    let phrase = '';
-    let isUnique = false;
-    let attempts = 0;
-
-    while (!isUnique && attempts < 5) {
-        attempts++;
-        const mnemonicObject = new Mnemonic();
-        phrase = mnemonicObject.toString();
-
-        const existing = await User.findOne({ recoveryPhrase: phrase }).lean();
-        if (!existing) {
-            isUnique = true;
-        };
-    };
-
-    return phrase;
-};
-
-function encryptText(text) {
-    try {
-        const ciphering = process.env.CIPHERING;
-        const secret_key = process.env.SECRET_KEY;
-        const encryption_iv = process.env.ENCRYPTION_IV;
-
-        const encryptor = crypto.createCipheriv(ciphering, secret_key, encryption_iv);
-        const encrypted = encryptor.update(text, 'utf8', 'base64') + encryptor.final('base64');
-
-        return encrypted;
-    } catch (error) {
-        log1(["Error in encryptText ----->", error]);
-        return null;
-    };
-};
-
-function decryptCipher(cipher) {
-    try {
-        const ciphering = process.env.CIPHERING;
-        const secret_key = process.env.SECRET_KEY;
-        const encryption_iv = process.env.ENCRYPTION_IV;
-
-        const decryptor = crypto.createDecipheriv(ciphering, secret_key, encryption_iv);
-        const decrypted = decryptor.update(cipher, 'base64', 'utf8') + decryptor.final('utf8');
-
-        return decrypted;
-    } catch (error) {
-        log1(["Error in decryptCipher ----->", error]);
-        return null;
-    };
-};
-
 module.exports = {
     errorResponse,
     successResponse,
@@ -200,8 +128,4 @@ module.exports = {
     generateRandomToken,
     generateOTP,
     generateAuthToken,
-    generateUniqueMemo,
-    generateRecoveryPhrase,
-    encryptText,
-    decryptCipher,
 };

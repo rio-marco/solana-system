@@ -1,7 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
 const constants = require('../../../../lib/constants');
 const messages = require('../../../../lib/messages');
-const User = require('../../../../lib/models/user.model');
+const Admin = require('../../../../lib/models/admin.model');
 const OTP = require('../../../../lib/models/otp.model');
 const { sendMail } = require('../../../../lib/services/mail.service');
 const { errorResponse, successResponse, log1, generateOTP } = require("../../../../lib/general");
@@ -16,33 +16,17 @@ async function POST(req) {
         };
 
         const cleanEmail = email.trim().toLowerCase();
-        const user = await User.findOne({ email: cleanEmail }).lean();
+        const admin = await Admin.findOne({ email: cleanEmail }).lean();
 
-        if (!user) {
+        if (!admin) {
             return errorResponse("No account found with this email address.");
-        };
-
-        if (user.status === constants.USER_STATUS.SUSPENDED) {
-            return errorResponse("Your account is suspended. Please contact support.");
         };
 
         const otpExpires = new Date(Date.now() + constants.OTP_EXPIRY_MINUTE);
         const directUrlExpires = new Date(Date.now() + constants.DIRECT_URL_EXPIRY_MINUTE);
 
-        if (!user) {
+        if (!admin) {
             return errorResponse("No account found with this email address.");
-        } else if (user.status === constants.USER_STATUS.INACTIVE) {
-            await OTP.findOneAndUpdate({ email: cleanEmail },
-                {
-                    verificationOtpExpires: otpExpires,
-                    directUrlExpires: directUrlExpires,
-                },
-                { new: true },
-            );
-
-            return successResponse("Your account is not verified. Please complete the verification process.", { email: cleanEmail });
-        } else if (user.status === constants.USER_STATUS.SUSPENDED) {
-            return errorResponse("Your account is suspended. Please contact support.");
         };
 
         await OTP.deleteMany({ email: cleanEmail });
@@ -71,7 +55,7 @@ async function POST(req) {
                 subject: `Login Verification Code - ${constants.PLATFORM_NAME}`,
                 html: `
                     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #07090e; color: #f8fafc; border-radius: 12px; border: 1px solid #1e293b;">
-                        <h2 style="color: #14F195; margin-bottom: 20px;">Solana Platform Login</h2>
+                        <h2 style="color: #14F195; margin-bottom: 20px;">Solana Admin Platform Login</h2>
                         <p style="font-size: 16px; line-height: 1.5; color: #cbd5e1;">Your login verification code is:</p>
                         <div style="background-color: #0f1422; border: 1px solid #9945FF; border-radius: 8px; padding: 16px; text-align: center; font-size: 28px; font-weight: bold; letter-spacing: 6px; color: #14F195; margin: 20px 0;">
                             ${otpCode}

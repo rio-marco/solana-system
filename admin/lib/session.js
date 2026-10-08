@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const constants = require('./constants');
 const { log1, generateAuthToken, } = require('./general');
-const User = require('./models/user.model');
+const Admin = require('./models/admin.model');
 const Session = require('./models/session.model');
 
 const getAuthTokenFromReq = (req) => {
@@ -52,11 +52,11 @@ const verifySession = async (req) => {
             return null;
         };
 
-        const userId = decoded._id;
+        const adminId = decoded._id;
         const ua = req.headers.get ? req.headers.get('user-agent') : req.headers['user-agent'];
 
         const sessionQuery = {
-            userId: new mongoose.Types.ObjectId(userId),
+            userId: new mongoose.Types.ObjectId(adminId),
             authToken,
             status: constants.SESSION_STATUS.ACTIVE,
         };
@@ -65,40 +65,39 @@ const verifySession = async (req) => {
             sessionQuery.ua = ua;
         };
 
-        const userSession = await Session.findOne(sessionQuery).lean();
-        if (!userSession) {
+        const adminSession = await Session.findOne(sessionQuery).lean();
+        if (!adminSession) {
             return null;
         };
 
-        const user = await User.findOne({
-            _id: new mongoose.Types.ObjectId(userId),
-            status: constants.USER_STATUS.ACTIVE,
+        const admin = await Admin.findOne({
+            _id: new mongoose.Types.ObjectId(adminId),
         }).lean();
 
-        if (!user) {
+        if (!admin) {
             return null;
         };
 
-        return { user, userId, authToken };
+        return { admin, adminId, authToken };
     } catch (err) {
         log1(["Error in verifySession:", err.message]);
         return null;
     };
 };
 
-const createSessionRecord = async (userId, userAgent = '') => {
+const createSessionRecord = async (adminId, adminAgent = '') => {
     try {
         const payload = {
-            _id: userId.toString(),
+            _id: adminId.toString(),
             iat: Math.floor(Date.now() / 1000),
         };
 
         const authToken = await generateAuthToken(payload);
 
         const session = await Session.create({
-            userId,
+            userId: adminId,
             authToken,
-            ua: userAgent || 'Web-Browser',
+            ua: adminAgent || 'Web-Browser',
             status: constants.SESSION_STATUS.ACTIVE,
         });
 

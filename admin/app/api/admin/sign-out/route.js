@@ -6,9 +6,9 @@ const { errorResponse, successResponse, log1 } = require("../../../../lib/genera
 async function POST(req) {
     try {
         const sessionAuth = await verifySession(req);
-        if (sessionAuth && sessionAuth.userId && sessionAuth.authToken) {
+        if (sessionAuth && sessionAuth.adminId && sessionAuth.authToken) {
             await Session.updateOne(
-                { userId: sessionAuth.userId, authToken: sessionAuth.authToken },
+                { userId: sessionAuth.adminId, authToken: sessionAuth.authToken },
                 { status: constants.SESSION_STATUS.EXPIRED }
             );
         };

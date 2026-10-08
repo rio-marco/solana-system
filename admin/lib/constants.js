@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 module.exports = {
-    PLATFORM_NAME: "solana-system",
+    PLATFORM_NAME: "solana-admin-system",
     SUPPORT_EMAIL: "support@solanasystem.com",
     CURRENT_TIMEZONE: process.env.TZ || "Asia/Kolkata",
 

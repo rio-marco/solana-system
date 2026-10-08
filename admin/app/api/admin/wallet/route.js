@@ -7,7 +7,7 @@ const Wallet = require('../../../../lib/models/wallet.model');
 async function GET(req) {
     try {
         const sessionAuth = await verifySession(req);
-        if (!sessionAuth || !sessionAuth.userId) {
+        if (!sessionAuth || !sessionAuth.adminId) {
             return authErrorResponse(messages.unauthorizedAccess);
         };
 

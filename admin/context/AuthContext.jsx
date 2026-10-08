@@ -9,19 +9,19 @@ axios.defaults.baseURL = '';
 axios.defaults.withCredentials = true;
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [admin, setAdmin] = useState(null);
     const [loading, setLoading] = useState(true);
     const [config, setConfig] = useState({ network: 'devnet', rpcUrl: 'https://api.devnet.solana.com' });
 
     const checkAuth = useCallback(async (showLoading = false) => {
         try {
-            if (showLoading && !user) {
+            if (showLoading && !admin) {
                 setLoading(true);
             };
 
-            const res = await axios.get('/api/user/me');
+            const res = await axios.get('/api/admin/me');
             if (res.data && res.data.flag && res.data.data) {
-                setUser(res.data.data.user);
+                setAdmin(res.data.data.admin);
                 if (res.data.data.network) {
                     setConfig({
                         network: res.data.data.network,
@@ -29,22 +29,22 @@ export const AuthProvider = ({ children }) => {
                     });
                 };
             } else {
-                setUser(null);
+                setAdmin(null);
             };
         } catch (err) {
-            setUser(null);
+            setAdmin(null);
         } finally {
             if (showLoading) {
                 setLoading(false);
             };
         };
-    }, [user]);
+    }, [admin]);
 
-    const refreshUser = useCallback(async () => {
+    const refreshAdmin = useCallback(async () => {
         try {
-            const res = await axios.get('/api/user/me');
+            const res = await axios.get('/api/admin/me');
             if (res.data && res.data.flag && res.data.data) {
-                setUser(res.data.data.user);
+                setAdmin(res.data.data.admin);
             };
         } catch (e) {
             // ignore
@@ -55,26 +55,26 @@ export const AuthProvider = ({ children }) => {
         checkAuth(true);
     }, []);
 
-    const login = (userData) => {
-        setUser(userData);
+    const login = (adminData) => {
+        setAdmin(adminData);
     };
 
     const logout = async () => {
         try {
-            await axios.post('/api/user/sign-out');
+            await axios.post('/api/admin/sign-out');
         } catch (e) {
             // ignore
         } finally {
-            setUser(null);
+            setAdmin(null);
         };
     };
 
-    const updateUserData = (updatedFields) => {
-        setUser((prev) => (prev ? { ...prev, ...updatedFields } : prev));
+    const updateAdminData = (updatedFields) => {
+        setAdmin((prev) => (prev ? { ...prev, ...updatedFields } : prev));
     };
 
     return (
-        <AuthContext.Provider value={{ user, setUser, loading, config, login, logout, checkAuth, refreshUser, updateUserData }}>
+        <AuthContext.Provider value={{ admin, setAdmin, loading, config, login, logout, checkAuth, refreshAdmin, updateAdminData }}>
             {children}
         </AuthContext.Provider>
     );

@@ -1,6 +1,6 @@
 const constants = require('../../../../lib/constants');
 const messages = require('../../../../lib/messages');
-const User = require('../../../../lib/models/user.model');
+const Admin = require('../../../../lib/models/admin.model');
 const OTP = require('../../../../lib/models/otp.model');
 const { createSessionRecord } = require('../../../../lib/session');
 const { errorResponse, successResponse, log1 } = require("../../../../lib/general");
@@ -23,9 +23,9 @@ async function POST(req) {
         const cleanEmail = email.trim().toLowerCase();
         const cleanOtp = otp.trim();
 
-        let user = await User.findOne({ email: cleanEmail });
-        if (!user) {
-            return errorResponse("User account not found.");
+        let admin = await Admin.findOne({ email: cleanEmail });
+        if (!admin) {
+            return errorResponse("Invalid account.");
         };
 
         const otpRecord = await OTP.findOne({
@@ -38,43 +38,12 @@ async function POST(req) {
             return errorResponse("Invalid or expired OTP verification code.");
         };
 
-        const isNewRegistration = user.status !== constants.USER_STATUS.ACTIVE;
-
-        user.status = constants.USER_STATUS.ACTIVE;
-        await user.save();
-
         await OTP.deleteMany({ email: cleanEmail });
 
-        if (user.twoFAStatus === constants.TwoFA_STATUS.ENABLED) {
-            return successResponse("2FA Verification Required.",
-                {
-                    requires2FA: true,
-                    email: user.email,
-                    tempUserId: user._id,
-                },
-            );
-        };
+        const adminAgent = req.headers.get('user-agent') || 'Web-Browser';
+        const { authToken } = await createSessionRecord(admin._id, adminAgent);
 
-        const userAgent = req.headers.get('user-agent') || 'Web-Browser';
-        const { authToken } = await createSessionRecord(user._id, userAgent);
-
-        const responseData = {
-            user: {
-                _id: user._id,
-                email: user.email,
-                fullName: user.fullName,
-                profilePhoto: user.profilePhoto || "",
-                memo: user.memo,
-                walletBalance: user.walletBalance,
-                is2FAEnabled: user.twoFAStatus === constants.TwoFA_STATUS.ENABLED,
-            },
-        };
-
-        if (isNewRegistration && user.recoveryPhrase) {
-            responseData.recoveryPhrase = user.recoveryPhrase;
-        };
-
-        const response = successResponse("OTP verified successfully!.", responseData);
+        const response = successResponse("OTP verified successfully!.");
 
         const cookieOptions = {
             httpOnly: true,

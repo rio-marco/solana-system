@@ -3,11 +3,12 @@ const messages = require('../../../../lib/messages');
 const { verifySession } = require('../../../../lib/session');
 const { errorResponse, successResponse, authErrorResponse, log1 } = require("../../../../lib/general");
 const Deposit = require('../../../../lib/models/deposit.model');
+const Setting = require("../../../../lib/models/setting.model");
 
 async function GET(req) {
     try {
         const sessionAuth = await verifySession(req);
-        if (!sessionAuth || !sessionAuth.userId) {
+        if (!sessionAuth || !sessionAuth.adminId) {
             return authErrorResponse(messages.unauthorizedAccess);
         };
 
@@ -16,10 +17,12 @@ async function GET(req) {
         const limit = Math.max(1, Math.min(100, parseInt(searchParams.get('limit') || '10', 10)));
         const skip = (page - 1) * limit;
 
-        const totalCount = await Deposit.countDocuments({ userId: sessionAuth.userId });
+        const pubKeyStr = (await Setting.getVal('SOLANA_PLATFORM_PUBLIC_KEY'));
+
+        const totalCount = await Deposit.countDocuments({ platformAddress: pubKeyStr });
         const totalPages = Math.ceil(totalCount / limit) || 1;
 
-        const deposits = await Deposit.find({ userId: sessionAuth.userId })
+        const deposits = await Deposit.find({ platformAddress: pubKeyStr })
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)

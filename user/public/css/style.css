@@ -1,0 +1,297 @@
+:root {
+    --bs-font-sans-serif: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --bs-font-monospace: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    --solana-purple: #9945FF;
+    --solana-green: #14F195;
+    --solana-dark: #121212;
+    --solana-blue: #38bdf8;
+    --solana-white: #ffffff;
+}
+
+body {
+    font-family: var(--bs-font-sans-serif);
+    background-color: #f8fafc;
+    color: #1e293b;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Authentication Pages (Login, Signup, Verify OTP) */
+body.auth-body {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #f8fafc;
+    min-height: 100vh;
+}
+
+.auth-card {
+    max-width: 460px;
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(12px);
+    background: rgba(30, 41, 59, 0.92);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+}
+
+/* Auth Input Group & Icon Styling - High Contrast & Glowing Accent */
+.auth-card .input-group-text {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #14F195 !important;
+    /* Glowing Solana Green Icon */
+    font-size: 1.05rem;
+    padding-left: 0.9rem;
+    padding-right: 0.9rem;
+}
+
+.auth-card .form-control {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+.auth-card .form-control::placeholder {
+    color: #94a3b8 !important;
+    opacity: 0.8;
+}
+
+.auth-card .form-control:focus {
+    background-color: #0f172a !important;
+    border-color: #14F195 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 0.25rem rgba(20, 241, 149, 0.25) !important;
+}
+
+.btn-solana {
+    background: linear-gradient(90deg, #9945FF 0%, #14F195 100%);
+    border: none;
+    color: #0f172a !important;
+    font-weight: 700;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-solana:hover {
+    opacity: 0.95;
+    color: #000000 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(20, 241, 149, 0.3);
+}
+
+.otp-input {
+    font-family: var(--bs-font-monospace) !important;
+    font-size: 1.6rem !important;
+    letter-spacing: 0.5rem !important;
+    text-align: center !important;
+    background-color: #0f172a !important;
+    border: 2px solid #14F195 !important;
+    color: #14F195 !important;
+    font-weight: 700 !important;
+}
+
+.otp-input:focus {
+    background-color: #0f172a !important;
+    border-color: #14F195 !important;
+    color: #14F195 !important;
+    box-shadow: 0 0 0 0.25rem rgba(20, 241, 149, 0.25) !important;
+}
+
+.feature-badge {
+    background-color: rgba(20, 241, 149, 0.1);
+    border: 1px solid rgba(20, 241, 149, 0.3);
+    color: #14F195;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    padding: 8px 12px;
+}
+
+/* Dashboard Custom Components */
+.user-balance-card {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color: #ffffff;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 0.65rem;
+}
+
+.memo-badge {
+    background-color: rgba(2, 132, 199, 0.1);
+    border: 1px solid rgba(2, 132, 199, 0.25);
+    color: #0284c7;
+}
+
+.realtime-toast-container {
+    z-index: 1090;
+}
+
+.table-min-width {
+    min-width: 250px;
+}
+
+.font-mono {
+    font-family: var(--bs-font-monospace) !important;
+}
+
+.max-w-1200 {
+    max-width: 1200px;
+}
+
+.max-w-1600 {
+    max-width: 1600px;
+}
+
+.max-w-768 {
+    max-width: 768px;
+}
+
+.max-w-500 {
+    max-width: 500px;
+}
+
+.fw-500 {
+    font-weight: 500;
+}
+
+.fw-600 {
+    font-weight: 600;
+}
+
+.fw-700 {
+    font-weight: 700;
+}
+
+.fs-7 {
+    font-size: 0.875rem;
+}
+
+.fs-8 {
+    font-size: 0.775rem;
+}
+
+.tracking-wider {
+    letter-spacing: 0.05em;
+}
+
+.shadow-xs {
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+}
+
+.display-none {
+    display: none !important;
+}
+
+.solana-badge {
+    background: linear-gradient(135deg, var(--solana-purple) 0%, #14F195 100%);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.bg-purple-subtle {
+    background-color: #f3e8ff !important;
+}
+
+.text-purple {
+    color: #7e22ce !important;
+}
+
+.border-purple-subtle {
+    border-color: #d8b4fe !important;
+}
+
+.address-box {
+    background-color: #f1f5f9 !important;
+    border-color: #e2e8f0 !important;
+    word-break: break-all;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.15);
+}
+
+.input-group-text {
+    border-color: #dee2e6;
+}
+
+.btn {
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-primary {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: #4338ca;
+    border-color: #4338ca;
+}
+
+.status-icon {
+    width: 56px;
+    height: 56px;
+}
+
+#resExplorerLink {
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.json-container {
+    background-color: #0f172a;
+    color: var(--solana-white);
+    border-radius: 8px;
+    padding: 1rem;
+    max-height: 400px;
+    overflow-y: auto;
+    font-family: var(--bs-font-monospace);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.action-icon-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+}
+
+.toast-container {
+    max-width: 340px;
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+}
+
+.toast-content {
+    padding: 20px 20px 20px 52px;
+    background: var(--dark);
+    border: 1px solid rgba(184, 184, 255, 0.4);
+    border-radius: 18px;
+    font-size: 14px;
+    position: relative;
+    font-weight: 500;
+    color: var(--l-gray);
+}
+
+.toast-content>i {
+    font-size: 24px;
+    color: #FFCC00;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 18px;
+}

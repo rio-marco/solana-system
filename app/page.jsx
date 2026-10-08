@@ -38,7 +38,7 @@ export default function DashboardPage() {
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-dark)' }}>
             <Navbar />
 
-            <main className="dashboard-container" style={{ flex: 1, width: '100%', maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
+            <main className="dashboard-container" style={{ flex: 1, width: '100%', maxWidth: '1500px', margin: '0 auto', padding: '2rem 1rem' }}>
                 {/* Solana Dashboard Tabs */}
                 <div
                     style={{
@@ -102,17 +102,29 @@ export default function DashboardPage() {
                     </button>
                 </div>
 
-                {/* Active Tab Content */}
-                <div style={{ maxWidth: '680px', margin: '0 auto' }}>
-                    {activeTab === 'deposit' ? (
-                        <DepositSection onDepositSuccess={triggerRefresh} />
-                    ) : (
-                        <WithdrawSection onWithdrawSuccess={triggerRefresh} />
-                    )}
-                </div>
+                {/* Side-by-Side Split Container: Form Box on Left, List Table on Right */}
+                <div
+                    style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))',
+                        gap: '2rem',
+                        alignItems: 'start',
+                    }}
+                >
+                    {/* Left Side: Deposit / Withdraw Form Box */}
+                    <div>
+                        {activeTab === 'deposit' ? (
+                            <DepositSection onDepositSuccess={triggerRefresh} />
+                        ) : (
+                            <WithdrawSection onWithdrawSuccess={triggerRefresh} />
+                        )}
+                    </div>
 
-                {/* Tab-Aware History List: Deposit List when on Deposit tab, Withdraw List when on Withdraw tab */}
-                <TransactionListTable type={activeTab} refreshTrigger={refreshTrigger} />
+                    {/* Right Side: Deposit / Withdraw List Table */}
+                    <div>
+                        <TransactionListTable type={activeTab} refreshTrigger={refreshTrigger} />
+                    </div>
+                </div>
             </main>
         </div>
     );

@@ -136,7 +136,7 @@ export function AdminWalletCard({ walletData, onRefresh, onGenerateWallet, gener
             >
                 <div style={{ display: 'flex', alignItems: 'center', justify: 'space-between', marginBottom: '0.4rem' }}>
                     <span style={{ color: '#94a3b8', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
-                        Active Platform Public Key
+                        Active Deposite Address
                     </span>
                     <span
                         style={{

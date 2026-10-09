@@ -18,7 +18,11 @@ async function GET(req) {
         const statusFilter = searchParams.get('status') || 'ALL';
         const searchQuery = (searchParams.get('search') || '').trim();
 
-        const filter = {};
+        const pubKeyStr = (await Setting.getVal('SOLANA_PLATFORM_PUBLIC_KEY'));
+
+        const filter = {
+            fromAddress: pubKeyStr,
+        };
 
         if (statusFilter && statusFilter !== 'ALL') {
             filter.status = statusFilter;

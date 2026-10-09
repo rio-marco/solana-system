@@ -134,7 +134,9 @@ export default function LoginPage() {
                     </button>
                     <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.45)', textAlign: 'center', marginTop: '0.75rem', lineHeight: 1.4, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem' }}>
                         <Info size={14} />
-                        <span>If registered, enter your 12-word seed phrase to receive a login link.</span>
+                        <span>
+                            If your email address is registered in our records, you will receive an email with a login link, allowing you to log in directly.
+                        </span>
                     </p>
                 </div>
 

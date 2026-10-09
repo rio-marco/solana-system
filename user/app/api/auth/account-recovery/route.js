@@ -28,7 +28,7 @@ async function POST(req) {
             status: constants.USER_STATUS.ACTIVE,
         }).lean();
 
-        const successMsg = "If your recovery phrase is correct, a login link has been sent to your registered email address.";
+        const successMsg = "Login link has been sent to your registered email address.";
 
         if (!user) {
             return successResponse(successMsg);
@@ -53,28 +53,26 @@ async function POST(req) {
         const origin = req.nextUrl ? req.nextUrl.origin : (process.env.NODE_URL);
         const loginUrl = `${origin}/api/auth/direct-login?email=${encodeURIComponent(user.email)}&token=${encodeURIComponent(verificationToken)}`;
 
-        try {
-            await sendMail({
-                from: process.env.MAIL_FROM_ADDRESS || constants.SUPPORT_EMAIL,
-                to: user.email,
-                subject: `Account Recovery Direct Login - ${constants.PLATFORM_NAME}`,
-                html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #07090e; color: #f8fafc; border-radius: 12px; border: 1px solid #1e293b;">
-                        <h2 style="color: #14F195; margin-bottom: 20px;">Account Recovery</h2>
-                        <p style="font-size: 16px; line-height: 1.5; color: #cbd5e1;">Hi <strong>${user.fullName}</strong>,</p>
-                        <p style="font-size: 16px; line-height: 1.5; color: #cbd5e1;">Click the button below to complete account recovery and sign in directly:</p>
-                        <div style="text-align: center; margin: 30px 0;">
-                            <a href="${loginUrl}" style="background-color: #9945FF; color: #ffffff; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px; display: inline-block;">
-                                Sign In Now
-                            </a>
-                        </div>
-                        <p style="font-size: 14px; color: #94a3b8;">This link will expire in ${process.env.LOGIN_URL_EXPIRY_IN_MINUTE || 10} minutes.</p>
+        sendMail({
+            from: process.env.MAIL_FROM_ADDRESS || constants.SUPPORT_EMAIL,
+            to: user.email,
+            subject: `Account Recovery Direct Login - ${constants.PLATFORM_NAME}`,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #07090e; color: #f8fafc; border-radius: 12px; border: 1px solid #1e293b;">
+                    <h2 style="color: #14F195; margin-bottom: 20px;">Account Recovery</h2>
+                    <p style="font-size: 16px; line-height: 1.5; color: #cbd5e1;">Hi <strong>${user.fullName}</strong>,</p>
+                    <p style="font-size: 16px; line-height: 1.5; color: #cbd5e1;">Click the button below to complete account recovery and sign in directly:</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="${loginUrl}" style="background-color: #9945FF; color: #ffffff; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px; display: inline-block;">
+                            Sign In Now
+                        </a>
                     </div>
-                `,
-            });
-        } catch (mailErr) {
-            log1(["Mail send warning:", mailErr.message]);
-        };
+                    <p style="font-size: 14px; color: #94a3b8;">This link will expire in ${process.env.LOGIN_URL_EXPIRY_IN_MINUTE || 10} minutes.</p>
+                </div>
+            `,
+        }).catch((mailErr) => {
+            log1(['Mail send warning:', mailErr.message]);
+        });
 
         return successResponse("Recovery email sent. Please check your registered email inbox.", { email: user.email });
     } catch (error) {

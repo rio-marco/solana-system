@@ -28,10 +28,6 @@ export const NotificationsDrawer = ({ isOpen, onClose, onUnreadCountChange }) =>
     };
 
     useEffect(() => {
-        fetchNotifications();
-    }, []);
-
-    useEffect(() => {
         if (isOpen) {
             fetchNotifications();
         };

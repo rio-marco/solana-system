@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Key, Unlock, AlertCircle, CheckCircle, X } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
@@ -11,6 +11,16 @@ export const RecoveryModal = ({ isOpen, onClose }) => {
     const [message, setMessage] = useState(null);
     const [error, setError] = useState(null);
     const { toastError, toastSuccess } = useToast();
+
+    // Reset state whenever modal opens or closes
+    useEffect(() => {
+        if (!isOpen) {
+            setPhrase('');
+            setLoading(false);
+            setMessage(null);
+            setError(null);
+        };
+    }, [isOpen]);
 
     if (!isOpen) return null;
 

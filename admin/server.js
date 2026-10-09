@@ -67,7 +67,7 @@ nextApp.prepare().then(async () => {
 
     httpServer.listen(PORT, '0.0.0.0', () => {
         log1(['Admin Next.js System running on PORT ----->', PORT]);
-        log1(['Admin Next.js System URL -----> ', process.env.NODE_URL || `http://localhost:${PORT}`]);
+        log1(['Admin Next.js System URL -----> ', process.env.NODE_URL]);
     });
 }).catch((err) => {
     log1('Error starting Admin Next.js server:', err);

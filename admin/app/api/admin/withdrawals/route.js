@@ -3,6 +3,7 @@ const { verifySession } = require('../../../../lib/session');
 const { errorResponse, successResponse, authErrorResponse, log1 } = require("../../../../lib/general");
 const Withdrawal = require('../../../../lib/models/withdrawal.model');
 const User = require('../../../../lib/models/user.model');
+const Setting = require('../../../../lib/models/setting.model');
 
 async function GET(req) {
     try {
@@ -51,7 +52,7 @@ async function GET(req) {
         };
 
         const totalCount = await Withdrawal.countDocuments(filter);
-        const totalPages = Math.ceil(totalCount / limit) || 1;
+        const totalPages = Math.ceil(totalCount / limit) || 0;
 
         const withdrawals = await Withdrawal.find(filter)
             .populate('userId', 'fullName email memo')

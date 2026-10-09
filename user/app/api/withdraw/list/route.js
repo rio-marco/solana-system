@@ -17,7 +17,7 @@ async function GET(req) {
         const skip = (page - 1) * limit;
 
         const totalCount = await Withdrawal.countDocuments({ userId: sessionAuth.userId });
-        const totalPages = Math.ceil(totalCount / limit) || 1;
+        const totalPages = Math.ceil(totalCount / limit) || 0;
 
         const withdrawals = await Withdrawal.find({ userId: sessionAuth.userId })
             .sort({ createdAt: -1 })

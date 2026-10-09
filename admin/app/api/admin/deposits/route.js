@@ -3,6 +3,7 @@ const { verifySession } = require('../../../../lib/session');
 const { errorResponse, successResponse, authErrorResponse, log1 } = require("../../../../lib/general");
 const Deposit = require('../../../../lib/models/deposit.model');
 const User = require('../../../../lib/models/user.model');
+const Setting = require('../../../../lib/models/setting.model');
 
 async function GET(req) {
     try {
@@ -29,7 +30,6 @@ async function GET(req) {
         };
 
         if (searchQuery) {
-            // Find users matching search name or email
             const matchedUsers = await User.find({
                 $or: [
                     { email: { $regex: searchQuery, $options: 'i' } },
@@ -52,7 +52,7 @@ async function GET(req) {
         };
 
         const totalCount = await Deposit.countDocuments(filter);
-        const totalPages = Math.ceil(totalCount / limit) || 1;
+        const totalPages = Math.ceil(totalCount / limit) || 0;
 
         const deposits = await Deposit.find(filter)
             .populate('userId', 'fullName email memo')

@@ -316,7 +316,6 @@ export function AdminTransactionTable({ refreshTrigger }) {
 
                 {/* Status Select */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Filter size={16} style={{ color: '#94a3b8' }} />
                     <select
                         value={statusFilter}
                         onChange={handleStatusFilterChange}

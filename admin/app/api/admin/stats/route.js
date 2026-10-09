@@ -111,7 +111,7 @@ async function GET(req) {
             totalUsers,
             deposits: depositStats,
             withdrawals: withdrawalStats,
-            netVolume: Number(netVolume.toFixed(6)),
+            netVolume: Number(netVolume.toFixed(8)),
         });
     } catch (err) {
         log1(['Error in admin/stats API route:', err.message]);

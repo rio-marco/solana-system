@@ -31,6 +31,10 @@ const WithdrawalSchema = new mongoose.Schema(
             required: true,
             min: 0.000000001,
         },
+        platformFee: {
+            type: Number,
+            default: 0.000000,
+        },
         currency: {
             type: String,
             default: 'SOL',

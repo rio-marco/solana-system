@@ -6,7 +6,7 @@ import { Wallet, RefreshCw, Key, ExternalLink, ShieldCheck, AlertCircle } from '
 import { useToast } from '../context/ToastContext';
 
 export function AdminWalletCard({ walletData, onRefresh, onGenerateWallet, generating }) {
-    const { addToast } = useToast();
+    const { toastError, toastSuccess } = useToast();
     const [showConfirmModal, setShowConfirmModal] = useState(false);
 
     const handleConfirmGenerate = async () => {
@@ -14,7 +14,7 @@ export function AdminWalletCard({ walletData, onRefresh, onGenerateWallet, gener
         try {
             await onGenerateWallet();
         } catch (err) {
-            addToast(err.message || 'Failed to generate new wallet.', 'error');
+            toastError(err.message || 'Failed to generate new wallet.', 'error');
         };
     };
 
@@ -209,7 +209,7 @@ export function AdminWalletCard({ walletData, onRefresh, onGenerateWallet, gener
                     <span style={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600 }}>Live On-Chain Address Balance</span>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', marginTop: '0.3rem' }}>
                         <span style={{ fontSize: '1.8rem', fontWeight: 900, color: '#14F195' }}>
-                            {walletData?.balance !== undefined ? walletData.balance : '0.00'}
+                            {walletData?.balance !== undefined ? walletData.balance.toFixed(8) : '0.00'}
                         </span>
                         <span style={{ color: '#14F195', fontWeight: 800, fontSize: '1rem' }}>SOL</span>
                     </div>

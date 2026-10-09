@@ -33,14 +33,14 @@ export function AdminAnalytics({ statsData }) {
                     }}
                 >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                        <span style={{ color: '#94a3b8', fontSize: '0.85rem', fontWeight: 600 }}>Total Amount Deposited</span>
+                        <span style={{ color: '#94a3b8', fontSize: '0.85rem', fontWeight: 600 }}>Total Deposit Amount</span>
                         <div style={{ background: 'rgba(20, 241, 149, 0.15)', color: '#14F195', padding: '0.4rem', borderRadius: '10px' }}>
                             <ArrowDownLeft size={20} />
                         </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem' }}>
                         <span style={{ fontSize: '1.75rem', fontWeight: 900, color: '#ffffff' }}>
-                            {deposits.confirmedAmount.toFixed(4)}
+                            {deposits.confirmedAmount.toFixed(8)}
                         </span>
                         <span style={{ color: '#14F195', fontWeight: 800 }}>SOL</span>
                     </div>
@@ -63,14 +63,14 @@ export function AdminAnalytics({ statsData }) {
                     }}
                 >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                        <span style={{ color: '#94a3b8', fontSize: '0.85rem', fontWeight: 600 }}>Total Amount Withdrawn</span>
+                        <span style={{ color: '#94a3b8', fontSize: '0.85rem', fontWeight: 600 }}>Total Withdraw Amount</span>
                         <div style={{ background: 'rgba(153, 69, 255, 0.15)', color: '#9945FF', padding: '0.4rem', borderRadius: '10px' }}>
                             <ArrowUpRight size={20} />
                         </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem' }}>
                         <span style={{ fontSize: '1.75rem', fontWeight: 900, color: '#ffffff' }}>
-                            {withdrawals.confirmedAmount.toFixed(4)}
+                            {withdrawals.confirmedAmount.toFixed(8)}
                         </span>
                         <span style={{ color: '#9945FF', fontWeight: 800 }}>SOL</span>
                     </div>
@@ -80,6 +80,34 @@ export function AdminAnalytics({ statsData }) {
                         <span>{withdrawals.totalCount} Total Tx</span>
                     </div>
                 </div>
+
+                {/* Net Volume / Balance */}
+                {/* <div
+                    style={{
+                        background: 'rgba(15, 20, 34, 0.75)',
+                        backdropFilter: 'blur(12px)',
+                        borderRadius: '20px',
+                        border: '1px solid rgba(56, 189, 248, 0.25)',
+                        padding: '1.25rem 1.5rem',
+                        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.25)',
+                    }}
+                >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                        <span style={{ color: '#94a3b8', fontSize: '0.85rem', fontWeight: 600 }}>Net Platform Transfer Volume</span>
+                        <div style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '0.4rem', borderRadius: '10px' }}>
+                            <DollarSign size={20} />
+                        </div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem' }}>
+                        <span style={{ fontSize: '1.75rem', fontWeight: 900, color: netVolume >= 0 ? '#38bdf8' : '#ef4444' }}>
+                            {netVolume >= 0 ? `+${netVolume.toFixed(8)}` : netVolume.toFixed(8)}
+                        </span>
+                        <span style={{ color: '#38bdf8', fontWeight: 800 }}>SOL</span>
+                    </div>
+                    <div style={{ marginTop: '0.5rem', fontSize: '0.78rem', color: '#94a3b8' }}>
+                        Deposits minus Withdrawals
+                    </div>
+                </div> */}
 
                 {/* Total Users */}
                 <div
@@ -93,7 +121,7 @@ export function AdminAnalytics({ statsData }) {
                     }}
                 >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                        <span style={{ color: '#94a3b8', fontSize: '0.85rem', fontWeight: 600 }}>Total Registered Users</span>
+                        <span style={{ color: '#94a3b8', fontSize: '0.85rem', fontWeight: 600 }}>Total Users</span>
                         <div style={{ background: 'rgba(236, 72, 153, 0.15)', color: '#ec4899', padding: '0.4rem', borderRadius: '10px' }}>
                             <Users size={20} />
                         </div>
@@ -158,13 +186,13 @@ export function AdminAnalytics({ statsData }) {
                                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                                     <CheckCircle2 size={14} style={{ color: '#14F195' }} /> Confirmed
                                 </span>
-                                <span style={{ fontWeight: 700 }}>{deposits.confirmedCount} ({deposits.confirmedAmount.toFixed(4)} SOL)</span>
+                                <span style={{ fontWeight: 700 }}>{deposits.confirmedCount} ({deposits.confirmedAmount.toFixed(8)} SOL)</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.83rem', color: '#cbd5e1' }}>
                                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                                     <Clock size={14} style={{ color: '#f59e0b' }} /> Pending / Processing
                                 </span>
-                                <span style={{ fontWeight: 700 }}>{deposits.pendingCount} ({deposits.pendingAmount.toFixed(4)} SOL)</span>
+                                <span style={{ fontWeight: 700 }}>{deposits.pendingCount} ({deposits.pendingAmount.toFixed(8)} SOL)</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.83rem', color: '#cbd5e1' }}>
                                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
@@ -193,13 +221,13 @@ export function AdminAnalytics({ statsData }) {
                                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                                     <CheckCircle2 size={14} style={{ color: '#14F195' }} /> Confirmed
                                 </span>
-                                <span style={{ fontWeight: 700 }}>{withdrawals.confirmedCount} ({withdrawals.confirmedAmount.toFixed(4)} SOL)</span>
+                                <span style={{ fontWeight: 700 }}>{withdrawals.confirmedCount} ({withdrawals.confirmedAmount.toFixed(8)} SOL)</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.83rem', color: '#cbd5e1' }}>
                                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                                     <Clock size={14} style={{ color: '#f59e0b' }} /> Pending / Processing
                                 </span>
-                                <span style={{ fontWeight: 700 }}>{withdrawals.pendingCount} ({withdrawals.pendingAmount.toFixed(4)} SOL)</span>
+                                <span style={{ fontWeight: 700 }}>{withdrawals.pendingCount} ({withdrawals.pendingAmount.toFixed(8)} SOL)</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.83rem', color: '#cbd5e1' }}>
                                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>

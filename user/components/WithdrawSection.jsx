@@ -79,7 +79,7 @@ export const WithdrawSection = ({ onWithdrawSuccess }) => {
                     <span>Withdraw</span>
                 </h2>
                 <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>
-                    Max Withdrawable: <strong className="font-mono" style={{ color: '#00C2FF' }}>{user?.walletBalance !== undefined ? Number(user.walletBalance).toFixed(6) : '0.000000'} SOL</strong>
+                    Max Withdrawable: <strong className="font-mono" style={{ color: '#00C2FF' }}>{user?.walletBalance !== undefined ? Number(user.walletBalance).toFixed(8) : '0.00000000'} SOL</strong>
                 </span>
             </div>
 

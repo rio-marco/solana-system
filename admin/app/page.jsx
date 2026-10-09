@@ -14,7 +14,7 @@ import { Shield, RefreshCw } from 'lucide-react';
 export default function AdminDashboardPage() {
     const { admin, loading } = useAuth();
     const router = useRouter();
-    const { addToast } = useToast();
+    const { toastError, toastSuccess } = useToast();
 
     const [walletData, setWalletData] = useState(null);
     const [statsData, setStatsData] = useState(null);
@@ -45,11 +45,11 @@ export default function AdminDashboardPage() {
             };
         } catch (err) {
             console.error('Failed to fetch admin overview:', err);
-            addToast('Failed to load admin overview data.', 'error');
+            toastError('Failed to load admin overview data.', 'error');
         } finally {
             setFetchingData(false);
         };
-    }, [addToast]);
+    }, [toastError, toastSuccess]);
 
     useEffect(() => {
         if (admin) {
@@ -62,15 +62,15 @@ export default function AdminDashboardPage() {
         try {
             const res = await axios.post('/api/admin/wallet/generate');
             if (res.data && res.data.flag && res.data.data) {
-                addToast('New Admin Wallet Address generated successfully!', 'success');
+                toastSuccess('New Admin Wallet Address generated successfully!', 'success');
                 setWalletData(res.data.data);
                 setRefreshTrigger((prev) => prev + 1);
                 fetchAdminOverview();
             } else {
-                addToast(res.data?.message || 'Failed to generate new wallet address.', 'error');
+                toastError(res.data?.message || 'Failed to generate new wallet address.', 'error');
             };
         } catch (err) {
-            addToast(err.response?.data?.message || err.message || 'Error generating wallet address.', 'error');
+            toastError(err.response?.data?.message || err.message || 'Error generating wallet address.', 'error');
         } finally {
             setGeneratingWallet(false);
         };

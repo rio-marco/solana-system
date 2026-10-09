@@ -9,6 +9,7 @@ const { emitToUser } = require('../../../../lib/socket');
 const Withdrawal = require('../../../../lib/models/withdrawal.model');
 const User = require('../../../../lib/models/user.model');
 const Notification = require('../../../../lib/models/notification.model');
+const Setting = require('../../../../lib/models/setting.model');
 
 async function POST(req) {
     try {
@@ -41,6 +42,14 @@ async function POST(req) {
             return errorResponse(`Insufficient account balance. Available: ${avail} SOL, Requested: ${amountVal.numericAmount} SOL.`);
         };
 
+        const withdrawFee = (await Setting.getVal('WITHDRAWAL_PLATFORM_FEE'));
+
+        const totalWithdrawAmount = amountVal.numericAmount - Number(withdrawFee);
+
+        if (totalWithdrawAmount <= 0) {
+            return errorResponse("Invalid withdraw amount. Please enter valid amount.");
+        };
+
         const withdrawId = `WTH-${uuidv4().substring(0, 8).toUpperCase()}`;
 
         const withdrawal = new Withdrawal({
@@ -49,6 +58,7 @@ async function POST(req) {
             toAddress: toAddress.trim(),
             memo: memoVal.cleanMemo,
             amount: amountVal.numericAmount,
+            platformFee: Number(withdrawFee),
             currency: 'SOL',
             status: 'PENDING',
         });
@@ -62,7 +72,7 @@ async function POST(req) {
             txResult = await executeWithdrawalTransaction({
                 toAddress: toAddress.trim(),
                 memo: memoVal.cleanMemo,
-                amount: amountVal.numericAmount,
+                amount: totalWithdrawAmount,
             });
 
             withdrawal.transactionSignature = txResult.signature;

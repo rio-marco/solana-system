@@ -117,7 +117,7 @@ export const Navbar = () => {
                                 <Wallet size={16} style={{ color: '#14F195' }} />
                                 <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>Balance:</span>
                                 <span style={{ fontSize: '0.85rem', color: '#14F195', fontWeight: 800, fontFamily: 'monospace' }}>
-                                    {(user.walletBalance || 0).toFixed(4)} SOL
+                                    {(user.walletBalance || 0).toFixed(8)} SOL
                                 </span>
                             </div>
 

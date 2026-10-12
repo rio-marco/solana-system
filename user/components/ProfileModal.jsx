@@ -26,12 +26,19 @@ export const ProfileModal = ({ isOpen, onClose }) => {
     const [twoFALoading, setTwoFALoading] = useState(false);
     const [copiedSecret, setCopiedSecret] = useState(false);
 
+    const isModalOpen = isOpen !== undefined ? isOpen : '';
+
     useEffect(() => {
         if (user) {
             setFullName(user.fullName || '');
             setPreview(user.profilePhoto ? (user.profilePhoto.startsWith('/') ? user.profilePhoto : `/${user.profilePhoto}`) : null);
         };
-    }, [user]);
+
+        if (!isModalOpen) {
+            setError(null);
+            setSuccess(null);
+        };
+    }, [user, isModalOpen]);
 
     if (!isOpen || !user) return null;
 
@@ -41,6 +48,14 @@ export const ProfileModal = ({ isOpen, onClose }) => {
             setFile(selectedFile);
             setPreview(URL.createObjectURL(selectedFile));
         };
+    };
+
+    const handleClose = () => {
+        setSuccess(null);
+        setError(null);
+        setLoading(false);
+
+        if (onClose) onClose();
     };
 
     const handleSubmit = async (e) => {
@@ -185,7 +200,7 @@ export const ProfileModal = ({ isOpen, onClose }) => {
                         <UserIcon style={{ color: '#9945FF' }} size={20} />
                         <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#fff' }}>User Profile & Security</h3>
                     </div>
-                    <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
+                    <button onClick={handleClose} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
                         <X size={20} />
                     </button>
                 </div>

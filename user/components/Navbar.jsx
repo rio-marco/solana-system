@@ -21,11 +21,19 @@ export const Navbar = () => {
     const [showDecoder, setShowDecoder] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
 
+    const userId = user?._id;
+
     const fetchUnreadCount = useCallback(async () => {
-        if (!user) return;
+        // if (!user) return;
+
+        if (!userId) {
+            setUnreadCount(0);
+            return;
+        };
 
         try {
             const res = await axios.get('/api/notifications');
+
             if (res.data && res.data.flag && res.data.data) {
                 const list = res.data.data.notifications || [];
                 const unread = list.filter((n) => !n.isRead).length;
@@ -34,7 +42,7 @@ export const Navbar = () => {
         } catch (e) {
             // ignore
         };
-    }, [user]);
+    }, [userId]);
 
     useEffect(() => {
         fetchUnreadCount();

@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import {
     LayoutDashboard,
@@ -14,15 +16,21 @@ import {
 } from 'lucide-react';
 
 const NAV_ITEMS = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'users', label: 'User Management', icon: Users },
-    { id: 'deposits', label: 'Deposit Management', icon: ArrowDownLeft },
-    { id: 'withdrawals', label: 'Withdraw Management', icon: ArrowUpRight },
-    { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'dashboard', label: 'Dashboard',           icon: LayoutDashboard, href: '/' },
+    { id: 'users',     label: 'User Management',     icon: Users,           href: '/user' },
+    { id: 'deposits',  label: 'Deposit Management',  icon: ArrowDownLeft,   href: '/deposit' },
+    { id: 'withdrawals', label: 'Withdraw Management', icon: ArrowUpRight,  href: '/withdraw' },
+    { id: 'settings',  label: 'Settings',            icon: Settings,        href: '/setting' },
 ];
 
-export function Sidebar({ activeTab, onTabChange }) {
+export function Sidebar() {
     const { admin, logout, config } = useAuth();
+    const pathname = usePathname();
+
+    const isActive = (href) => {
+        if (href === '/') return pathname === '/';
+        return pathname === href || pathname.startsWith(href + '/');
+    };
 
     return (
         <aside
@@ -131,13 +139,12 @@ export function Sidebar({ activeTab, onTabChange }) {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
                     {NAV_ITEMS.map((item) => {
                         const Icon = item.icon;
-                        const isActive = activeTab === item.id;
+                        const active = isActive(item.href);
 
                         return (
-                            <button
+                            <Link
                                 key={item.id}
-                                type="button"
-                                onClick={() => onTabChange(item.id)}
+                                href={item.href}
                                 style={{
                                     display: 'flex',
                                     alignItems: 'center',
@@ -145,23 +152,22 @@ export function Sidebar({ activeTab, onTabChange }) {
                                     width: '100%',
                                     padding: '0.75rem 0.9rem',
                                     borderRadius: '12px',
-                                    border: 'none',
                                     cursor: 'pointer',
                                     transition: 'all 0.2s ease',
-                                    background: isActive
+                                    background: active
                                         ? 'linear-gradient(135deg, rgba(153,69,255,0.25) 0%, rgba(0,194,255,0.15) 100%)'
                                         : 'transparent',
-                                    borderLeft: isActive ? '3px solid #9945FF' : '3px solid transparent',
-                                    color: isActive ? '#ffffff' : '#94a3b8',
-                                    textAlign: 'left',
+                                    borderLeft: active ? '3px solid #9945FF' : '3px solid transparent',
+                                    color: active ? '#ffffff' : '#94a3b8',
+                                    textDecoration: 'none',
                                     position: 'relative',
                                 }}
-                                className={isActive ? '' : 'sidebar-nav-btn'}
+                                className={active ? '' : 'sidebar-nav-btn'}
                             >
                                 <Icon
                                     size={18}
                                     style={{
-                                        color: isActive ? '#14F195' : '#64748b',
+                                        color: active ? '#14F195' : '#64748b',
                                         transition: 'color 0.2s ease',
                                         flexShrink: 0,
                                     }}
@@ -169,20 +175,20 @@ export function Sidebar({ activeTab, onTabChange }) {
                                 <span
                                     style={{
                                         fontSize: '0.88rem',
-                                        fontWeight: isActive ? 700 : 500,
+                                        fontWeight: active ? 700 : 500,
                                         flex: 1,
                                         transition: 'all 0.2s ease',
                                     }}
                                 >
                                     {item.label}
                                 </span>
-                                {isActive && (
+                                {active && (
                                     <ChevronRight
                                         size={14}
                                         style={{ color: '#9945FF', opacity: 0.7 }}
                                     />
                                 )}
-                            </button>
+                            </Link>
                         );
                     })}
                 </div>

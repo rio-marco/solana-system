@@ -1,20 +1,13 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
-import { Sidebar } from '../components/Sidebar';
-import { AdminWalletCard } from '../components/AdminWalletCard';
-import { AdminAnalytics } from '../components/AdminAnalytics';
-import { UserManagement } from '../components/UserManagement';
-import { DepositManagement } from '../components/DepositManagement';
-import { WithdrawManagement } from '../components/WithdrawManagement';
-import { SettingsPanel } from '../components/SettingsPanel';
+import { useToast } from '../../context/ToastContext';
+import { AdminWalletCard } from '../../components/AdminWalletCard';
+import { AdminAnalytics } from '../../components/AdminAnalytics';
 import { RefreshCw, Shield } from 'lucide-react';
 
-function DashboardTab({ onGenerateWallet, generatingWallet }) {
+export default function DashboardPage() {
     const { toastError, toastSuccess } = useToast();
     const [walletData, setWalletData] = useState(null);
     const [statsData, setStatsData] = useState(null);
@@ -105,59 +98,6 @@ function DashboardTab({ onGenerateWallet, generatingWallet }) {
 
             {/* Analytics */}
             <AdminAnalytics statsData={statsData} />
-        </div>
-    );
-}
-
-export default function AdminDashboardPage() {
-    const { admin, loading } = useAuth();
-    const router = useRouter();
-    const [activeTab, setActiveTab] = useState('dashboard');
-
-    useEffect(() => {
-        if (!loading && !admin) {
-            router.push('/login');
-        }
-    }, [admin, loading, router]);
-
-    if (loading || !admin) {
-        return (
-            <div style={{ minHeight: '100vh', background: 'var(--bg-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '1rem' }}>
-                <div style={{ width: '44px', height: '44px', border: '4px solid rgba(153,69,255,0.3)', borderTop: '4px solid #9945FF', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-                <span style={{ color: '#9945FF', fontWeight: 700, fontSize: '0.9rem', letterSpacing: '0.05em' }}>Loading Admin Panel...</span>
-            </div>
-        );
-    };
-
-    const renderContent = () => {
-        switch (activeTab) {
-            case 'dashboard': return <DashboardTab />;
-            case 'users': return <UserManagement />;
-            case 'deposits': return <DepositManagement />;
-            case 'withdrawals': return <WithdrawManagement />;
-            case 'settings': return <SettingsPanel />;
-            default: return <DashboardTab />;
-        };
-    };
-
-    return (
-        <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-dark)' }}>
-            {/* Sidebar */}
-            <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-
-            {/* Main Content */}
-            <main
-                style={{
-                    flex: 1,
-                    minWidth: 0,
-                    overflowY: 'auto',
-                    overflowX: 'hidden',
-                    padding: '2rem 2rem 3rem',
-                    maxHeight: '100vh',
-                }}
-            >
-                {renderContent()}
-            </main>
         </div>
     );
 };

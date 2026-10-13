@@ -2,17 +2,15 @@ const Validator = require("validatorjs");
 const { errorResponse, successResponse, } = require('./general');
 
 const validateRules = {
-    auth: {
-        signIn: {
+    admin: {
+        login: {
             email: "required|email",
+            password: "required|min:6",
         },
-        verify_otp: {
-            email: "required|email",
-            otp: "required|min:6|max:6",
-        },
-        direct_link: {
-            email: "required|email",
-            token: "required",
+        change_password: {
+            currentPassword: "required",
+            newPassword: "required|min:6",
+            confirmPassword: "required|same:newPassword",
         },
     },
 };

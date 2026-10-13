@@ -50,4 +50,16 @@ module.exports = {
         EXPIRED: 0,
         ACTIVE: 1,
     },
+
+    DEPOSIT_STATUS: {
+        PENDING: "PENDING",
+        CONFIRMED: "CONFIRMED",
+        FAILED: "FAILED",
+    },
+    
+    WITHDRAW_STATUS: {
+        PENDING: "PENDING",
+        CONFIRMED: "CONFIRMED",
+        FAILED: "FAILED",
+    },
 };

@@ -60,20 +60,18 @@ export default function AdminLoginPage() {
                 const msg = res.data?.msg || res.data?.message || 'Invalid email address or password.';
                 setError(msg);
                 toastError(msg);
+
+                setTimeout(() => setError(null), 3000);
             };
         } catch (err) {
             const msg = err.response?.data?.msg || err.response?.data?.message || 'Invalid email address or password.';
             setError(msg);
             toastError(msg);
+
+            setTimeout(() => setError(null), 3000);
         } finally {
             setLoading(false);
         };
-    };
-
-    const handleFillDefaultAdmin = () => {
-        setEmail('admin@solana.com');
-        setPassword('admin123');
-        setError(null);
     };
 
     if (authLoading) {

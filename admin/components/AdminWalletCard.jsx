@@ -73,55 +73,6 @@ export function AdminWalletCard({ walletData, onRefresh, onGenerateWallet, gener
                         </p>
                     </div>
                 </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                    <button
-                        type="button"
-                        onClick={onRefresh}
-                        style={{
-                            background: 'rgba(255, 255, 255, 0.06)',
-                            border: '1px solid rgba(255, 255, 255, 0.12)',
-                            color: '#cbd5e1',
-                            padding: '0.5rem 0.9rem',
-                            borderRadius: '10px',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.4rem',
-                            fontSize: '0.82rem',
-                            fontWeight: 600,
-                            transition: 'all 0.2s ease',
-                        }}
-                        title="Refresh On-Chain Balance"
-                    >
-                        <RefreshCw size={14} className={generating ? 'animate-spin' : ''} />
-                        <span>Refresh</span>
-                    </button>
-
-                    <button
-                        type="button"
-                        onClick={() => setShowConfirmModal(true)}
-                        disabled={generating}
-                        style={{
-                            background: 'linear-gradient(135deg, #9945FF 0%, #7c2d12 0%, #dc2626 100%)',
-                            border: 'none',
-                            color: '#ffffff',
-                            padding: '0.55rem 1.1rem',
-                            borderRadius: '10px',
-                            cursor: generating ? 'not-allowed' : 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.45rem',
-                            fontSize: '0.85rem',
-                            fontWeight: 700,
-                            boxShadow: '0 4px 14px rgba(220, 38, 38, 0.35)',
-                            transition: 'all 0.2s ease',
-                        }}
-                    >
-                        <Key size={15} />
-                        <span>{generating ? 'Generating...' : 'Generate New Address'}</span>
-                    </button>
-                </div>
             </div>
 
             {/* Generated Address Box */}
@@ -137,20 +88,6 @@ export function AdminWalletCard({ walletData, onRefresh, onGenerateWallet, gener
                 <div style={{ display: 'flex', alignItems: 'center', justify: 'space-between', marginBottom: '0.4rem' }}>
                     <span style={{ marginRight: "10px", color: '#94a3b8', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
                         Active Deposite Address
-                    </span>
-                    <span
-                        style={{
-                            background: 'rgba(20, 241, 149, 0.12)',
-                            color: '#14F195',
-                            border: '1px solid rgba(20, 241, 149, 0.3)',
-                            padding: '0.15rem 0.6rem',
-                            borderRadius: '20px',
-                            fontSize: '0.72rem',
-                            fontWeight: 700,
-                            textTransform: 'uppercase',
-                        }}
-                    >
-                        {walletData?.network || 'devnet'} network
                     </span>
                 </div>
 

@@ -321,3 +321,57 @@ body {
     box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
     padding: 2rem;
 }
+
+/* ===== SIDEBAR ===== */
+.sidebar-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #ffffff !important;
+    border-left-color: rgba(153, 69, 255, 0.5) !important;
+}
+
+.sidebar-nav-btn:hover svg {
+    color: #9945FF !important;
+}
+
+.sidebar-logout-btn:hover {
+    background: rgba(239, 68, 68, 0.16) !important;
+    border-color: rgba(239, 68, 68, 0.4) !important;
+    color: #fff !important;
+}
+
+/* ===== SPINNER ===== */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+    animation: spin 0.8s linear infinite;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(153, 69, 255, 0.35);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(153, 69, 255, 0.6);
+}
+
+/* ===== INPUT FOCUS ===== */
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: rgba(153, 69, 255, 0.5) !important;
+    box-shadow: 0 0 0 3px rgba(153, 69, 255, 0.12);
+}

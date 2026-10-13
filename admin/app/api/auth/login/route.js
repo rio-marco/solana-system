@@ -3,6 +3,7 @@ const constants = require('../../../../lib/constants');
 const messages = require('../../../../lib/messages');
 const Admin = require('../../../../lib/models/admin.model');
 const { createSessionRecord } = require('../../../../lib/session');
+const customValidation = require("../../../../lib/validator");
 const { errorResponse, successResponse, log1 } = require("../../../../lib/general");
 
 async function POST(req) {
@@ -10,12 +11,9 @@ async function POST(req) {
         const body = await req.json();
         const { email, password } = body;
 
-        if (!email || !email.trim() || !(constants.EMAIL_REGEX).test(email.trim())) {
-            return errorResponse("Invalid email address.");
-        };
-
-        if (!password || !password.trim()) {
-            return errorResponse("Password is required.");
+        const validation = await customValidation(body, "admin.login");
+        if (validation.flag === 0) {
+            return errorResponse(validation.msg || "Validation error");
         };
 
         const cleanEmail = email.trim().toLowerCase();

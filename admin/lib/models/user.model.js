@@ -55,6 +55,20 @@ const UserSchema = new mongoose.Schema(
             enum: Object.values(constants.USER_STATUS),
             default: constants.USER_STATUS.INACTIVE,
         },
+        suspendReason: {
+            type: String,
+            default: null,
+        },
+        suspendHistory: {
+            type: [
+                {
+                    reason: { type: String, required: true },
+                    suspendedAt: { type: Date, default: Date.now },
+                    activatedAt: { type: Date, default: null },
+                },
+            ],
+            default: [],
+        },
     },
     {
         timestamps: true,

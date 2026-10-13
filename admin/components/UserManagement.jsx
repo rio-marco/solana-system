@@ -20,9 +20,12 @@ import {
     Filter,
     History,
 } from 'lucide-react';
-
-const USER_STATUS = { INACTIVE: 1, ACTIVE: 2, SUSPENDED: 3 };
-const TwoFA_STATUS = { DISABLED: 0, ENABLED: 1 };
+import {
+    USER_STATUS,
+    TwoFA_STATUS,
+    DEFAULT_CURRENT_PAGE,
+    DEFAULT_ITEM_PER_PAGE,
+} from './ui-constants.mjs';
 
 function getStatusBadge(status) {
     if (status === USER_STATUS.ACTIVE) {
@@ -189,7 +192,12 @@ function SuspendHistoryModal({ user, onClose }) {
 export function UserManagement() {
     const [loading, setLoading] = useState(false);
     const [users, setUsers] = useState([]);
-    const [pagination, setPagination] = useState({ totalCount: 0, totalPages: 1, currentPage: 1, limit: 10 });
+    const [pagination, setPagination] = useState({
+        totalCount: 0,
+        totalPages: 0,
+        currentPage: DEFAULT_CURRENT_PAGE,
+        limit: DEFAULT_ITEM_PER_PAGE,
+    });
 
     // Filters
     const [nameFilter, setNameFilter] = useState('');
@@ -208,14 +216,18 @@ export function UserManagement() {
     useEffect(() => {
         const t = setTimeout(() => {
             setDebouncedName(nameFilter);
-            setPagination(p => ({ ...p, currentPage: 1 }));
+            setPagination(p => ({ ...p, currentPage: DEFAULT_CURRENT_PAGE }));
         }, 350);
 
         return () => clearTimeout(t);
     }, [nameFilter]);
 
     useEffect(() => {
-        const t = setTimeout(() => { setDebouncedEmail(emailFilter); setPagination(p => ({ ...p, currentPage: 1 })); }, 350);
+        const t = setTimeout(() => {
+            setDebouncedEmail(emailFilter);
+            setPagination(p => ({ ...p, currentPage: DEFAULT_CURRENT_PAGE }));
+        }, 350);
+
         return () => clearTimeout(t);
     }, [emailFilter]);
 
@@ -235,7 +247,7 @@ export function UserManagement() {
             if (res.data?.flag && res.data?.data) {
                 const d = res.data.data;
                 setUsers(d.users || []);
-                setPagination(p => ({ ...p, totalCount: d.totalCount || 0, totalPages: d.totalPages || 1 }));
+                setPagination(p => ({ ...p, totalCount: d.totalCount || 0, totalPages: d.totalPages || 0 }));
             } else {
                 setUsers([]);
             };
@@ -251,10 +263,25 @@ export function UserManagement() {
         fetchUsers();
     }, [fetchUsers]);
 
-    const handleStatusChange = (e) => { setStatusFilter(e.target.value); setPagination(p => ({ ...p, currentPage: 1 })); };
-    const handleTwoFAChange = (e) => { setTwoFAFilter(e.target.value); setPagination(p => ({ ...p, currentPage: 1 })); };
-    const handleLimitChange = (e) => { setPagination(p => ({ ...p, limit: parseInt(e.target.value, 10), currentPage: 1 })); };
-    const handlePageChange = (pg) => { if (pg >= 1 && pg <= pagination.totalPages && !loading) setPagination(p => ({ ...p, currentPage: pg })); };
+    const handleStatusChange = (e) => {
+        setStatusFilter(e.target.value);
+        setPagination(p => ({ ...p, currentPage: DEFAULT_CURRENT_PAGE }));
+    };
+
+    const handleTwoFAChange = (e) => {
+        setTwoFAFilter(e.target.value);
+        setPagination(p => ({ ...p, currentPage: DEFAULT_CURRENT_PAGE }));
+    };
+
+    const handleLimitChange = (e) => {
+        setPagination(p => ({ ...p, limit: parseInt(e.target.value, 10), currentPage: DEFAULT_CURRENT_PAGE }));
+    };
+
+    const handlePageChange = (pg) => {
+        if (pg >= 1 && pg <= pagination.totalPages && !loading) {
+            setPagination(p => ({ ...p, currentPage: pg }));
+        };
+    };
 
     const handleConfirmSuspend = async (reason) => {
         if (!suspendModal) return;
@@ -404,20 +431,24 @@ export function UserManagement() {
                     {/* Status Filter */}
                     <select value={statusFilter} onChange={handleStatusChange} style={selectStyle}>
                         <option value="ALL">All Status</option>
-                        <option value="2">Active</option>
-                        <option value="3">Suspended</option>
-                        <option value="1">Inactive</option>
+                        <option value={USER_STATUS.ACTIVE}>Active</option>
+                        <option value={USER_STATUS.SUSPENDED}>Suspended</option>
+                        <option value={USER_STATUS.INACTIVE}>Inactive</option>
                     </select>
                     {/* 2FA Filter */}
                     <select value={twoFAFilter} onChange={handleTwoFAChange} style={selectStyle}>
                         <option value="ALL">All 2FA</option>
-                        <option value="1">ON</option>
-                        <option value="0">OFF</option>
+                        <option value={TwoFA_STATUS.ENABLED}>ON</option>
+                        <option value={TwoFA_STATUS.DISABLED}>OFF</option>
                     </select>
                     {/* Per page */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#94a3b8', fontSize: '0.8rem' }}>
                         <span>Per page:</span>
-                        <select value={pagination.limit} onChange={handleLimitChange} style={{ ...selectStyle, padding: '0.45rem 0.65rem' }}>
+                        <select
+                            value={pagination.limit}
+                            onChange={handleLimitChange}
+                            style={{ ...selectStyle, padding: '0.45rem 0.65rem' }}
+                        >
                             <option value={10}>10</option>
                             <option value={25}>25</option>
                             <option value={50}>50</option>
@@ -429,7 +460,13 @@ export function UserManagement() {
                 <div style={{ overflowX: 'auto', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.84rem' }}>
                         <thead>
-                            <tr style={{ background: 'rgba(10,14,26,0.9)', color: '#94a3b8', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                            <tr
+                                style={{
+                                    background: 'rgba(10,14,26,0.9)',
+                                    color: '#94a3b8',
+                                    borderBottom: '1px solid rgba(255,255,255,0.08)'
+                                }}
+                            >
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>User</th>
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Memo</th>
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Wallet Balance</th>

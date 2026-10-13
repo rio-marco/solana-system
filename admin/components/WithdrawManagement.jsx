@@ -17,12 +17,17 @@ import {
     Eye,
     RefreshCw,
 } from 'lucide-react';
+import {
+    WITHDRAW_STATUS,
+    DEFAULT_CURRENT_PAGE,
+    DEFAULT_ITEM_PER_PAGE
+} from './ui-constants.mjs';
 
 function getStatusBadge(status) {
     switch (status) {
-        case "CONFIRMED":
+        case WITHDRAW_STATUS.CONFIRMED:
             return <span style={{ background: 'rgba(20,241,149,0.12)', color: '#14F195', border: '1px solid rgba(20,241,149,0.3)', padding: '0.2rem 0.65rem', borderRadius: '20px', fontSize: '0.73rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><CheckCircle2 size={11} />Confirmed</span>;
-        case "FAILED":
+        case WITHDRAW_STATUS.FAILED:
             return <span style={{ background: 'rgba(239,68,68,0.12)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)', padding: '0.2rem 0.65rem', borderRadius: '20px', fontSize: '0.73rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><XCircle size={11} />Failed</span>;
         default:
             return <span style={{ background: 'rgba(245,158,11,0.12)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.3)', padding: '0.2rem 0.65rem', borderRadius: '20px', fontSize: '0.73rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><Clock size={11} />{status || 'Pending'}</span>;
@@ -34,9 +39,9 @@ export function WithdrawManagement() {
     const [items, setItems] = useState([]);
     const [pagination, setPagination] = useState({
         totalCount: 0,
-        totalPages: 1,
-        currentPage: 1,
-        limit: 10,
+        totalPages: 0,
+        currentPage: DEFAULT_CURRENT_PAGE,
+        limit: DEFAULT_ITEM_PER_PAGE,
     });
     const [statusFilter, setStatusFilter] = useState('ALL');
     const [searchTerm, setSearchTerm] = useState('');
@@ -46,7 +51,7 @@ export function WithdrawManagement() {
     useEffect(() => {
         const t = setTimeout(() => {
             setDebouncedSearch(searchTerm);
-            setPagination(p => ({ ...p, currentPage: 1 }));
+            setPagination(p => ({ ...p, currentPage: DEFAULT_CURRENT_PAGE }));
         }, 350);
 
         return () => clearTimeout(t);
@@ -59,14 +64,14 @@ export function WithdrawManagement() {
                 page: pagination.currentPage,
                 limit: pagination.limit,
                 status: statusFilter,
-                search: debouncedSearch
+                search: debouncedSearch,
             };
 
             const res = await axios.get('/api/admin/withdrawals', { params: payload });
             if (res.data?.flag && res.data?.data) {
                 const d = res.data.data;
                 setItems(d.withdrawals || []);
-                setPagination(p => ({ ...p, totalCount: d.totalCount || 0, totalPages: d.totalPages || 1 }));
+                setPagination(p => ({ ...p, totalCount: d.totalCount || 0, totalPages: d.totalPages || 0 }));
             } else {
                 setItems([]);
             };
@@ -122,7 +127,17 @@ export function WithdrawManagement() {
         return pages;
     };
 
-    const selectStyle = { background: 'rgba(10,14,26,0.7)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', padding: '0.6rem 1rem', color: '#fff', fontSize: '0.83rem', outline: 'none', cursor: 'pointer' };
+    const selectStyle = {
+        background: 'rgba(10,14,26,0.7)',
+        border: '1px solid rgba(255,255,255,0.12)',
+        borderRadius: '12px',
+        padding: '0.6rem 1rem',
+        color: '#fff',
+        fontSize: '0.83rem',
+        outline: 'none',
+        cursor: 'pointer',
+    };
+
     const startEntry = pagination.totalCount === 0 ? 0 : (pagination.currentPage - 1) * pagination.limit + 1;
     const endEntry = Math.min(pagination.currentPage * pagination.limit, pagination.totalCount);
 
@@ -158,16 +173,29 @@ export function WithdrawManagement() {
                         <Search size={14} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
                         <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search by email, tx signature, memo, ID..." style={{ width: '100%', ...selectStyle, paddingLeft: '2.4rem' }} />
                     </div>
-                    <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPagination(p => ({ ...p, currentPage: 1 })); }} style={selectStyle}>
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => {
+                            setStatusFilter(e.target.value);
+                            setPagination(p => ({ ...p, currentPage: DEFAULT_CURRENT_PAGE }));
+                        }}
+                        style={selectStyle}
+                    >
                         <option value="ALL">All Statuses</option>
-                        <option value="CONFIRMED">Confirmed</option>
-                        <option value="PENDING">Pending</option>
-                        <option value="FAILED">Failed</option>
+                        <option value={WITHDRAW_STATUS.CONFIRMED}>Confirmed</option>
+                        <option value={WITHDRAW_STATUS.PENDING}>Pending</option>
+                        <option value={WITHDRAW_STATUS.FAILED}>Failed</option>
                     </select>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#94a3b8', fontSize: '0.8rem' }}>
                         <span>Per page:</span>
-                        <select value={pagination.limit} onChange={(e) => setPagination(p => ({ ...p, limit: parseInt(e.target.value, 10), currentPage: 1 }))} style={{ ...selectStyle, padding: '0.45rem 0.65rem' }}>
-                            <option value={10}>10</option><option value={25}>25</option><option value={50}>50</option>
+                        <select
+                            value={pagination.limit}
+                            onChange={(e) => setPagination(p => ({ ...p, limit: parseInt(e.target.value, 10), currentPage: DEFAULT_CURRENT_PAGE }))}
+                            style={{ ...selectStyle, padding: '0.45rem 0.65rem' }}
+                        >
+                            <option value={10}>10</option>
+                            <option value={25}>25</option>
+                            <option value={50}>50</option>
                         </select>
                     </div>
                 </div>
@@ -176,7 +204,13 @@ export function WithdrawManagement() {
                 <div style={{ overflowX: 'auto', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.84rem' }}>
                         <thead>
-                            <tr style={{ background: 'rgba(10,14,26,0.9)', color: '#94a3b8', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                            <tr
+                                style={{
+                                    background: 'rgba(10,14,26,0.9)',
+                                    color: '#94a3b8',
+                                    borderBottom: '1px solid rgba(255,255,255,0.08)'
+                                }}
+                            >
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>User Email</th>
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>ID / Memo</th>
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Amount (SOL)</th>

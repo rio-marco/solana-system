@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import moment from 'moment';
+import Link from 'next/link';
 import {
     Search,
     ChevronLeft,
@@ -22,7 +23,7 @@ import {
 } from 'lucide-react';
 import {
     USER_STATUS,
-    TwoFA_STATUS,
+    TWOFA_STATUS,
     DEFAULT_CURRENT_PAGE,
     DEFAULT_ITEM_PER_PAGE,
 } from './ui-constants.mjs';
@@ -52,7 +53,7 @@ function getStatusBadge(status) {
 };
 
 function getTwoFABadge(twoFAStatus) {
-    if (twoFAStatus === TwoFA_STATUS.ENABLED) {
+    if (twoFAStatus === TWOFA_STATUS.ENABLED) {
         return (
             <span style={{ background: 'rgba(153,69,255,0.12)', color: '#9945FF', border: '1px solid rgba(153,69,255,0.3)', padding: '0.2rem 0.55rem', borderRadius: '20px', fontSize: '0.73rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
                 <ShieldCheck size={11} /> ON
@@ -438,8 +439,8 @@ export function UserManagement() {
                     {/* 2FA Filter */}
                     <select value={twoFAFilter} onChange={handleTwoFAChange} style={selectStyle}>
                         <option value="ALL">All 2FA</option>
-                        <option value={TwoFA_STATUS.ENABLED}>ON</option>
-                        <option value={TwoFA_STATUS.DISABLED}>OFF</option>
+                        <option value={TWOFA_STATUS.ENABLED}>ON</option>
+                        <option value={TWOFA_STATUS.DISABLED}>OFF</option>
                     </select>
                     {/* Per page */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#94a3b8', fontSize: '0.8rem' }}>
@@ -531,26 +532,26 @@ export function UserManagement() {
                                     <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
                                             {/* History */}
-                                            <button
-                                                type="button"
+                                            <Link
+                                                href={`/user/${user._id}`}
                                                 title="View User Details"
-                                                onClick={() => setHistoryModal(user)}
                                                 style={{
-                                                    background: 'rgba(153,69,255,0.12)',
-                                                    border: '1px solid rgba(153,69,255,0.25)',
-                                                    color: '#9945FF',
+                                                    background: '#E7F1FF',
+                                                    border: '1px solid #9EC5FE',
+                                                    color: '#0D6EFD',
                                                     padding: '0.35rem 0.55rem',
-                                                    borderRadius: '8px',
+                                                    borderRadius: '6px',
                                                     cursor: 'pointer',
                                                     display: 'inline-flex',
                                                     alignItems: 'center',
                                                     gap: '0.25rem',
                                                     fontSize: '0.73rem',
                                                     fontWeight: 600,
+                                                    textDecoration: 'none',
                                                 }}
                                             >
                                                 <Eye size={13} /> View Details
-                                            </button>
+                                            </Link>
                                             {/* Suspend / Activate */}
                                             {user.status === USER_STATUS.SUSPENDED ? (
                                                 <button

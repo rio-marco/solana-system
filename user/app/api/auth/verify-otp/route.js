@@ -45,7 +45,7 @@ async function POST(req) {
 
         await OTP.deleteMany({ email: cleanEmail });
 
-        if (user.twoFAStatus === constants.TwoFA_STATUS.ENABLED) {
+        if (user.twoFAStatus === constants.TWOFA_STATUS.ENABLED) {
             return successResponse("2FA Verification Required.",
                 {
                     requires2FA: true,
@@ -66,7 +66,7 @@ async function POST(req) {
                 profilePhoto: user.profilePhoto || "",
                 memo: user.memo,
                 walletBalance: user.walletBalance,
-                is2FAEnabled: user.twoFAStatus === constants.TwoFA_STATUS.ENABLED,
+                is2FAEnabled: user.twoFAStatus === constants.TWOFA_STATUS.ENABLED,
             },
         };
 

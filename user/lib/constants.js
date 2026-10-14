@@ -26,7 +26,7 @@ module.exports = {
         LOGIN: 2,
     },
 
-    TwoFA_STATUS: {
+    TWOFA_STATUS: {
         DISABLED: 0,
         ENABLED: 1,
     },

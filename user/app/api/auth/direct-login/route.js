@@ -38,7 +38,7 @@ async function GET(req) {
 
         await OTP.deleteOne({ _id: otpRecord._id });
 
-        if (user.twoFAStatus === constants.TwoFA_STATUS.ENABLED) {
+        if (user.twoFAStatus === constants.TWOFA_STATUS.ENABLED) {
             return NextResponse.redirect(new URL(`/verify-otp?email=${encodeURIComponent(cleanEmail)}&requires2FA=true`, req.url));
         };
 

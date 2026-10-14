@@ -32,7 +32,7 @@ async function POST(req) {
             sessionAuth.userId,
             {
                 twoFASecret: secret.trim(),
-                twoFAStatus: constants.TwoFA_STATUS.ENABLED,
+                twoFAStatus: constants.TWOFA_STATUS.ENABLED,
             },
             { new: true }
         ).lean();

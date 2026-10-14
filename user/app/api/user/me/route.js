@@ -21,7 +21,7 @@ async function GET(req) {
                     profilePhoto: user.profilePhoto || "",
                     memo: user.memo,
                     walletBalance: user.walletBalance,
-                    is2FAEnabled: user.twoFAStatus === constants.TwoFA_STATUS.ENABLED,
+                    is2FAEnabled: user.twoFAStatus === constants.TWOFA_STATUS.ENABLED,
                 },
                 network: process.env.SOLANA_NETWORK || 'devnet',
                 rpcUrl: process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com',

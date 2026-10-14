@@ -26,7 +26,7 @@ module.exports = {
         LOGIN: 2,
     },
 
-    TwoFA_STATUS: {
+    TWOFA_STATUS: {
         DISABLED: 0,
         ENABLED: 1,
     },
@@ -51,12 +51,17 @@ module.exports = {
         ACTIVE: 1,
     },
 
+    TRX_TYPE: {
+        DEPOSIT: 0,
+        WITHDRAW: 1,
+    },
+
     DEPOSIT_STATUS: {
         PENDING: "PENDING",
         CONFIRMED: "CONFIRMED",
         FAILED: "FAILED",
     },
-    
+
     WITHDRAW_STATUS: {
         PENDING: "PENDING",
         CONFIRMED: "CONFIRMED",

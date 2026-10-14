@@ -13,9 +13,14 @@ export const USER_STATUS = {
     SUSPENDED: 3,
 };
 
-export const TwoFA_STATUS = {
+export const TWOFA_STATUS = {
     DISABLED: 0,
     ENABLED:  1,
+};
+
+export const TRX_TYPE = {
+    DEPOSIT: 0,
+    WITHDRAW: 1,
 };
 
 export const DEPOSIT_STATUS = {

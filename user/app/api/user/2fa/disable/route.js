@@ -20,7 +20,7 @@ async function POST(req) {
         };
 
         const user = await User.findById(sessionAuth.userId);
-        if (!user || user.twoFAStatus !== constants.TwoFA_STATUS.ENABLED || !user.twoFASecret) {
+        if (!user || user.twoFAStatus !== constants.TWOFA_STATUS.ENABLED || !user.twoFASecret) {
             return errorResponse("2FA is not enabled on this account.");
         };
 
@@ -30,7 +30,7 @@ async function POST(req) {
         };
 
         user.twoFASecret = null;
-        user.twoFAStatus = constants.TwoFA_STATUS.DISABLED;
+        user.twoFAStatus = constants.TWOFA_STATUS.DISABLED;
         await user.save();
 
         return successResponse("Two-Factor Authentication disabled successfully!", {

@@ -68,7 +68,7 @@ async function POST(req) {
             recoveryPhrase: recoveryPhrase,
             walletBalance: 0,
             status: constants.USER_STATUS.INACTIVE,
-            twoFAStatus: constants.TwoFA_STATUS.DISABLED,
+            twoFAStatus: constants.TWOFA_STATUS.DISABLED,
         };
 
         const createdUser = await User.create(createUserPayload);

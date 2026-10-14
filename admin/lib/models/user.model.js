@@ -47,8 +47,8 @@ const UserSchema = new mongoose.Schema(
         },
         twoFAStatus: {
             type: Number,
-            enum: Object.values(constants.TwoFA_STATUS),
-            default: constants.TwoFA_STATUS.DISABLED,
+            enum: Object.values(constants.TWOFA_STATUS),
+            default: constants.TWOFA_STATUS.DISABLED,
         },
         status: {
             type: Number,

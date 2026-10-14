@@ -5,22 +5,27 @@
 @tailwind utilities;
 
 :root {
-    --bg-dark: #07090e;
-    --bg-card: #0f1422;
-    --bg-card-hover: #161c2e;
-    --border-color: rgba(255, 255, 255, 0.08);
-    --border-glow: rgba(153, 69, 255, 0.35);
+    --bg-primary: #F8F9FA;
+    --bg-sidebar: #FFFFFF;
+    --bg-header: #FFFFFF;
+    --bg-card: #FFFFFF;
+    --bg-card-hover: #F1F3F5;
+    --border-color: #DEE2E6;
+    --border-subtle: #F1F3F5;
 
-    --solana-purple: #9945FF;
-    --solana-green: #14F195;
-    --solana-cyan: #00C2FF;
-    --solana-amber: #F59E0B;
-    --solana-gradient: linear-gradient(135deg, #9945FF 0%, #00C2FF 50%, #14F195 100%);
-    --solana-btn-gradient: linear-gradient(135deg, #9945FF 0%, #14F195 100%);
+    --primary-blue: #0D6EFD;
+    --primary-blue-light: #E7F1FF;
+    --success: #198754;
+    --success-light: #D1E7DD;
+    --warning: #FFC107;
+    --warning-light: #FFF3CD;
+    --danger: #DC3545;
+    --danger-light: #F8D7DA;
 
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
-    --text-dim: #64748b;
+    --text-primary: #212529;
+    --text-secondary: #6C757D;
+    --text-muted: #6C757D;
+    --text-dim: #ADB5BD;
 }
 
 * {
@@ -31,19 +36,16 @@
 
 html,
 body {
-    background-color: var(--bg-dark);
-    color: var(--text-main);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
 }
 
 body {
-    background-image:
-        radial-gradient(circle at 20% 10%, rgba(153, 69, 255, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 80% 90%, rgba(20, 241, 149, 0.1) 0%, transparent 40%),
-        radial-gradient(circle at 50% 50%, rgba(0, 194, 255, 0.05) 0%, transparent 50%);
-    background-attachment: fixed;
+    background-color: var(--bg-primary);
+    background-image: none;
 }
 
 .font-mono {
@@ -59,17 +61,16 @@ body {
     padding: 1.5rem;
 }
 
-/* Glassmorphism Auth Card */
+/* Auth Card */
 .solana-auth-card {
     max-width: 460px;
     width: 100%;
-    background: rgba(15, 20, 34, 0.85);
-    backdrop-filter: blur(20px);
+    background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 24px;
+    border-radius: 8px;
     padding: 2.5rem;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 30px rgba(153, 69, 255, 0.1);
-    transition: transform 0.25s ease, border-color 0.25s ease;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .solana-auth-card:hover {
@@ -82,10 +83,10 @@ body {
     align-items: center;
     gap: 0.5rem;
     padding: 0.4rem 1rem;
-    border-radius: 30px;
-    background: rgba(153, 69, 255, 0.12);
-    border: 1px solid rgba(153, 69, 255, 0.3);
-    color: var(--solana-green);
+    border-radius: 6px;
+    background: var(--primary-blue-light);
+    border: 1px solid rgba(13, 110, 253, 0.3);
+    color: var(--primary-blue);
     font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.5px;
@@ -118,7 +119,7 @@ body {
     left: 1.1rem;
     width: 1.2rem;
     height: 1.2rem;
-    color: var(--solana-green);
+    color: var(--primary-blue);
     pointer-events: none;
     z-index: 5;
 }
@@ -126,11 +127,11 @@ body {
 .solana-input-field {
     width: 100%;
     height: 48px;
-    background: rgba(7, 9, 14, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
     padding: 0 1rem 0 3rem;
-    color: var(--text-main);
+    color: var(--text-primary);
     font-size: 0.95rem;
     outline: none;
     transition: all 0.2s ease;
@@ -142,9 +143,9 @@ body {
 }
 
 .solana-input-field:focus {
-    border-color: var(--solana-purple);
-    box-shadow: 0 0 15px rgba(153, 69, 255, 0.3);
-    background: rgba(7, 9, 14, 0.95);
+    border-color: rgba(13, 110, 253, 0.5);
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
+    background: var(--bg-card);
 }
 
 /* OTP Code Box */
@@ -154,8 +155,8 @@ body {
     font-size: 1.6rem !important;
     letter-spacing: 0.6rem !important;
     font-weight: 700 !important;
-    color: var(--solana-green) !important;
-    border-color: var(--solana-purple) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
     padding: 0 1rem !important;
 }
 
@@ -163,25 +164,25 @@ body {
 .solana-btn-primary {
     width: 100%;
     height: 48px;
-    background: var(--solana-btn-gradient);
-    color: #05070a;
+    background: var(--primary-blue);
+    color: #fff;
     font-weight: 700;
     font-size: 0.95rem;
     border: none;
-    border-radius: 14px;
+    border-radius: 6px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.6rem;
     transition: all 0.25s ease;
-    box-shadow: 0 4px 20px rgba(20, 241, 149, 0.25);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .solana-btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 25px rgba(153, 69, 255, 0.4);
-    opacity: 0.96;
+    background: #0b5ed7;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .solana-btn-primary:disabled {
@@ -194,12 +195,12 @@ body {
 .solana-btn-outline {
     width: 100%;
     height: 44px;
-    background: transparent;
-    color: var(--solana-amber);
-    border: 1px solid rgba(245, 158, 11, 0.4);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
     font-weight: 600;
     font-size: 0.88rem;
-    border-radius: 14px;
+    border-radius: 6px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -301,8 +302,7 @@ body {
 .solana-modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.5);
     z-index: 1000;
     display: flex;
     align-items: center;
@@ -312,31 +312,30 @@ body {
 
 .solana-modal-card {
     background: var(--bg-card);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 24px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
     width: 100%;
     max-width: 520px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
     padding: 2rem;
 }
 
 /* ===== SIDEBAR ===== */
 .sidebar-nav-btn:hover {
-    background: rgba(255, 255, 255, 0.05) !important;
-    color: #ffffff !important;
-    border-left-color: rgba(153, 69, 255, 0.5) !important;
+    background: var(--bg-card-hover) !important;
+    color: var(--text-primary) !important;
 }
 
 .sidebar-nav-btn:hover svg {
-    color: #9945FF !important;
+    color: var(--primary-blue) !important;
 }
 
 .sidebar-logout-btn:hover {
-    background: rgba(239, 68, 68, 0.16) !important;
-    border-color: rgba(239, 68, 68, 0.4) !important;
-    color: #fff !important;
+    background: var(--danger-light) !important;
+    border-color: var(--danger) !important;
+    color: var(--danger) !important;
 }
 
 /* ===== SPINNER ===== */
@@ -360,18 +359,18 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(153, 69, 255, 0.35);
+    background: var(--text-dim);
     border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(153, 69, 255, 0.6);
+    background: var(--text-muted);
 }
 
 /* ===== INPUT FOCUS ===== */
 input:focus,
 select:focus,
 textarea:focus {
-    border-color: rgba(153, 69, 255, 0.5) !important;
-    box-shadow: 0 0 0 3px rgba(153, 69, 255, 0.12);
+    border-color: rgba(13, 110, 253, 0.5) !important;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
 }

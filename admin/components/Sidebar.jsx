@@ -35,16 +35,15 @@ export function Sidebar() {
     return (
         <aside
             style={{
-                width: '260px',
-                minWidth: '260px',
+                width: '240px',
+                minWidth: '240px',
                 height: '100vh',
                 position: 'sticky',
                 top: 0,
                 display: 'flex',
                 flexDirection: 'column',
-                background: 'rgba(10, 13, 22, 0.98)',
-                borderRight: '1px solid rgba(255,255,255,0.07)',
-                backdropFilter: 'blur(20px)',
+                background: '#FFFFFF',
+                borderRight: '1px solid #DEE2E6',
                 zIndex: 200,
                 overflow: 'hidden',
             }}
@@ -53,37 +52,24 @@ export function Sidebar() {
             <div
                 style={{
                     padding: '1.75rem 1.5rem 1.25rem',
-                    borderBottom: '1px solid rgba(255,255,255,0.07)',
+                    borderBottom: '1px solid #DEE2E6',
                 }}
             >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
                     <div
-                        style={{
-                            width: '44px',
-                            height: '44px',
-                            borderRadius: '14px',
-                            background: 'linear-gradient(135deg, #ef4444 0%, #9945FF 100%)',
-                            padding: '2px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexShrink: 0,
-                            boxShadow: '0 4px 16px rgba(239,68,68,0.35)',
-                        }}
-                    >
-                        <div
                             style={{
-                                width: '100%',
-                                height: '100%',
-                                background: '#07090e',
-                                borderRadius: '12px',
+                                width: '44px',
+                                height: '44px',
+                                borderRadius: '6px',
+                                background: '#E7F1FF',
+                                padding: '0',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
+                                flexShrink: 0,
                             }}
                         >
-                            <Shield size={22} style={{ color: '#ef4444' }} />
-                        </div>
+                            <Shield size={22} style={{ color: '#0D6EFD' }} />
                     </div>
                     <div>
                         <div
@@ -91,7 +77,7 @@ export function Sidebar() {
                                 fontWeight: 900,
                                 fontSize: '0.95rem',
                                 letterSpacing: '0.5px',
-                                color: '#fff',
+                                color: '#212529',
                                 lineHeight: 1.2,
                             }}
                         >
@@ -104,9 +90,9 @@ export function Sidebar() {
                                 alignItems: 'center',
                                 gap: '0.4rem',
                                 padding: '0.25rem 0.7rem',
-                                borderRadius: '20px',
-                                background: 'rgba(239, 68, 68, 0.1)',
-                                border: '1px solid rgba(239, 68, 68, 0.25)',
+                                borderRadius: '6px',
+                                background: '#F1F3F5',
+                                border: '1px solid #DEE2E6',
                             }}
                         >
                             <div
@@ -114,14 +100,13 @@ export function Sidebar() {
                                     width: '6px',
                                     height: '6px',
                                     borderRadius: '50%',
-                                    background: '#14F195',
-                                    boxShadow: '0 0 6px #14F195',
+                                    background: '#198754',
                                 }}
                             />
                             <span
                                 style={{
                                     fontSize: '0.67rem',
-                                    color: '#fca5a5',
+                                    color: '#6C757D',
                                     fontWeight: 700,
                                     textTransform: 'uppercase',
                                     letterSpacing: '0.5px',
@@ -150,24 +135,23 @@ export function Sidebar() {
                                     alignItems: 'center',
                                     gap: '0.75rem',
                                     width: '100%',
-                                    padding: '0.75rem 0.9rem',
-                                    borderRadius: '12px',
+                                    padding: '0.65rem 0.9rem',
+                                    borderRadius: '14px',
                                     cursor: 'pointer',
                                     transition: 'all 0.2s ease',
                                     background: active
-                                        ? 'linear-gradient(135deg, rgba(153,69,255,0.25) 0%, rgba(0,194,255,0.15) 100%)'
+                                        ? '#E7F1FF'
                                         : 'transparent',
-                                    borderLeft: active ? '3px solid #9945FF' : '3px solid transparent',
-                                    color: active ? '#ffffff' : '#94a3b8',
+                                    borderLeft: active ? '3px solid #0D6EFD' : '3px solid transparent',
+                                    color: active ? '#0D6EFD' : '#212529',
                                     textDecoration: 'none',
                                     position: 'relative',
                                 }}
-                                className={active ? '' : 'sidebar-nav-btn'}
                             >
                                 <Icon
                                     size={18}
                                     style={{
-                                        color: active ? '#14F195' : '#64748b',
+                                        color: active ? '#0D6EFD' : '#6C757D',
                                         transition: 'color 0.2s ease',
                                         flexShrink: 0,
                                     }}
@@ -175,19 +159,13 @@ export function Sidebar() {
                                 <span
                                     style={{
                                         fontSize: '0.88rem',
-                                        fontWeight: active ? 700 : 500,
+                                        fontWeight: active ? 600 : 500,
                                         flex: 1,
                                         transition: 'all 0.2s ease',
                                     }}
                                 >
                                     {item.label}
                                 </span>
-                                {active && (
-                                    <ChevronRight
-                                        size={14}
-                                        style={{ color: '#9945FF', opacity: 0.7 }}
-                                    />
-                                )}
                             </Link>
                         );
                     })}
@@ -198,7 +176,7 @@ export function Sidebar() {
             <div
                 style={{
                     padding: '1rem 0.75rem 1.25rem',
-                    borderTop: '1px solid rgba(255,255,255,0.07)',
+                    borderTop: '1px solid #DEE2E6',
                 }}
             >
                 {admin && (
@@ -208,27 +186,27 @@ export function Sidebar() {
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '0.75rem',
-                                padding: '0.75rem 0.9rem',
-                                borderRadius: '12px',
-                                background: 'rgba(255,255,255,0.04)',
-                                border: '1px solid rgba(255,255,255,0.07)',
+                                padding: '0.65rem 0.9rem',
+                                borderRadius: '6px',
+                                background: '#F8F9FA',
+                                border: '1px solid #DEE2E6',
                                 marginBottom: '0.5rem',
                             }}
                         >
                             <div
-                                style={{
-                                    width: '36px',
-                                    height: '36px',
-                                    borderRadius: '10px',
-                                    background: 'linear-gradient(135deg, rgba(239,68,68,0.4) 0%, rgba(153,69,255,0.4) 100%)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontSize: '0.9rem',
-                                    fontWeight: 800,
-                                    color: '#fff',
-                                    flexShrink: 0,
-                                }}
+                            style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '6px',
+                                background: '#0D6EFD',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '0.9rem',
+                                fontWeight: 800,
+                                color: '#FFFFFF',
+                                flexShrink: 0,
+                            }}
                             >
                                 {admin.name ? admin.name[0].toUpperCase() : 'A'}
                             </div>
@@ -237,7 +215,7 @@ export function Sidebar() {
                                     style={{
                                         fontSize: '0.85rem',
                                         fontWeight: 700,
-                                        color: '#fff',
+                                        color: '#212529',
                                         whiteSpace: 'nowrap',
                                         overflow: 'hidden',
                                         textOverflow: 'ellipsis',
@@ -268,10 +246,10 @@ export function Sidebar() {
                                 gap: '0.65rem',
                                 width: '100%',
                                 padding: '0.65rem 0.9rem',
-                                borderRadius: '12px',
-                                background: 'rgba(239,68,68,0.08)',
-                                border: '1px solid rgba(239,68,68,0.2)',
-                                color: '#fca5a5',
+                                borderRadius: '6px',
+                                background: '#FFFFFF',
+                                border: '1px solid #DC3545',
+                                color: '#DC3545',
                                 cursor: 'pointer',
                                 fontSize: '0.85rem',
                                 fontWeight: 600,

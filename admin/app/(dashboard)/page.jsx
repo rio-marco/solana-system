@@ -66,23 +66,19 @@ export default function DashboardPage() {
                     marginBottom: '1.75rem',
                     flexWrap: 'wrap',
                     gap: '1rem',
-                    padding: '1.75rem 1.5rem 1.25rem',
-                    borderBottom: '1px solid rgba(255,255,255,0.07)',
+                    padding: '1rem 0 0.5rem',
                 }}
             >
                 <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#ef4444', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.3rem' }}>
-                        <Shield size={16} /> System Administration
-                    </div>
-                    <h1 style={{ color: '#fff', fontSize: '1.6rem', fontWeight: 900, margin: 0 }}>Dashboard Overview</h1>
+                    <h1 style={{ color: '#212529', fontSize: '1.5rem', fontWeight: 700, margin: 0 }}>Dashboard Overview</h1>
                 </div>
                 <button
                     type="button"
                     onClick={fetchAdminOverview}
                     disabled={fetchingData}
-                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#fff', padding: '0.6rem 1.25rem', borderRadius: '12px', cursor: fetchingData ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: 700 }}
+                    style={{ background: '#FFFFFF', border: '1px solid #DEE2E6', color: '#212529', padding: '0.6rem 1.25rem', borderRadius: '6px', cursor: fetchingData ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: 600 }}
                 >
-                    <RefreshCw size={15} className={fetchingData ? 'animate-spin' : ''} /> Refresh Overview
+                    <RefreshCw size={15} className={fetchingData ? 'animate-spin' : ''} /> Refresh
                 </button>
             </div>
 

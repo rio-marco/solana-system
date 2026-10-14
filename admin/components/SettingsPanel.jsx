@@ -22,13 +22,13 @@ import { useAuth } from '../context/AuthContext';
 
 function SectionCard({ title, subtitle, icon: Icon, accentColor = '#9945FF', children }) {
     return (
-        <div style={{ background: 'rgba(15,20,34,0.75)', backdropFilter: 'blur(12px)', borderRadius: '24px', border: `1px solid rgba(255,255,255,0.08)`, padding: '1.75rem', boxShadow: '0 20px 50px rgba(0,0,0,0.3)', marginBottom: '1.5rem', borderTop: `3px solid ${accentColor}` }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: `rgba(${accentColor === '#14F195' ? '20,241,149' : accentColor === '#ef4444' ? '239,68,68' : '153,69,255'},0.15)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ background: '#FFFFFF', borderRadius: '6px', border: `1px solid #DEE2E6`, padding: '1.75rem', boxShadow: '0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06)', marginBottom: '1.5rem', borderTop: `3px solid ${accentColor}` }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid #DEE2E6' }}>
+                <div style={{ width: '42px', height: '42px', borderRadius: '6px', background: `rgba(${accentColor === '#14F195' ? '20,241,149' : accentColor === '#ef4444' ? '239,68,68' : '153,69,255'},0.15)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Icon size={20} style={{ color: accentColor }} />
                 </div>
                 <div>
-                    <h3 style={{ color: '#fff', fontWeight: 800, fontSize: '1rem', margin: 0 }}>{title}</h3>
+                    <h3 style={{ color: '#212529', fontWeight: 800, fontSize: '1rem', margin: 0 }}>{title}</h3>
                     <p style={{ color: '#64748b', fontSize: '0.78rem', margin: 0 }}>{subtitle}</p>
                 </div>
             </div>
@@ -40,7 +40,7 @@ function SectionCard({ title, subtitle, icon: Icon, accentColor = '#9945FF', chi
 function InputField({ label, type = 'text', value, onChange, placeholder, disabled = false, rightAddon }) {
     return (
         <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.45rem' }}>{label}</label>
+            <label style={{ display: 'block', color: '#6C757D', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.45rem' }}>{label}</label>
             <div style={{ position: 'relative' }}>
                 <input
                     type={type}
@@ -48,7 +48,7 @@ function InputField({ label, type = 'text', value, onChange, placeholder, disabl
                     onChange={onChange}
                     placeholder={placeholder}
                     disabled={disabled}
-                    style={{ width: '100%', background: 'rgba(7,9,14,0.8)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', padding: rightAddon ? '0.7rem 3rem 0.7rem 1rem' : '0.7rem 1rem', color: '#fff', fontSize: '0.88rem', outline: 'none', transition: 'border-color 0.2s', opacity: disabled ? 0.6 : 1 }}
+                    style={{ width: '100%', background: '#FFFFFF', border: '1px solid #DEE2E6', borderRadius: '6px', padding: rightAddon ? '0.7rem 3rem 0.7rem 1rem' : '0.7rem 1rem', color: '#212529', fontSize: '0.88rem', outline: 'none', transition: 'border-color 0.2s', opacity: disabled ? 0.6 : 1 }}
                 />
                 {rightAddon && (
                     <div style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)' }}>
@@ -63,7 +63,7 @@ function InputField({ label, type = 'text', value, onChange, placeholder, disabl
 function Alert({ type, message }) {
     const isSuccess = type === 'success';
     return (
-        <div style={{ background: isSuccess ? 'rgba(20,241,149,0.1)' : 'rgba(239,68,68,0.1)', border: `1px solid ${isSuccess ? 'rgba(20,241,149,0.3)' : 'rgba(239,68,68,0.3)'}`, borderRadius: '12px', padding: '0.8rem 1rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.6rem', color: isSuccess ? '#14F195' : '#fca5a5', fontSize: '0.85rem', fontWeight: 600 }}>
+        <div style={{ background: isSuccess ? 'rgba(20,241,149,0.1)' : 'rgba(239,68,68,0.1)', border: `1px solid ${isSuccess ? 'rgba(20,241,149,0.3)' : 'rgba(239,68,68,0.3)'}`, borderRadius: '6px', padding: '0.8rem 1rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.6rem', color: isSuccess ? '#14F195' : '#fca5a5', fontSize: '0.85rem', fontWeight: 600 }}>
             {isSuccess ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
             {message}
         </div>
@@ -208,11 +208,11 @@ export function SettingsPanel() {
 
     const inputStyle = {
         width: '100%',
-        background: 'rgba(7,9,14,0.8)',
-        border: '1px solid rgba(255,255,255,0.12)',
-        borderRadius: '12px',
+        background: '#FFFFFF',
+        border: '1px solid #DEE2E6',
+        borderRadius: '6px',
         padding: '0.7rem 1rem',
-        color: '#fff',
+        color: '#212529',
         fontSize: '0.88rem',
         outline: 'none',
     };
@@ -224,11 +224,11 @@ export function SettingsPanel() {
     return (
         <div>
             {/* Header */}
-            <div style={{ marginBottom: '1.75rem', padding: '1.75rem 1.5rem 1.25rem', borderBottom: '1px solid rgba(255,255,255,0.07)', }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.3rem' }}>
+            <div style={{ marginBottom: '1.75rem', padding: '1.75rem 1.5rem 1.25rem', borderBottom: '1px solid #DEE2E6', }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#6C757D', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.3rem' }}>
                     <Settings size={16} /> Settings
                 </div>
-                <h1 style={{ color: '#fff', fontSize: '1.6rem', fontWeight: 900, margin: 0 }}>Admin Settings</h1>
+                <h1 style={{ color: '#212529', fontSize: '1.6rem', fontWeight: 900, margin: 0 }}>Admin Settings</h1>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '1.5rem', alignItems: 'start' }}>
@@ -238,7 +238,7 @@ export function SettingsPanel() {
                     <SectionCard title="Change Password" subtitle="Update your admin account password" icon={Lock} accentColor="#ef4444">
                         <form onSubmit={handlePasswordChange}>
                             <div style={{ marginBottom: '1rem' }}>
-                                <label style={{ display: 'block', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.45rem' }}>Current Password</label>
+                                <label style={{ display: 'block', color: '#6C757D', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.45rem' }}>Current Password</label>
                                 <div style={{ position: 'relative' }}>
                                     <input
                                         type={showCurrent ? 'text' : 'password'}
@@ -270,7 +270,7 @@ export function SettingsPanel() {
                                 <label
                                     style={{
                                         display: 'block',
-                                        color: '#94a3b8',
+                                        color: '#6C757D',
                                         fontSize: '0.8rem',
                                         fontWeight: 600,
                                         marginBottom: '0.45rem',
@@ -306,7 +306,7 @@ export function SettingsPanel() {
                                 </div>
                             </div>
                             <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.45rem' }}>
+                                <label style={{ display: 'block', color: '#6C757D', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.45rem' }}>
                                     Confirm New Password
                                 </label>
                                 <input
@@ -324,9 +324,9 @@ export function SettingsPanel() {
                                     width: '100%',
                                     padding: '0.85rem',
                                     borderRadius: '14px',
-                                    background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                                    background: '#0D6EFD',
                                     border: 'none',
-                                    color: '#fff',
+                                    color: '#E7F1FF',
                                     fontWeight: 700,
                                     fontSize: '0.9rem',
                                     cursor: pwLoading ? 'not-allowed' : 'pointer',
@@ -335,7 +335,7 @@ export function SettingsPanel() {
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     gap: '0.5rem',
-                                    boxShadow: '0 4px 16px rgba(239,68,68,0.3)'
+                                    boxShadow: '0 4px 16px rgba(13, 110, 253, 0.3)'
                                 }}
                             >
                                 <Lock size={16} />
@@ -347,23 +347,32 @@ export function SettingsPanel() {
                     {/* Generate Wallet */}
                     <SectionCard title="Generate New Sender Address" subtitle="Create a new Solana sender wallet for the platform" icon={Wallet} accentColor="#00C2FF">
                         {generatedWallet && (
-                            <div style={{ background: 'rgba(0,194,255,0.08)', border: '1px solid rgba(0,194,255,0.2)', borderRadius: '12px', padding: '1rem', marginBottom: '1rem' }}>
+                            <div style={{ background: 'rgba(0,194,255,0.08)', border: '1px solid rgba(0,194,255,0.2)', borderRadius: '6px', padding: '1rem', marginBottom: '1rem' }}>
                                 <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600, marginBottom: '0.4rem' }}>New Public Key:</div>
                                 <div style={{ fontFamily: 'monospace', color: '#00C2FF', fontSize: '0.8rem', wordBreak: 'break-all' }}>{generatedWallet.publicKey || generatedWallet.address}</div>
                             </div>
                         )}
                         <div
                             style={{
-                                background: 'rgba(10, 14, 26, 0.8)',
-                                borderRadius: '16px',
+                                background: '#F8F9FA',
+                                borderRadius: '6px',
                                 padding: '1.1rem 1.25rem',
-                                border: '1px solid rgba(255, 255, 255, 0.08)',
+                                border: '1px solid #DEE2E6',
                                 marginBottom: '1.25rem',
                             }}
                         >
                             <div style={{ display: 'flex', alignItems: 'center', justify: 'space-between', marginBottom: '0.4rem' }}>
-                                <span style={{ marginRight: "10px", color: '#94a3b8', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
-                                    Active Deposite Address
+                                <span
+                                    style={{
+                                        marginRight: "10px",
+                                        color: '#6C757D',
+                                        fontSize: '0.78rem',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.05em',
+                                        fontWeight: 700,
+                                    }}
+                                >
+                                    Active Deposit Address
                                 </span>
                             </div>
 
@@ -372,7 +381,7 @@ export function SettingsPanel() {
                                     style={{
                                         fontFamily: 'monospace',
                                         fontSize: '1rem',
-                                        color: '#14F195',
+                                        color: '#198754',
                                         fontWeight: 700,
                                         wordBreak: 'break-all',
                                     }}
@@ -391,14 +400,14 @@ export function SettingsPanel() {
                                                 display: 'inline-flex',
                                                 alignItems: 'center',
                                                 gap: '0.3rem',
-                                                color: '#9945FF',
+                                                color: '#0D6EFD',
                                                 fontSize: '0.8rem',
                                                 fontWeight: 600,
                                                 textDecoration: 'none',
-                                                background: 'rgba(153, 69, 255, 0.12)',
+                                                background: '#E7F1FF',
                                                 padding: '0.4rem 0.7rem',
-                                                borderRadius: '8px',
-                                                border: '1px solid rgba(153, 69, 255, 0.25)',
+                                                borderRadius: '6px',
+                                                border: '1px solid #DEE2E6',
                                             }}
                                         >
                                             <span>Explorer</span>
@@ -408,7 +417,7 @@ export function SettingsPanel() {
                                 )}
                             </div>
                         </div>
-                        <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '12px', padding: '0.85rem 1rem', marginBottom: '1.25rem' }}>
+                        <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '6px', padding: '0.85rem 1rem', marginBottom: '1.25rem' }}>
                             <p style={{ color: '#fbbf24', fontSize: '0.82rem', margin: 0, lineHeight: 1.5 }}>
                                 ⚠️ Generating a new address will deactivate the current wallet and save the new keys to the database.
                             </p>
@@ -417,7 +426,23 @@ export function SettingsPanel() {
                             type="button"
                             onClick={handleGenerateWallet}
                             disabled={genLoading}
-                            style={{ width: '100%', padding: '0.85rem', borderRadius: '14px', background: 'linear-gradient(135deg, #00C2FF 0%, #0070ff 100%)', border: 'none', color: '#fff', fontWeight: 700, fontSize: '0.9rem', cursor: genLoading ? 'not-allowed' : 'pointer', opacity: genLoading ? 0.7 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: '0 4px 16px rgba(0,194,255,0.3)' }}
+                            style={{
+                                width: '100%',
+                                padding: '0.85rem',
+                                borderRadius: '14px',
+                                background: '#0D6EFD',
+                                border: 'none',
+                                color: '#E7F1FF',
+                                fontWeight: 700,
+                                fontSize: '0.9rem',
+                                cursor: genLoading ? 'not-allowed' : 'pointer',
+                                opacity: genLoading ? 0.7 : 1,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '0.5rem',
+                                boxShadow: '0 4px 16px rgba(13, 110, 253, 0.3)'
+                            }}
                         >
                             {genLoading ? <RefreshCw size={16} className="animate-spin" /> : <Zap size={16} />}
                             {genLoading ? 'Generating...' : 'Generate New Wallet Address'}
@@ -439,7 +464,7 @@ export function SettingsPanel() {
 
                                 {/* Public Key */}
                                 <div style={{ marginBottom: '1rem' }}>
-                                    <label style={{ display: 'block', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.45rem' }}>
+                                    <label style={{ display: 'block', color: '#6C757D', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.45rem' }}>
                                         SOLANA_SENDER_PUBLIC_KEY
                                         <span style={{ marginLeft: '0.5rem', padding: '0.1rem 0.45rem', borderRadius: '6px', background: 'rgba(20,241,149,0.1)', color: '#14F195', fontSize: '0.68rem' }}>Public</span>
                                     </label>
@@ -454,7 +479,7 @@ export function SettingsPanel() {
 
                                 {/* Private Key */}
                                 <div style={{ marginBottom: '1rem' }}>
-                                    <label style={{ display: 'block', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.45rem' }}>
+                                    <label style={{ display: 'block', color: '#6C757D', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.45rem' }}>
                                         SOLANA_SENDER_PRIVATE_KEY
                                         <span style={{ marginLeft: '0.5rem', padding: '0.1rem 0.45rem', borderRadius: '6px', background: 'rgba(239,68,68,0.1)', color: '#fca5a5', fontSize: '0.68rem' }}>Secret</span>
                                     </label>
@@ -474,7 +499,7 @@ export function SettingsPanel() {
 
                                 {/* Platform Fee */}
                                 <div style={{ marginBottom: '1.5rem' }}>
-                                    <label style={{ display: 'block', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.45rem' }}>
+                                    <label style={{ display: 'block', color: '#6C757D', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.45rem' }}>
                                         WITHDRAWAL_PLATFORM_FEE
                                         <span style={{ marginLeft: '0.5rem', padding: '0.1rem 0.45rem', borderRadius: '6px', background: 'rgba(245,158,11,0.1)', color: '#f59e0b', fontSize: '0.68rem' }}>SOL amount</span>
                                     </label>
@@ -491,7 +516,23 @@ export function SettingsPanel() {
                                 <button
                                     type="submit"
                                     disabled={settingsLoading}
-                                    style={{ width: '100%', padding: '0.85rem', borderRadius: '14px', background: 'linear-gradient(135deg, #9945FF 0%, #14F195 100%)', border: 'none', color: '#fff', fontWeight: 700, fontSize: '0.9rem', cursor: settingsLoading ? 'not-allowed' : 'pointer', opacity: settingsLoading ? 0.7 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: '0 4px 16px rgba(153,69,255,0.3)' }}
+                                    style={{
+                                        width: '100%',
+                                        padding: '0.85rem',
+                                        borderRadius: '14px',
+                                        background: '#0D6EFD',
+                                        border: 'none',
+                                        color: '#E7F1FF',
+                                        fontWeight: 700,
+                                        fontSize: '0.9rem',
+                                        cursor: settingsLoading ? 'not-allowed' : 'pointer',
+                                        opacity: settingsLoading ? 0.7 : 1,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '0.5rem',
+                                        boxShadow: '0 4px 16px rgba(13, 110, 253, 0.3)'
+                                    }}
                                 >
                                     {settingsLoading ? <RefreshCw size={16} className="animate-spin" /> : <Save size={16} />}
                                     {settingsLoading ? 'Saving...' : 'Save Platform Settings'}

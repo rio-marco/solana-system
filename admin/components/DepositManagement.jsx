@@ -26,11 +26,11 @@ import {
 function getStatusBadge(status) {
     switch (status) {
         case DEPOSIT_STATUS.CONFIRMED:
-            return <span style={{ background: 'rgba(20,241,149,0.12)', color: '#14F195', border: '1px solid rgba(20,241,149,0.3)', padding: '0.2rem 0.65rem', borderRadius: '20px', fontSize: '0.73rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><CheckCircle2 size={11} />Confirmed</span>;
+            return <span style={{ background: 'rgba(20,241,149,0.12)', color: '#0D6EFD', border: '1px solid rgba(20,241,149,0.3)', padding: '0.2rem 0.65rem', borderRadius: '20px', fontSize: '0.73rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><CheckCircle2 size={11} />Confirmed</span>;
         case DEPOSIT_STATUS.FAILED:
-            return <span style={{ background: 'rgba(239,68,68,0.12)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)', padding: '0.2rem 0.65rem', borderRadius: '20px', fontSize: '0.73rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><XCircle size={11} />Failed</span>;
+            return <span style={{ background: '#F8D7DA', color: '#DC3545', border: '1px solid #F1AEB5', padding: '0.2rem 0.65rem', borderRadius: '20px', fontSize: '0.73rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><XCircle size={11} />Failed</span>;
         default:
-            return <span style={{ background: 'rgba(245,158,11,0.12)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.3)', padding: '0.2rem 0.65rem', borderRadius: '20px', fontSize: '0.73rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><Clock size={11} />{status || 'Pending'}</span>;
+            return <span style={{ background: '#FFF3CD', color: '#664D03', border: '1px solid #FFE69C', padding: '0.2rem 0.65rem', borderRadius: '20px', fontSize: '0.73rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><Clock size={11} />{status || 'Pending'}</span>;
     };
 };
 
@@ -128,11 +128,11 @@ export function DepositManagement() {
     };
 
     const selectStyle = {
-        background: 'rgba(10,14,26,0.7)',
-        border: '1px solid rgba(255,255,255,0.12)',
+        background: '#FFFFFF',
+        border: '1px solid #CED4DA',
         borderRadius: '12px',
         padding: '0.6rem 1rem',
-        color: '#fff',
+        color: '#495057',
         fontSize: '0.83rem',
         outline: 'none',
         cursor: 'pointer',
@@ -152,25 +152,25 @@ export function DepositManagement() {
                     flexWrap: 'wrap',
                     gap: '1rem',
                     padding: '1.75rem 1.5rem 1.25rem',
-                    borderBottom: '1px solid rgba(255,255,255,0.07)',
+                    borderBottom: '1px solid #DEE2E6',
                 }}
             >
                 <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#14F195', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.3rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#0D6EFD', fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.3rem' }}>
                         <ArrowDownLeft size={16} /> Deposit Management
                     </div>
-                    <h1 style={{ color: '#fff', fontSize: '1.6rem', fontWeight: 900, margin: 0 }}>All User Deposits</h1>
+                    <h1 style={{ color: '#212529', fontSize: '1.6rem', fontWeight: 900, margin: 0 }}>All User Deposits</h1>
                 </div>
-                <button type="button" onClick={fetchDeposits} disabled={loading} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#fff', padding: '0.6rem 1.25rem', borderRadius: '12px', cursor: loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: 700 }}>
+                <button type="button" onClick={fetchDeposits} disabled={loading} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#212529', padding: '0.6rem 1.25rem', borderRadius: '6px', cursor: loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: 700 }}>
                     <RefreshCw size={15} className={loading ? 'animate-spin' : ''} /> Refresh
                 </button>
             </div>
 
-            <div style={{ background: 'rgba(15,20,34,0.75)', backdropFilter: 'blur(12px)', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.08)', padding: '1.75rem', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}>
+            <div style={{ background: '#FFFFFF', borderRadius: '6px', border: '1px solid #DEE2E6', padding: '1.75rem', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)' }}>
                 {/* Filters */}
                 <div style={{ display: 'flex', gap: '0.85rem', marginBottom: '1.25rem', flexWrap: 'wrap', alignItems: 'center' }}>
                     <div style={{ position: 'relative', flex: 1, minWidth: '260px' }}>
-                        <Search size={14} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+                        <Search size={14} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: '#6C757D' }} />
                         <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search by email, tx signature, memo, ID..." style={{ width: '100%', ...selectStyle, paddingLeft: '2.4rem' }} />
                     </div>
                     <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPagination(p => ({ ...p, currentPage: DEFAULT_CURRENT_PAGE })); }} style={selectStyle}>
@@ -179,7 +179,7 @@ export function DepositManagement() {
                         <option value={DEPOSIT_STATUS.PENDING}>Pending</option>
                         <option value={DEPOSIT_STATUS.FAILED}>Failed</option>
                     </select>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#94a3b8', fontSize: '0.8rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#6C757D', fontSize: '0.8rem' }}>
                         <span>Per page:</span>
                         <select
                             value={pagination.limit}
@@ -194,14 +194,14 @@ export function DepositManagement() {
                 </div>
 
                 {/* Table */}
-                <div style={{ overflowX: 'auto', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ overflowX: 'auto', borderRadius: '16px', border: '1px solid #DEE2E6' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.84rem' }}>
                         <thead>
                             <tr
                                 style={{
-                                    background: 'rgba(10,14,26,0.9)',
-                                    color: '#94a3b8',
-                                    borderBottom: '1px solid rgba(255,255,255,0.08)'
+                                    background: '#F5F9FC',
+                                    color: '#171D25',
+                                    borderBottom: '1px solid #D8DFE4'
                                 }}
                             >
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>User Email</th>
@@ -217,14 +217,14 @@ export function DepositManagement() {
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td colSpan={8} style={{ padding: '3rem', textAlign: 'center', color: '#94a3b8' }}>
+                                    <td colSpan={8} style={{ padding: '3rem', textAlign: 'center', color: '#6C757D' }}>
                                         <div style={{ width: '32px', height: '32px', border: '3px solid rgba(20,241,149,0.2)', borderTop: '3px solid #14F195', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 0.75rem' }} />
                                         <span>Fetching deposits...</span>
                                     </td>
                                 </tr>
                             ) : items.length === 0 ? (
                                 <tr>
-                                    <td colSpan={8} style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
+                                    <td colSpan={8} style={{ padding: '3rem', textAlign: 'center', color: '#6C757D' }}>
                                         No deposit transactions found.
                                     </td>
                                 </tr>
@@ -235,36 +235,36 @@ export function DepositManagement() {
                                 const txSig = item.transactionSignature;
                                 const targetAddr = item.platformAddress || 'N/A';
                                 return (
-                                    <tr key={item._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.15s' }} className="hover:bg-white/5">
+                                    <tr key={item._id} style={{ borderBottom: '1px solid #DEE2E6', transition: 'background 0.15s' }} className="hover:bg-gray-50">
                                         <td style={{ padding: '0.85rem 1rem' }}>
-                                            <div style={{ color: '#fff', fontWeight: 600 }}>{userEmail}</div>
-                                            {userName && <div style={{ color: '#64748b', fontSize: '0.75rem' }}>{userName}</div>}
+                                            <div style={{ color: '#212529', fontWeight: 600 }}>{userEmail}</div>
+                                            {userName && <div style={{ color: '#6C757D', fontSize: '0.75rem' }}>{userName}</div>}
                                         </td>
                                         <td style={{ padding: '0.85rem 1rem' }}>
-                                            <div style={{ color: '#94a3b8', fontFamily: 'monospace', fontSize: '0.78rem' }}>{id}</div>
-                                            <div style={{ color: '#14F195', fontWeight: 700, fontSize: '0.75rem' }}>Memo: {item.memo}</div>
+                                            <div style={{ color: '#6C757D', fontFamily: 'monospace', fontSize: '0.78rem' }}>{id}</div>
+                                            <div style={{ color: '#0D6EFD', fontWeight: 700, fontSize: '0.75rem' }}>Memo: {item.memo}</div>
                                         </td>
-                                        <td style={{ padding: '0.85rem 1rem', fontWeight: 800, color: '#14F195' }}>+{item.amount} SOL</td>
+                                        <td style={{ padding: '0.85rem 1rem', fontWeight: 800, color: '#0D6EFD' }}>+{item.amount} SOL</td>
                                         <td style={{ padding: '0.85rem 1rem' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                                <span style={{ fontFamily: 'monospace', color: '#94a3b8', fontSize: '0.75rem' }}>{targetAddr.length > 12 ? `${targetAddr.slice(0, 6)}...${targetAddr.slice(-6)}` : targetAddr}</span>
+                                                <span style={{ fontFamily: 'monospace', color: '#6C757D', fontSize: '0.75rem' }}>{targetAddr.length > 12 ? `${targetAddr.slice(0, 6)}...${targetAddr.slice(-6)}` : targetAddr}</span>
                                                 <CopyButton text={targetAddr} />
                                             </div>
                                         </td>
                                         <td style={{ padding: '0.85rem 1rem' }}>
                                             {txSig ? (
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                                    <span style={{ fontFamily: 'monospace', color: '#64748b', fontSize: '0.75rem' }}>{`${txSig.slice(0, 6)}...${txSig.slice(-6)}`}</span>
+                                                    <span style={{ fontFamily: 'monospace', color: '#6C757D', fontSize: '0.75rem' }}>{`${txSig.slice(0, 6)}...${txSig.slice(-6)}`}</span>
                                                     <CopyButton text={txSig} />
                                                     <a href={`https://explorer.solana.com/tx/${txSig}?cluster=devnet`} target="_blank" rel="noopener noreferrer" style={{ color: '#9945FF' }}><ExternalLink size={12} /></a>
                                                 </div>
                                             ) : <span style={{ color: '#475569', fontSize: '0.75rem' }}>—</span>}
                                         </td>
                                         <td style={{ padding: '0.85rem 1rem' }}>{getStatusBadge(item.status)}</td>
-                                        <td style={{ padding: '0.85rem 1rem', color: '#64748b', fontSize: '0.75rem' }}>{moment(item.createdAt).format('MMM DD, YYYY HH:mm')}</td>
+                                        <td style={{ padding: '0.85rem 1rem', color: '#6C757D', fontSize: '0.75rem' }}>{moment(item.createdAt).format('MMM DD, YYYY HH:mm')}</td>
                                         <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
                                             {txSig ? (
-                                                <button type="button" onClick={() => setSelectedTxSig(txSig)} style={{ background: 'rgba(153,69,255,0.15)', border: '1px solid rgba(153,69,255,0.3)', color: '#fff', padding: '0.35rem 0.6rem', borderRadius: '8px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.73rem', fontWeight: 600 }}>
+                                                <button type="button" onClick={() => setSelectedTxSig(txSig)} style={{ background: 'rgba(153,69,255,0.15)', border: '1px solid rgba(153,69,255,0.3)', color: '#212529', padding: '0.35rem 0.6rem', borderRadius: '8px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.73rem', fontWeight: 600 }}>
                                                     <Eye size={12} /> Decode
                                                 </button>
                                             ) : <span style={{ color: '#475569', fontSize: '0.75rem' }}>—</span>}
@@ -279,11 +279,82 @@ export function DepositManagement() {
                 {/* Pagination */}
                 {pagination.totalCount > 0 && (
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.08)', flexWrap: 'wrap', gap: '1rem' }}>
-                        <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Showing <strong style={{ color: '#fff' }}>{startEntry}</strong> to <strong style={{ color: '#fff' }}>{endEntry}</strong> of <strong style={{ color: '#fff' }}>{pagination.totalCount}</strong> entries</div>
+                        <div style={{ fontSize: '0.85rem', color: '#6C757D' }}>
+                            Showing <strong style={{ color: '#212529' }}>{startEntry}</strong> to <strong style={{ color: '#212529' }}>{endEntry}</strong> of <strong style={{ color: '#212529' }}>{pagination.totalCount}</strong> entries
+                        </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                            <button type="button" onClick={() => handlePageChange(pagination.currentPage - 1)} disabled={pagination.currentPage <= 1 || loading} style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', color: pagination.currentPage <= 1 ? '#475569' : '#cbd5e1', cursor: pagination.currentPage <= 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronLeft size={16} /></button>
-                            {getPageNumbers().map((p, idx) => p === '...' ? <span key={`e-${idx}`} style={{ width: '32px', textAlign: 'center', color: '#64748b' }}>...</span> : <button key={`p-${p}`} type="button" onClick={() => handlePageChange(p)} disabled={loading || p === pagination.currentPage} style={{ minWidth: '36px', height: '36px', padding: '0 0.5rem', borderRadius: '10px', background: p === pagination.currentPage ? 'linear-gradient(135deg,#14F195,#9945FF)' : 'rgba(255,255,255,0.05)', border: p === pagination.currentPage ? 'none' : '1px solid rgba(255,255,255,0.12)', color: '#fff', fontWeight: p === pagination.currentPage ? 800 : 500, cursor: p === pagination.currentPage ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{p}</button>)}
-                            <button type="button" onClick={() => handlePageChange(pagination.currentPage + 1)} disabled={pagination.currentPage >= pagination.totalPages || loading} style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', color: pagination.currentPage >= pagination.totalPages ? '#475569' : '#cbd5e1', cursor: pagination.currentPage >= pagination.totalPages ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={16} /></button>
+                            <button
+                                type="button"
+                                onClick={() => handlePageChange(pagination.currentPage - 1)}
+                                disabled={pagination.currentPage <= 1 || loading}
+                                style={{
+                                    width: '36px',
+                                    height: '36px',
+                                    borderRadius: '10px',
+                                    background: '#F5F9FC',
+                                    border: '1px solid #D8DFE4',
+                                    color: pagination.currentPage <= 1 ? '#cbd5e1' : '#475569',
+                                    cursor: pagination.currentPage <= 1 ? 'not-allowed' : 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}
+                            >
+                                <ChevronLeft size={16} />
+                            </button>
+                            {getPageNumbers().map((p, idx) => (
+                                p === '...'
+                                    ? <span
+                                        key={`e-${idx}`}
+                                        style={{
+                                            width: '32px',
+                                            textAlign: 'center',
+                                            color: '#cbd5e1'
+                                        }}
+                                    >...</span>
+                                    :
+                                    <button
+                                        key={`p-${p}`}
+                                        type="button"
+                                        onClick={() => handlePageChange(p)}
+                                        disabled={loading || p === pagination.currentPage}
+                                        style={{
+                                            minWidth: '36px',
+                                            height: '36px',
+                                            padding: '0 0.5rem',
+                                            borderRadius: '10px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            background: p === pagination.currentPage ? 'rgb(13, 110, 253)' : '#F5F9FC',
+                                            color: p === pagination.currentPage ? '#FFFFFF' : '#212529',
+                                            border: p === pagination.currentPage ? 'none' : '1px solid #D8DFE4',
+                                            fontWeight: p === pagination.currentPage ? 800 : 500,
+                                            cursor: p === pagination.currentPage ? 'default' : 'pointer',
+                                        }}
+                                    >
+                                        {p}
+                                    </button>
+                            ))}
+                            <button
+                                type="button"
+                                onClick={() => handlePageChange(pagination.currentPage + 1)}
+                                disabled={pagination.currentPage >= pagination.totalPages || loading}
+                                style={{
+                                    width: '36px',
+                                    height: '36px',
+                                    borderRadius: '10px',
+                                    background: '#F5F9FC',
+                                    border: '1px solid #D8DFE4',
+                                    color: pagination.currentPage >= pagination.totalPages ? '#cbd5e1' : '#475569',
+                                    cursor: pagination.currentPage >= pagination.totalPages ? 'not-allowed' : 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                <ChevronRight size={16} />
+                            </button>
                         </div>
                     </div>
                 )}

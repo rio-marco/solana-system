@@ -8,13 +8,16 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        dark: '#07090e',
-        card: '#0f1422',
-        'card-hover': '#161c2e',
-        'solana-purple': '#9945FF',
-        'solana-green': '#14F195',
-        'solana-cyan': '#00C2FF',
-        'solana-amber': '#F59E0B',
+        primary: '#0D6EFD',
+        'primary-light': '#E7F1FF',
+        success: '#198754',
+        warning: '#FFC107',
+        danger: '#DC3545',
+        'bg-primary': '#F8F9FA',
+        'bg-sidebar': '#FFFFFF',
+        'bg-header': '#FFFFFF',
+        card: '#FFFFFF',
+        'card-hover': '#F1F3F5',
       },
     },
   },

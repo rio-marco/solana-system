@@ -17,15 +17,15 @@ export default function DashboardLayout({ children }) {
 
     if (loading || !admin) {
         return (
-            <div style={{ minHeight: '100vh', background: 'var(--bg-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '1rem' }}>
-                <div style={{ width: '44px', height: '44px', border: '4px solid rgba(153,69,255,0.3)', borderTop: '4px solid #9945FF', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-                <span style={{ color: '#9945FF', fontWeight: 700, fontSize: '0.9rem', letterSpacing: '0.05em' }}>Loading Admin Panel...</span>
+            <div style={{ minHeight: '100vh', background: '#F8F9FA', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ width: '44px', height: '44px', border: '4px solid rgba(13,110,253,0.3)', borderTop: '4px solid #0D6EFD', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                <span style={{ color: '#0D6EFD', fontWeight: 700, fontSize: '0.9rem', letterSpacing: '0.05em' }}>Loading Admin Panel...</span>
             </div>
         );
     }
 
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-dark)' }}>
+        <div style={{ display: 'flex', minHeight: '100vh', background: '#F8F9FA' }}>
             {/* Sidebar */}
             <Sidebar />
 
@@ -36,8 +36,8 @@ export default function DashboardLayout({ children }) {
                     minWidth: 0,
                     overflowY: 'auto',
                     overflowX: 'hidden',
-                    padding: '2rem 2rem 3rem',
-                    maxHeight: '100vh',
+                    padding: '1.5rem 1.5rem 2rem',
+                    background: '#F8F9FA',
                 }}
             >
                 {children}

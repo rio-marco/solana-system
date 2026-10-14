@@ -14,20 +14,20 @@ export const Navbar = () => {
 
     return (
         <>
-            <nav className="dashboard-navbar" style={{ padding: '0.85rem 1.5rem', background: 'rgba(7, 9, 14, 0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', sticky: 'top', top: 0, zIndex: 100 }}>
+            <nav className="dashboard-navbar" style={{ padding: '0.85rem 1.5rem', background: '#FFFFFF', borderBottom: '1px solid #DEE2E6', sticky: 'top', top: 0, zIndex: 100 }}>
                 <div style={{ maxWidth: '1500px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
                     {/* Logo & Admin Panel Badge */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
                         <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'linear-gradient(135deg, #ef4444 0%, #9945FF 100%)', padding: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <div style={{ width: '40px', height: '40px', borderRadius: '6px', background: 'linear-gradient(135deg, #ef4444 0%, #9945FF 100%)', padding: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <div style={{ width: '100%', height: '100%', background: '#07090e', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <Shield size={20} style={{ color: '#ef4444' }} />
                                 </div>
                             </div>
                             <div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <span style={{ fontWeight: 900, fontSize: '1.15rem', letterSpacing: '0.5px', color: '#fff' }}>SOLANA SYSTEM</span>
-                                    <span style={{ fontSize: '0.72rem', padding: '0.25rem 0.65rem', borderRadius: '12px', background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', color: '#ffffff', fontWeight: 800 }}>
+                                    <span style={{ fontWeight: 900, fontSize: '1.15rem', letterSpacing: '0.5px', color: '#212529' }}>SOLANA SYSTEM</span>
+                                    <span style={{ fontSize: '0.72rem', padding: '0.25rem 0.65rem', borderRadius: '6px', background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', color: '#ffffff', fontWeight: 800 }}>
                                         ADMIN PANEL
                                     </span>
                                 </div>
@@ -54,7 +54,7 @@ export const Navbar = () => {
 
                             <button
                                 type="button"
-                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.35rem 0.85rem', borderRadius: '30px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', cursor: 'pointer' }}
+                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.35rem 0.85rem', borderRadius: '30px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#212529', cursor: 'pointer' }}
                             >
                                 <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(239, 68, 68, 0.3)', color: '#fca5a5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700 }}>
                                     {admin.name ? admin.name[0].toUpperCase() : 'A'}

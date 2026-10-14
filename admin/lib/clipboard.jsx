@@ -50,9 +50,9 @@ export function CopyButton({ text, className = '' }) {
             title="Copy to clipboard"
             className={className}
             style={{
-                background: copied ? 'rgba(20, 241, 149, 0.15)' : 'rgba(255, 255, 255, 0.08)',
-                border: copied ? '1px solid rgba(20, 241, 149, 0.3)' : '1px solid rgba(255, 255, 255, 0.12)',
-                color: copied ? '#14F195' : '#cbd5e1',
+                background: copied ? 'rgba(20, 241, 149, 0.15)' : '#E7F1FF',
+                border: copied ? '1px solid rgba(20, 241, 149, 0.3)' : '1px solid #DEE2E6',
+                color: copied ? '#14F195' : '#0D6EFD',
                 borderRadius: '8px',
                 padding: '0.35rem 0.55rem',
                 cursor: 'pointer',

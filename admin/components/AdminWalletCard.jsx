@@ -24,28 +24,14 @@ export function AdminWalletCard({ walletData, onRefresh, onGenerateWallet, gener
 
     return (
         <div
-            className="glass-card"
             style={{
-                background: 'linear-gradient(135deg, rgba(20, 24, 40, 0.95) 0%, rgba(15, 20, 32, 0.98) 100%)',
-                borderRadius: '24px',
-                border: '1px solid rgba(153, 69, 255, 0.25)',
-                padding: '1.75rem',
-                boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4), 0 0 30px rgba(153, 69, 255, 0.1)',
-                position: 'relative',
+                background: '#FFFFFF',
+                borderRadius: '6px',
+                border: '1px solid #DEE2E6',
+                padding: '1.5rem',
                 overflow: 'hidden',
             }}
         >
-            {/* Top accent glow line */}
-            <div
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: '3px',
-                    background: 'linear-gradient(90deg, #9945FF 0%, #14F195 100%)',
-                }}
-            />
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -53,23 +39,22 @@ export function AdminWalletCard({ walletData, onRefresh, onGenerateWallet, gener
                         style={{
                             width: '44px',
                             height: '44px',
-                            borderRadius: '14px',
-                            background: 'rgba(153, 69, 255, 0.15)',
-                            border: '1px solid rgba(153, 69, 255, 0.3)',
+                            borderRadius: '6px',
+                            background: '#E7F1FF',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            color: '#14F195',
+                            color: '#0D6EFD',
                         }}
                     >
-                        <Wallet size={24} />
+                        <Wallet size={20} />
                     </div>
                     <div>
-                        <h2 style={{ color: '#ffffff', fontSize: '1.2rem', fontWeight: 800, margin: 0 }}>
+                        <h2 style={{ color: '#212529', fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>
                             Admin Generated Platform Wallet Address
                         </h2>
-                        <p style={{ color: '#94a3b8', fontSize: '0.82rem', margin: '2px 0 0 0' }}>
-                            Unified wallet for user deposit collection & withdrawal transfers
+                        <p style={{ color: '#6C757D', fontSize: '0.82rem', margin: '2px 0 0 0' }}>
+                            Unified wallet for user deposit collection and withdrawal transfers
                         </p>
                     </div>
                 </div>
@@ -78,16 +63,25 @@ export function AdminWalletCard({ walletData, onRefresh, onGenerateWallet, gener
             {/* Generated Address Box */}
             <div
                 style={{
-                    background: 'rgba(10, 14, 26, 0.8)',
-                    borderRadius: '16px',
+                    background: '#F8F9FA',
+                    borderRadius: '6px',
                     padding: '1.1rem 1.25rem',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    border: '1px solid #DEE2E6',
                     marginBottom: '1.25rem',
                 }}
             >
                 <div style={{ display: 'flex', alignItems: 'center', justify: 'space-between', marginBottom: '0.4rem' }}>
-                    <span style={{ marginRight: "10px", color: '#94a3b8', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
-                        Active Deposite Address
+                    <span
+                        style={{
+                            marginRight: "10px",
+                            color: '#6C757D',
+                            fontSize: '0.78rem',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            fontWeight: 700,
+                        }}
+                    >
+                        ACTIVE DEPOSIT ADDRESS
                     </span>
                 </div>
 
@@ -96,7 +90,7 @@ export function AdminWalletCard({ walletData, onRefresh, onGenerateWallet, gener
                         style={{
                             fontFamily: 'monospace',
                             fontSize: '1rem',
-                            color: '#14F195',
+                            color: '#198754',
                             fontWeight: 700,
                             wordBreak: 'break-all',
                         }}
@@ -115,14 +109,14 @@ export function AdminWalletCard({ walletData, onRefresh, onGenerateWallet, gener
                                     display: 'inline-flex',
                                     alignItems: 'center',
                                     gap: '0.3rem',
-                                    color: '#9945FF',
+                                    color: '#0D6EFD',
                                     fontSize: '0.8rem',
                                     fontWeight: 600,
                                     textDecoration: 'none',
-                                    background: 'rgba(153, 69, 255, 0.12)',
+                                    background: '#E7F1FF',
                                     padding: '0.4rem 0.7rem',
-                                    borderRadius: '8px',
-                                    border: '1px solid rgba(153, 69, 255, 0.25)',
+                                    borderRadius: '6px',
+                                    border: '1px solid #DEE2E6',
                                 }}
                             >
                                 <span>Explorer</span>
@@ -137,37 +131,37 @@ export function AdminWalletCard({ walletData, onRefresh, onGenerateWallet, gener
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
                 <div
                     style={{
-                        background: 'rgba(20, 241, 149, 0.05)',
-                        border: '1px solid rgba(20, 241, 149, 0.2)',
-                        borderRadius: '14px',
+                        background: '#F8F9FA',
+                        border: '1px solid #DEE2E6',
+                        borderRadius: '6px',
                         padding: '1rem 1.25rem',
                     }}
                 >
-                    <span style={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600 }}>Live On-Chain Address Balance</span>
+                    <span style={{ color: '#6C757D', fontSize: '0.8rem', fontWeight: 600 }}>Live On-Chain Address Balance</span>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', marginTop: '0.3rem' }}>
-                        <span style={{ fontSize: '1.8rem', fontWeight: 900, color: '#14F195' }}>
+                        <span style={{ fontSize: '1.6rem', fontWeight: 700, color: '#212529' }}>
                             {walletData?.balance !== undefined ? walletData.balance.toFixed(8) : '0.00'}
                         </span>
-                        <span style={{ color: '#14F195', fontWeight: 800, fontSize: '1rem' }}>SOL</span>
+                        <span style={{ color: '#6C757D', fontWeight: 700, fontSize: '1rem' }}>SOL</span>
                     </div>
                 </div>
 
                 <div
                     style={{
-                        background: 'rgba(153, 69, 255, 0.05)',
-                        border: '1px solid rgba(153, 69, 255, 0.2)',
-                        borderRadius: '14px',
+                        background: '#F8F9FA',
+                        border: '1px solid #DEE2E6',
+                        borderRadius: '6px',
                         padding: '1rem 1.25rem',
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'center',
                     }}
                 >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#a855f7', fontWeight: 700, fontSize: '0.85rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#212529', fontWeight: 600, fontSize: '0.85rem' }}>
                         <ShieldCheck size={16} />
                         <span>Address Usage Confirmation</span>
                     </div>
-                    <p style={{ color: '#94a3b8', fontSize: '0.78rem', margin: '0.3rem 0 0 0', lineHeight: 1.35 }}>
+                    <p style={{ color: '#6C757D', fontSize: '0.78rem', margin: '0.3rem 0 0 0', lineHeight: 1.35 }}>
                         Users will send deposits to this address. Withdrawals will also be signed and transferred from this wallet.
                     </p>
                 </div>
@@ -193,21 +187,20 @@ export function AdminWalletCard({ walletData, onRefresh, onGenerateWallet, gener
                 >
                     <div
                         style={{
-                            background: '#0f172a',
-                            border: '1px solid rgba(239, 68, 68, 0.4)',
-                            borderRadius: '20px',
-                            padding: '1.75rem',
+                            background: '#FFFFFF',
+                            border: '1px solid #DEE2E6',
+                            borderRadius: '6px',
+                            padding: '1.5rem',
                             maxWidth: '480px',
                             width: '100%',
-                            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.6)',
                         }}
                     >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#ef4444', marginBottom: '1rem' }}>
-                            <AlertCircle size={28} />
-                            <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800 }}>Generate New Admin Wallet?</h3>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#212529', marginBottom: '1rem' }}>
+                            <AlertCircle size={24} style={{ color: '#DC3545' }} />
+                            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Generate New Admin Wallet?</h3>
                         </div>
 
-                        <p style={{ color: '#cbd5e1', fontSize: '0.9rem', lineHeight: 1.5, marginBottom: '1.25rem' }}>
+                        <p style={{ color: '#6C757D', fontSize: '0.9rem', lineHeight: 1.5, marginBottom: '1.25rem' }}>
                             Generating a new Solana wallet address will deactivate the previous platform deposit address. Future user deposit transfers will target this new address.
                         </p>
 
@@ -216,11 +209,11 @@ export function AdminWalletCard({ walletData, onRefresh, onGenerateWallet, gener
                                 type="button"
                                 onClick={() => setShowConfirmModal(false)}
                                 style={{
-                                    background: 'rgba(255, 255, 255, 0.08)',
-                                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                                    color: '#ffffff',
+                                    background: '#FFFFFF',
+                                    border: '1px solid #DEE2E6',
+                                    color: '#212529',
                                     padding: '0.6rem 1.25rem',
-                                    borderRadius: '10px',
+                                    borderRadius: '6px',
                                     fontWeight: 600,
                                     cursor: 'pointer',
                                 }}
@@ -231,14 +224,13 @@ export function AdminWalletCard({ walletData, onRefresh, onGenerateWallet, gener
                                 type="button"
                                 onClick={handleConfirmGenerate}
                                 style={{
-                                    background: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)',
-                                    border: 'none',
-                                    color: '#ffffff',
+                                    background: '#DC3545',
+                                    border: '1px solid #DC3545',
+                                    color: '#FFFFFF',
                                     padding: '0.6rem 1.25rem',
-                                    borderRadius: '10px',
-                                    fontWeight: 700,
+                                    borderRadius: '6px',
+                                    fontWeight: 600,
                                     cursor: 'pointer',
-                                    boxShadow: '0 4px 14px rgba(239, 68, 68, 0.4)',
                                 }}
                             >
                                 Yes, Generate Address

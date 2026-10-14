@@ -241,7 +241,7 @@ export function WithdrawManagement() {
                                 const targetAddr = item.toAddress || 'N/A';
 
                                 return (
-                                    <tr key={item._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.15s' }} className="hover:bg-gray-50">
+                                    <tr key={item._id} style={{ borderBottom: '1px solid #DEE2E6', transition: 'background 0.15s' }} className="hover:bg-gray-50">
                                         <td style={{ padding: '0.85rem 1rem' }}>
                                             <div style={{ color: '#212529', fontWeight: 600 }}>{userEmail}</div>
                                             {userName && <div style={{ color: '#64748b', fontSize: '0.75rem' }}>{userName}</div>}

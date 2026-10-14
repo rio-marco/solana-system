@@ -8,20 +8,15 @@ import { useToast } from '../context/ToastContext';
 import {
     ArrowLeft,
     User,
-    Mail,
-    Wallet,
-    ShieldCheck,
-    ShieldOff,
-    Clock,
     History,
     Activity,
     CheckCircle2,
-    XCircle,
-    Search,
+    ShieldOff,
+    Clock,
+    ShieldCheck,
     ChevronLeft,
     ChevronRight,
     ExternalLink,
-    Filter,
 } from 'lucide-react';
 import {
     USER_STATUS,
@@ -110,32 +105,14 @@ function getTxTypeBadge(type) {
 
 function InfoRow({ label, value, mono }) {
     return (
-        <div
-            style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                padding: '0.75rem 0',
-                borderBottom: '1px solid #F1F3F5',
-            }}
-        >
-            <div style={{ color: '#6C757D', fontSize: '0.85rem' }}>
-                {label}
-            </div>
-            <div
-                style={{
-                    color: '#212529',
-                    fontSize: '0.85rem',
-                    fontWeight: 500,
-                    wordBreak: 'break-all',
-                    textAlign: 'right',
-                    maxWidth: '60%',
-                }}
-            >
+        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem 0', borderBottom: '1px solid #F1F3F5' }}>
+            <div style={{ color: '#6C757D', fontSize: '0.85rem' }}>{label}</div>
+            <div style={{ color: '#212529', fontSize: '0.85rem', fontWeight: 500, wordBreak: 'break-all', textAlign: 'right', maxWidth: '60%' }}>
                 {mono ? <code style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{value || '-'}</code> : value || '-'}
             </div>
         </div>
     );
-}
+};
 
 export function UserDetails({ userId }) {
     const { toastError } = useToast();
@@ -153,6 +130,8 @@ export function UserDetails({ userId }) {
     const [txStatus, setTxStatus] = useState('ALL');
 
     const fetchDetails = useCallback(async () => {
+        if (!userId) return;
+
         setLoading(true);
         try {
             const params = new URLSearchParams();
@@ -160,6 +139,7 @@ export function UserDetails({ userId }) {
             params.set('txLimit', String(pagination.limit));
             params.set('txType', txType);
             params.set('txStatus', txStatus);
+
             const res = await axios.get(`/api/admin/users/${userId}?${params.toString()}`);
             if (res.data?.flag && res.data?.data) {
                 const d = res.data.data;
@@ -179,10 +159,8 @@ export function UserDetails({ userId }) {
     }, [userId, pagination.currentPage, pagination.limit, txType, txStatus, toastError]);
 
     useEffect(() => {
-        if (userId) {
-            fetchDetails();
-        };
-    }, [userId, fetchDetails]);
+        fetchDetails();
+    }, [fetchDetails]);
 
     const handleTxTypeChange = (e) => {
         setTxType(e.target.value);
@@ -242,6 +220,9 @@ export function UserDetails({ userId }) {
     const explorerBase = 'https://explorer.solana.com';
     const clusterParam = user.network ? `?cluster=${user.network}` : '?cluster=devnet';
 
+    const startEntry = pagination.totalCount === 0 ? 0 : (pagination.currentPage - 1) * pagination.limit + 1;
+    const endEntry = Math.min(pagination.currentPage * pagination.limit, pagination.totalCount);
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
@@ -261,228 +242,334 @@ export function UserDetails({ userId }) {
                     </Link>
                 </div>
             </div>
-
-            <div style={{ background: '#FFFFFF', border: '1px solid #DEE2E6', borderRadius: '6px' }}>
-                <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #DEE2E6', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <User size={16} style={{ color: '#0D6EFD' }} />
-                    <h2 style={{ color: '#212529', fontSize: '1rem', fontWeight: 600, margin: 0 }}>User Information</h2>
-                </div>
-                <div style={{ padding: '0.75rem 1.25rem' }}>
-                    <InfoRow label="Full Name" value={user.fullName} />
-                    <InfoRow label="Email Address" value={user.email} mono />
-                    {user.walletAddress ? <InfoRow label="Wallet Address" value={user.walletAddress} mono /> : null}
-                    {user.walletBalance !== undefined ? <InfoRow label="Available SOL Balance" value={Number(user.walletBalance).toFixed(8) + ' SOL'} /> : null}
-                    {user.memo ? <InfoRow label="Memo" value={user.memo} /> : null}
-                    {user.referralCode ? <InfoRow label="Referral Code" value={user.referralCode} /> : null}
-                    <InfoRow label="Account Status" value={getStatusBadge(user.status)} />
-                    <InfoRow label="Two-Factor Authentication" value={getTwoFABadge(user.twoFAStatus)} />
-                    {user.suspendReason ? <InfoRow label="Current Suspend Reason" value={user.suspendReason} /> : null}
-                    {user.lastLogin ? <InfoRow label="Last Login" value={moment(user.lastLogin).format('MMM DD, YYYY HH:mm:ss')} /> : null}
-                    <InfoRow label="Created At" value={moment(user.createdAt).format('MMM DD, YYYY HH:mm:ss')} />
-                </div>
-            </div>
-
-            <div style={{ background: '#FFFFFF', border: '1px solid #DEE2E6', borderRadius: '6px' }}>
-                <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #DEE2E6', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <History size={16} style={{ color: '#6C757D' }} />
-                    <h2 style={{ color: '#212529', fontSize: '1rem', fontWeight: 600, margin: 0 }}>Suspend History</h2>
-                </div>
-                <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-                        <thead>
-                            <tr style={{ background: '#F8F9FA', borderBottom: '1px solid #DEE2E6' }}>
-                                <th style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#6C757D', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>#</th>
-                                <th style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#6C757D', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Action</th>
-                                <th style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#6C757D', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Reason</th>
-                                <th style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#6C757D', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Date & Time</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {suspendHistory.length === 0 ? (
-                                <tr>
-                                    <td colSpan={4} style={{ padding: '2rem', textAlign: 'center', color: '#6C757D' }}>No suspend history found.</td>
-                                </tr>
-                            ) : (
-                                [...suspendHistory].reverse().map((entry, idx) => {
-                                    const isActive = !entry.activatedAt;
-                                    return (
-                                        <tr key={idx} style={{ borderBottom: '1px solid #F1F3F5' }}>
-                                            <td style={{ padding: '0.75rem 1rem', color: '#212529' }}>{idx + 1}</td>
-                                            <td style={{ padding: '0.75rem 1rem' }}>
-                                                {isActive ? (
-                                                    <span style={{ ...STATUS_BADGE_STYLE, background: '#F8D7DA', color: '#DC3545', border: '1px solid #F1AEB5' }}>Suspended</span>
-                                                ) : (
-                                                    <span style={{ ...STATUS_BADGE_STYLE, background: '#D1E7DD', color: '#198754', border: '1px solid #A3CFBB' }}>Activated</span>
-                                                )}
-                                            </td>
-                                            <td style={{ padding: '0.75rem 1rem', color: '#212529', wordBreak: 'break-word' }}>{entry.reason || '-'}</td>
-                                            <td style={{ padding: '0.75rem 1rem', color: '#6C757D', fontSize: '0.8rem' }}>
-                                                {entry.suspendedAt && `Suspended: ${moment(entry.suspendedAt).format('MMM DD, YYYY HH:mm')}`}
-                                                {entry.activatedAt && <><br />Activated: {moment(entry.activatedAt).format('MMM DD, YYYY HH:mm')}</>}
-                                            </td>
-                                        </tr>
-                                    );
-                                })
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div style={{ background: '#FFFFFF', border: '1px solid #DEE2E6', borderRadius: '6px' }}>
-                <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #DEE2E6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <Activity size={16} style={{ color: '#0D6EFD' }} />
-                        <h2 style={{ color: '#212529', fontSize: '1rem', fontWeight: 600, margin: 0 }}>Transaction History</h2>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                        <select value={txType} onChange={handleTxTypeChange} style={{ background: '#FFFFFF', border: '1px solid #DEE2E6', color: '#212529', padding: '0.4rem 0.6rem', borderRadius: '6px', fontSize: '0.8rem' }}>
-                            <option value="ALL">All Transactions</option>
-                            <option value="DEPOSIT">Deposits</option>
-                            <option value="WITHDRAW">Withdrawals</option>
-                        </select>
-                        <select value={txStatus} onChange={handleTxStatusChange} style={{ background: '#FFFFFF', border: '1px solid #DEE2E6', color: '#212529', padding: '0.4rem 0.6rem', borderRadius: '6px', fontSize: '0.8rem' }}>
-                            <option value="ALL">All Status</option>
-                            <option value="PENDING">Pending</option>
-                            <option value="PROCESSING">Processing</option>
-                            <option value="CONFIRMED">Confirmed</option>
-                            <option value="FAILED">Failed</option>
-                        </select>
-                        <select value={pagination.limit} onChange={handleLimitChange} style={{ background: '#FFFFFF', border: '1px solid #DEE2E6', color: '#212529', padding: '0.4rem 0.6rem', borderRadius: '6px', fontSize: '0.8rem' }}>
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                        </select>
-                    </div>
-                </div>
-                <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-                        <thead>
-                            <tr style={{ background: '#F8F9FA', borderBottom: '1px solid #DEE2E6' }}>
-                                <th style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#6C757D', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>#</th>
-                                <th style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#6C757D', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Type</th>
-                                <th style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#6C757D', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Amount (SOL)</th>
-                                <th style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#6C757D', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
-                                <th style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#6C757D', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Transaction Hash</th>
-                                <th style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#6C757D', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Date & Time</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {transactions.length === 0 ? (
-                                <tr>
-                                    <td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: '#6C757D' }}>No transactions found.</td>
-                                </tr>
-                            ) : (
-                                transactions.map((tx, idx) => {
-                                    const sig = tx.transactionSignature;
-                                    const explorerUrl = sig ? `${explorerBase}/tx/${sig}${clusterParam}` : null;
-                                    const start = (pagination.currentPage - 1) * pagination.limit + idx + 1;
-                                    return (
-                                        <tr key={tx._id || idx} style={{ borderBottom: '1px solid #F1F3F5' }}>
-                                            <td style={{ padding: '0.75rem 1rem', color: '#212529' }}>{start}</td>
-                                            <td style={{ padding: '0.75rem 1rem' }}>{getTxTypeBadge(tx.transactionType)}</td>
-                                            <td style={{ padding: '0.75rem 1rem', color: '#212529', fontWeight: 500 }}>{Number(tx.amount).toFixed(8)}</td>
-                                            <td style={{ padding: '0.75rem 1rem' }}>{getTxStatusBadge(tx.status)}</td>
-                                            <td style={{ padding: '0.75rem 1rem' }}>
-                                                {sig ? (
-                                                    <a href={explorerUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#0D6EFD', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8rem', wordBreak: 'break-all' }}>
-                                                        <span style={{ fontFamily: 'monospace' }}>{sig.slice(0, 6)}...{sig.slice(-6)}</span>
-                                                        <ExternalLink size={12} />
-                                                    </a>
-                                                ) : (
-                                                    <span style={{ color: '#6C757D', fontFamily: 'monospace', fontSize: '0.8rem' }}>-</span>
-                                                )}
-                                            </td>
-                                            <td style={{ padding: '0.75rem 1rem', color: '#6C757D', fontSize: '0.8rem' }}>{moment(tx.createdAt).format('MMM DD, YYYY HH:mm')}</td>
-                                        </tr>
-                                    );
-                                })
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-                {pagination.totalCount > 0 && (
-                    <div style={{ padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
-                        <div style={{ color: '#6C757D', fontSize: '0.8rem' }}>
-                            Showing {((pagination.currentPage - 1) * pagination.limit) + 1} to {Math.min(pagination.currentPage * pagination.limit, pagination.totalCount)} of {pagination.totalCount} entries
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                            <button
-                                type="button"
-                                onClick={() => handlePageChange(pagination.currentPage - 1)}
-                                disabled={pagination.currentPage === 1}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                <div style={{ background: '#FFFFFF', border: '1px solid #DEE2E6', borderRadius: '6px', padding: '1.25rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                        {user.profilePhoto ? (
+                            <img
+                                src={user.profilePhoto}
+                                alt={user.fullName}
                                 style={{
-                                    width: '36px',
-                                    height: '36px',
-                                    borderRadius: '10px',
-                                    background: '#F5F9FC',
-                                    border: '1px solid #D8DFE4',
-                                    color: pagination.currentPage <= 1 ? '#cbd5e1' : '#475569',
-                                    cursor: pagination.currentPage <= 1 ? 'not-allowed' : 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
+                                    width: '90px',
+                                    height: '90px',
+                                    borderRadius: '50%',
+                                    objectFit: 'cover',
+                                    border: '1px solid #DEE2E6',
                                 }}
-                            >
-                                <ChevronLeft size={16} />
-                            </button>
-                            {getPageNumbers().map((p, idx) =>
-                                p === '...' ? (
-                                    <span
-                                        key={`e-${idx}`}
+                                onError={(e) => { e.target.style.display = 'none'; }}
+                            />
+                        ) : (
+                            <div style={{ width: '90px', height: '90px', borderRadius: '50%', background: '#E7F1FF', color: '#0D6EFD', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 700, border: '1px solid #9EC5FE' }}>
+                                {(user.fullName || '').charAt(0).toUpperCase()}
+                            </div>
+                        )}
+                        <div style={{ color: '#212529', fontSize: '1.1rem', fontWeight: 600, textAlign: 'center' }}>
+                            {user.fullName}
+                        </div>
+                    </div>
+                    <div style={{ height: '1px', background: '#DEE2E6', marginBottom: '1rem' }} />
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <InfoRow label="Email" value={user.email} mono />
+                        <InfoRow label="User ID" value={user._id} mono />
+                        {user.mobileNumber ? <InfoRow label="Mobile Number" value={user.mobileNumber} /> : null}
+                        {user.referralCode ? <InfoRow label="Referral Code" value={user.referralCode} /> : null}
+                        {user.memo ? <InfoRow label="Memo" value={user.memo} /> : null}
+                        {user.walletAddress ? <InfoRow label="Wallet Address" value={user.walletAddress} mono /> : null}
+                        {user.walletBalance !== undefined ? <InfoRow label="Available SOL Balance" value={Number(user.walletBalance).toFixed(8) + ' SOL'} /> : null}
+                        <InfoRow label="Account Status" value={getStatusBadge(user.status)} />
+                        <InfoRow label="2FA Status" value={getTwoFABadge(user.twoFAStatus)} />
+                        {user.suspendReason ? <InfoRow label="Current Suspend Reason" value={user.suspendReason} /> : null}
+                        {user.lastLogin ? <InfoRow label="Last Login" value={moment(user.lastLogin).format('MMM DD, YYYY HH:mm:ss')} /> : null}
+                        <InfoRow label="Created At" value={moment(user.createdAt).format('MMM DD, YYYY HH:mm:ss')} />
+                        <InfoRow label="Updated At" value={moment(user.updatedAt).format('MMM DD, YYYY HH:mm:ss')} />
+                    </div>
+                </div>
+                <div style={{ background: '#FFFFFF', border: '1px solid #DEE2E6', borderRadius: '6px', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                            <History size={16} style={{ color: '#6C757D' }} />
+                            <h2 style={{ color: '#212529', fontSize: '1rem', fontWeight: 600, margin: 0 }}>Suspend History</h2>
+                        </div>
+                        <div style={{ overflowX: 'auto', borderRadius: '16px', border: '1px solid #DEE2E6' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+                                <thead>
+                                    <tr
                                         style={{
-                                            width: '32px',
-                                            textAlign: 'center',
-                                            color: '#cbd5e1',
+                                            background: '#F5F9FC',
+                                            color: '#171D25',
+                                            borderBottom: '1px solid #D8DFE4'
                                         }}
-                                    >...</span>
-                                ) : (
-                                    <button
-                                        key={`p-${p}`}
-                                        type="button"
-                                        onClick={() => handlePageChange(p)}
-                                        disabled={p === pagination.currentPage}
+                                    >
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>#</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Action</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Reason</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Date & Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {suspendHistory.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={4} style={{ padding: '2rem', textAlign: 'center', color: '#6C757D' }}>No suspend history found.</td>
+                                        </tr>
+                                    ) : (
+                                        [...suspendHistory].reverse().map((entry, idx) => {
+                                            const isActive = !entry.activatedAt;
+                                            return (
+                                                <tr
+                                                    key={idx}
+                                                    style={{ borderBottom: '1px solid #DEE2E6', transition: 'background 0.15s' }}
+                                                    className="hover:bg-gray-50"
+                                                >
+                                                    <td style={{ padding: '0.75rem 1rem' }}>{idx + 1}</td>
+                                                    <td style={{ padding: '0.75rem 1rem' }}>
+                                                        {isActive ? (
+                                                            <span style={{ ...STATUS_BADGE_STYLE, background: '#F8D7DA', color: '#DC3545', border: '1px solid #F1AEB5' }}>Suspended</span>
+                                                        ) : (
+                                                            <span style={{ ...STATUS_BADGE_STYLE, background: '#D1E7DD', color: '#198754', border: '1px solid #A3CFBB' }}>Activated</span>
+                                                        )}
+                                                    </td>
+                                                    <td style={{ padding: '0.75rem 1rem', wordBreak: 'break-word' }}>{entry.reason || '-'}</td>
+                                                    <td style={{ padding: '0.75rem 1rem', color: '#6C757D', fontSize: '0.8rem' }}>
+                                                        {entry.suspendedAt && `Suspended: ${moment(entry.suspendedAt).format('MMM DD, YYYY HH:mm')}`}
+                                                        {entry.activatedAt && (
+                                                            <>
+                                                                <br />
+                                                                Activated: {moment(entry.activatedAt).format('MMM DD, YYYY HH:mm')}
+                                                            </>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div style={{ height: '1px', background: '#DEE2E6', marginBottom: '1rem', marginTop: '1rem' }} />
+                    <div>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.25rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <Activity size={16} style={{ color: '#0D6EFD' }} />
+                                <h2 style={{ color: '#212529', fontSize: '1rem', fontWeight: 600, margin: 0 }}>Transaction History</h2>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                <select
+                                    value={txType}
+                                    onChange={handleTxTypeChange}
+                                    style={{
+                                        background: '#FFFFFF',
+                                        border: '1px solid #DEE2E6',
+                                        padding: '0.4rem 0.6rem',
+                                        borderRadius: '6px',
+                                        fontSize: '0.8rem',
+                                    }}
+                                >
+                                    <option value="ALL">All Transactions</option>
+                                    <option value="DEPOSIT">Deposits</option>
+                                    <option value="WITHDRAW">Withdrawals</option>
+                                </select>
+                                <select
+                                    value={txStatus}
+                                    onChange={handleTxStatusChange}
+                                    style={{
+                                        background: '#FFFFFF',
+                                        border: '1px solid #DEE2E6',
+                                        padding: '0.4rem 0.6rem',
+                                        borderRadius: '6px',
+                                        fontSize: '0.8rem',
+                                    }}
+                                >
+                                    <option value="ALL">All Status</option>
+                                    <option value="PENDING">Pending</option>
+                                    <option value="PROCESSING">Processing</option>
+                                    <option value="CONFIRMED">Confirmed</option>
+                                    <option value="FAILED">Failed</option>
+                                </select>
+                                <select
+                                    value={pagination.limit}
+                                    onChange={handleLimitChange}
+                                    style={{
+                                        background: '#FFFFFF',
+                                        border: '1px solid #DEE2E6',
+                                        padding: '0.4rem 0.6rem',
+                                        borderRadius: '6px',
+                                        fontSize: '0.8rem',
+                                    }}
+                                >
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style={{ overflowX: 'auto' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+                                <thead>
+                                    <tr
                                         style={{
-                                            minWidth: '36px',
+                                            background: '#F5F9FC',
+                                            color: '#171D25',
+                                            borderBottom: '1px solid #D8DFE4'
+                                        }}
+                                    >
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>#</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Type</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Amount (SOL)</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Status</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Transaction Hash</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Date & Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {transactions.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: '#6C757D' }}>
+                                                No transactions found.
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        transactions.map((tx, idx) => {
+                                            const sig = tx.transactionSignature;
+                                            const explorerUrl = sig ? `${explorerBase}/tx/${sig}${clusterParam}` : null;
+                                            const start = (pagination.currentPage - 1) * pagination.limit + idx + 1;
+
+                                            return (
+                                                <tr
+                                                    key={tx._id || idx}
+                                                    style={{ borderBottom: '1px solid #DEE2E6', transition: 'background 0.15s' }}
+                                                    className="hover:bg-gray-50"
+                                                >
+                                                    <td style={{ padding: '0.75rem 1rem' }}>
+                                                        {start}
+                                                    </td>
+                                                    <td style={{ padding: '0.75rem 1rem' }}>
+                                                        {getTxTypeBadge(tx.transactionType)}
+                                                    </td>
+                                                    <td style={{ padding: '0.75rem 1rem', fontWeight: 500 }}>
+                                                        {Number(tx.amount).toFixed(8)}
+                                                    </td>
+                                                    <td style={{ padding: '0.75rem 1rem' }}>
+                                                        {getTxStatusBadge(tx.status)}
+                                                    </td>
+                                                    <td style={{ padding: '0.75rem 1rem' }}>
+                                                        {sig ? (
+                                                            <a
+                                                                href={explorerUrl}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                style={{
+                                                                    color: '#0D6EFD',
+                                                                    textDecoration: 'none',
+                                                                    display: 'inline-flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '0.25rem',
+                                                                    fontSize: '0.8rem',
+                                                                    wordBreak: 'break-all',
+                                                                }}
+                                                            >
+                                                                <span style={{ fontFamily: 'monospace' }}>
+                                                                    {sig.slice(0, 6)}...{sig.slice(-6)}
+                                                                </span>
+                                                                <ExternalLink size={12} />
+                                                            </a>
+                                                        ) : (
+                                                            <span style={{ color: '#6C757D', fontFamily: 'monospace', fontSize: '0.8rem' }}>-</span>
+                                                        )}
+                                                    </td>
+                                                    <td style={{ padding: '0.75rem 1rem', color: '#6C757D', fontSize: '0.8rem' }}>
+                                                        {moment(tx.createdAt).format('MMM DD, YYYY HH:mm')}
+                                                    </td>
+                                                </tr>
+                                            );
+                                        }))}
+                                </tbody>
+                            </table>
+                        </div>
+                        {pagination.totalCount > 0 && (
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.08)', flexWrap: 'wrap', gap: '1rem' }}>
+                                <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
+                                    Showing <strong style={{ color: '#212529' }}>{startEntry}</strong> to <strong style={{ color: '#212529' }}>{endEntry}</strong> of <strong style={{ color: '#212529' }}>{pagination.totalCount}</strong> users
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => handlePageChange(pagination.currentPage - 1)}
+                                        disabled={pagination.currentPage <= 1 || loading}
+                                        style={{
+                                            width: '36px',
                                             height: '36px',
-                                            padding: '0 0.5rem',
                                             borderRadius: '10px',
+                                            background: '#F5F9FC',
+                                            border: '1px solid #D8DFE4',
+                                            color: pagination.currentPage <= 1 ? '#cbd5e1' : '#475569',
+                                            cursor: pagination.currentPage <= 1 ? 'not-allowed' : 'pointer',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
-                                            background: p === pagination.currentPage ? 'rgb(13, 110, 253)' : '#F5F9FC',
-                                            color: p === pagination.currentPage ? '#FFFFFF' : '#212529',
-                                            border: p === pagination.currentPage ? 'none' : '1px solid #D8DFE4',
-                                            fontWeight: p === pagination.currentPage ? 800 : 500,
-                                            cursor: p === pagination.currentPage ? 'default' : 'pointer',
                                         }}
                                     >
-                                        {p}
+                                        <ChevronLeft size={16} />
                                     </button>
-                                )
-                            )}
-                            <button
-                                type="button"
-                                onClick={() => handlePageChange(pagination.currentPage + 1)}
-                                disabled={pagination.currentPage === pagination.totalPages}
-                                style={{
-                                    width: '36px',
-                                    height: '36px',
-                                    borderRadius: '10px',
-                                    background: '#F5F9FC',
-                                    border: '1px solid #D8DFE4',
-                                    color: pagination.currentPage >= pagination.totalPages ? '#cbd5e1' : '#475569',
-                                    cursor: pagination.currentPage >= pagination.totalPages ? 'not-allowed' : 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <ChevronRight size={16} />
-                            </button>
-                        </div>
+                                    {getPageNumbers().map((p, idx) => (
+                                        p === '...'
+                                            ? <span
+                                                key={`e-${idx}`}
+                                                style={{
+                                                    width: '32px',
+                                                    textAlign: 'center',
+                                                    color: '#cbd5e1'
+                                                }}
+                                            >...</span>
+                                            :
+                                            <button
+                                                key={`p-${p}`}
+                                                type="button"
+                                                onClick={() => handlePageChange(p)}
+                                                disabled={loading || p === pagination.currentPage}
+                                                style={{
+                                                    minWidth: '36px',
+                                                    height: '36px',
+                                                    padding: '0 0.5rem',
+                                                    borderRadius: '10px',
+                                                    fontSize: '0.85rem',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    background: p === pagination.currentPage ? 'rgb(13, 110, 253)' : '#F5F9FC',
+                                                    color: p === pagination.currentPage ? '#FFFFFF' : '#212529',
+                                                    border: p === pagination.currentPage ? 'none' : '1px solid #D8DFE4',
+                                                    fontWeight: p === pagination.currentPage ? 800 : 500,
+                                                    cursor: p === pagination.currentPage ? 'default' : 'pointer',
+                                                }}
+                                            >
+                                                {p}
+                                            </button>
+                                    ))}
+                                    <button
+                                        type="button"
+                                        onClick={() => handlePageChange(pagination.currentPage + 1)}
+                                        disabled={pagination.currentPage >= pagination.totalPages || loading}
+                                        style={{
+                                            width: '36px',
+                                            height: '36px',
+                                            borderRadius: '10px',
+                                            background: '#F5F9FC',
+                                            border: '1px solid #D8DFE4',
+                                            color: pagination.currentPage >= pagination.totalPages ? '#cbd5e1' : '#475569',
+                                            cursor: pagination.currentPage >= pagination.totalPages ? 'not-allowed' : 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}
+                                    >
+                                        <ChevronRight size={16} />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
-                )}
+                </div>
             </div>
         </div>
     );

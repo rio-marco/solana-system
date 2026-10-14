@@ -492,7 +492,7 @@ export function UserManagement() {
                             ) : users.map((user) => (
                                 <tr
                                     key={user._id}
-                                    style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', transition: 'background 0.15s' }}
+                                    style={{ borderBottom: '1px solid #DEE2E6', transition: 'background 0.15s' }}
                                     className="hover:bg-gray-50"
                                 >
                                     {/* User Info */}

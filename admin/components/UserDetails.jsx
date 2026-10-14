@@ -242,8 +242,13 @@ export function UserDetails({ userId }) {
                     </Link>
                 </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                <div style={{ background: '#FFFFFF', border: '1px solid #DEE2E6', borderRadius: '6px', padding: '1.25rem' }}>
+            <div className="user-details-layout">
+                <div style={{
+                    background: '#FFFFFF',
+                    border: '1px solid #DEE2E6',
+                    borderRadius: '6px',
+                    padding: '1.25rem',
+                }}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
                         {user.profilePhoto ? (
                             <img
@@ -284,7 +289,16 @@ export function UserDetails({ userId }) {
                         <InfoRow label="Updated At" value={moment(user.updatedAt).format('MMM DD, YYYY HH:mm:ss')} />
                     </div>
                 </div>
-                <div style={{ background: '#FFFFFF', border: '1px solid #DEE2E6', borderRadius: '6px', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{
+                    background: '#FFFFFF',
+                    border: '1px solid #DEE2E6',
+                    borderRadius: '6px',
+                    padding: '1.25rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '1rem',
+                    minWidth: 0,
+                }}>
                     <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                             <History size={16} style={{ color: '#6C757D' }} />

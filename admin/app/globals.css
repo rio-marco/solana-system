@@ -255,6 +255,7 @@ body {
         opacity: 0;
         transform: translateX(100px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -266,10 +267,12 @@ body {
         opacity: 0;
         transform: translate(-50%, -40px) scale(0.92);
     }
+
     60% {
         opacity: 1;
         transform: translate(-50%, 8px) scale(1.02);
     }
+
     100% {
         opacity: 1;
         transform: translate(-50%, 0) scale(1);
@@ -340,8 +343,13 @@ body {
 
 /* ===== SPINNER ===== */
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .animate-spin {
@@ -373,4 +381,17 @@ select:focus,
 textarea:focus {
     border-color: rgba(13, 110, 253, 0.5) !important;
     box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
+}
+
+.user-details-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: 1.5rem;
+    align-items: start;
+}
+
+@media (max-width: 768px) {
+    .user-details-layout {
+        grid-template-columns: 1fr;
+    }
 }

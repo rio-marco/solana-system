@@ -52,6 +52,12 @@ export const TRANSACTION_STATUS = {
     FAILED: 4,
 };
 
+export const ACTIVITY_STATUS = {
+    PENDING: 0,
+    VERIFIED: 1,
+    FAILED: 2,
+};
+
 export const COUNTRY_PHONE_LENGTHS = {
     '+1': { min: 10, max: 10 },
     '+7': { min: 10, max: 10 },

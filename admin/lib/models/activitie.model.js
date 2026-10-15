@@ -38,4 +38,4 @@ const ActivitySchema = new mongoose.Schema(
     },
 );
 
-module.exports = mongoose.models.Admin || mongoose.model('Activitie', ActivitySchema);
+module.exports = mongoose.models.Activitie || mongoose.model('Activitie', ActivitySchema);

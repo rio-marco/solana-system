@@ -95,7 +95,7 @@ module.exports = {
     ACTIVITY_STATUS: {
         PENDING: 0,
         VERIFIED: 1,
-        FAILED: 1,
+        FAILED: 2,
     },
 
     COUNTRY_PHONE_LENGTHS: {

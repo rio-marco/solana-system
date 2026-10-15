@@ -23,6 +23,7 @@ import {
     TWOFA_STATUS,
     TRANSACTION_STATUS,
     TRX_TYPE,
+    ACTIVITY_STATUS,
     DEFAULT_CURRENT_PAGE,
     DEFAULT_ITEM_PER_PAGE,
 } from './ui-constants.mjs';
@@ -105,6 +106,22 @@ function getTxTypeBadge(type) {
     return <span style={{ ...STATUS_BADGE_STYLE, background: '#E7F1FF', color: '#0D6EFD', border: '1px solid #9EC5FE' }}>Withdraw</span>;
 };
 
+function getActivityStatusBadge(status) {
+    if (status === ACTIVITY_STATUS.VERIFIED) {
+        return <span style={{ ...STATUS_BADGE_STYLE, background: '#D1E7DD', color: '#198754', border: '1px solid #A3CFBB' }}>Verified</span>;
+    };
+
+    if (status === ACTIVITY_STATUS.FAILED) {
+        return <span style={{ ...STATUS_BADGE_STYLE, background: '#F8D7DA', color: '#DC3545', border: '1px solid #F1AEB5' }}>Failed</span>;
+    };
+
+    if (status === ACTIVITY_STATUS.PENDING) {
+        return <span style={{ ...STATUS_BADGE_STYLE, background: '#FFF3CD', color: '#664D03', border: '1px solid #FFECB5' }}>Pending</span>;
+    };
+
+    return <span style={{ ...STATUS_BADGE_STYLE, background: '#F1F3F5', color: '#6C757D', border: '1px solid #DEE2E6' }}>{status ?? '-'}</span>;
+};
+
 function InfoRow({ label, value, mono }) {
     return (
         <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem 0', borderBottom: '1px solid #F1F3F5' }}>
@@ -120,8 +137,15 @@ export function UserDetails({ userId }) {
     const { toastError, toastSuccess } = useToast();
     const [loading, setLoading] = useState(true);
     const [transactionLoading, setTransactionLoading] = useState(false);
+    const [activityLoading, setActivityLoading] = useState(false);
     const [user, setUser] = useState(null);
-    const [suspendHistory, setSuspendHistory] = useState([]);
+    const [activities, setActivities] = useState([]);
+    const [activityPagination, setActivityPagination] = useState({
+        totalCount: 0,
+        totalPages: 0,
+        currentPage: DEFAULT_CURRENT_PAGE,
+        limit: DEFAULT_ITEM_PER_PAGE,
+    });
     const [transactions, setTransactions] = useState([]);
     const [pagination, setPagination] = useState({
         totalCount: 0,
@@ -149,7 +173,6 @@ export function UserDetails({ userId }) {
                 const d = res.data.data;
                 setUser(d.user);
                 setUserStatus(d.user?.status ?? USER_STATUS.INACTIVE);
-                setSuspendHistory(d.user?.suspendHistory || []);
             } else {
                 toastError(res.data?.msg || res.data?.message || 'Failed to load user details');
             };
@@ -160,6 +183,31 @@ export function UserDetails({ userId }) {
             setLoading(false);
         };
     }, [userId, toastError]);
+
+    const fetchActivity = useCallback(async () => {
+        if (!userId) return;
+
+        setActivityLoading(true);
+        try {
+            const params = new URLSearchParams();
+            params.set('page', String(activityPagination.currentPage));
+            params.set('limit', String(activityPagination.limit));
+
+            const res = await axios.get(`/api/admin/users/${userId}/activity?${params.toString()}`);
+            if (res.data?.flag && res.data?.data) {
+                const d = res.data.data;
+                setActivities(d.activities || []);
+                setActivityPagination(d.pagination || { totalCount: 0, totalPages: 0, currentPage: DEFAULT_CURRENT_PAGE, limit: DEFAULT_ITEM_PER_PAGE });
+            } else {
+                toastError(res.data?.msg || res.data?.message || 'Failed to load user activity');
+            };
+        } catch (err) {
+            const errMsg = err.response?.data?.msg || err.response?.data?.message || 'Failed to load user activity.';
+            toastError(errMsg);
+        } finally {
+            setActivityLoading(false);
+        };
+    }, [userId, activityPagination.currentPage, activityPagination.limit, toastError]);
 
     const fetchTrxDetails = useCallback(async () => {
         if (!userId) return;
@@ -192,6 +240,10 @@ export function UserDetails({ userId }) {
     useEffect(() => {
         fetchDetails();
     }, [fetchDetails]);
+
+    useEffect(() => {
+        fetchActivity();
+    }, [fetchActivity]);
 
     useEffect(() => {
         fetchTrxDetails();
@@ -299,6 +351,19 @@ export function UserDetails({ userId }) {
     const handlePageChange = (pg) => {
         if (pg < 1 || pg > pagination.totalPages) return;
         setPagination((p) => ({ ...p, currentPage: pg }));
+    };
+
+    const handleActivityPageChange = (pg) => {
+        if (pg < 1 || pg > activityPagination.totalPages) return;
+        setActivityPagination((p) => ({ ...p, currentPage: pg }));
+    };
+
+    const handleActivityLimitChange = (e) => {
+        setActivityPagination((p) => ({
+            ...p,
+            limit: parseInt(e.target.value, 10),
+            currentPage: DEFAULT_CURRENT_PAGE,
+        }));
     };
 
     if (loading && !user) {
@@ -436,12 +501,29 @@ export function UserDetails({ userId }) {
                     gap: '1rem',
                     minWidth: 0,
                 }}>
-                    {/* <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                            <History size={16} style={{ color: '#6C757D' }} />
-                            <h2 style={{ color: '#212529', fontSize: '1rem', fontWeight: 600, margin: 0 }}>Suspend History</h2>
+                    <div>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.25rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <History size={16} style={{ color: '#0D6EFD' }} />
+                                <h2 style={{ color: '#212529', fontSize: '1rem', fontWeight: 600, margin: 0 }}>User Activity</h2>
+                            </div>
+                            <select
+                                value={activityPagination.limit}
+                                onChange={handleActivityLimitChange}
+                                style={{
+                                    background: '#FFFFFF',
+                                    border: '1px solid #DEE2E6',
+                                    padding: '0.4rem 0.6rem',
+                                    borderRadius: '6px',
+                                    fontSize: '0.8rem',
+                                }}
+                            >
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                            </select>
                         </div>
-                        <div style={{ overflowX: 'auto', borderRadius: '16px', border: '1px solid #DEE2E6' }}>
+                        <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid #DEE2E6' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
                                 <thead>
                                     <tr
@@ -452,42 +534,63 @@ export function UserDetails({ userId }) {
                                         }}
                                     >
                                         <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>#</th>
-                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Action</th>
-                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Reason</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Campaign</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Comment</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Status</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Rewarded</th>
                                         <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Date & Time</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {suspendHistory.length === 0 ? (
+                                    {activityLoading ? (
                                         <tr>
-                                            <td colSpan={4} style={{ padding: '2rem', textAlign: 'center', color: '#6C757D' }}>No suspend history found.</td>
+                                            <td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: '#6C757D' }}>
+                                                Loading activities...
+                                            </td>
+                                        </tr>
+                                    ) : activities.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: '#6C757D' }}>No activity found.</td>
                                         </tr>
                                     ) : (
-                                        [...suspendHistory].reverse().map((entry, idx) => {
-                                            const isActive = !entry.activatedAt;
+                                        activities.map((activity, idx) => {
+                                            const start = (activityPagination.currentPage - 1) * activityPagination.limit + idx + 1;
+                                            const commentUrl = activity.comment_url || '-';
+                                            const campaignName = activity.campaign_id?.name || 'N/A';
+
                                             return (
                                                 <tr
-                                                    key={idx}
+                                                    key={activity._id || idx}
                                                     style={{ borderBottom: '1px solid #DEE2E6', transition: 'background 0.15s' }}
                                                     className="hover:bg-gray-50"
                                                 >
-                                                    <td style={{ padding: '0.75rem 1rem' }}>{idx + 1}</td>
+                                                    <td style={{ padding: '0.75rem 1rem' }}>{start}</td>
+                                                    <td style={{ padding: '0.75rem 1rem', wordBreak: 'break-word' }}>{campaignName}</td>
                                                     <td style={{ padding: '0.75rem 1rem' }}>
-                                                        {isActive ? (
-                                                            <span style={{ ...STATUS_BADGE_STYLE, background: '#F8D7DA', color: '#DC3545', border: '1px solid #F1AEB5' }}>Suspended</span>
+                                                        {commentUrl !== '-' ? (
+                                                            <a
+                                                                href={commentUrl}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                style={{ color: '#0D6EFD', display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8rem', wordBreak: 'break-all' }}
+                                                            >
+                                                                {commentUrl.length > 40 ? `${commentUrl.slice(0, 34)}...` : commentUrl}
+                                                                <ExternalLink size={12} />
+                                                            </a>
                                                         ) : (
-                                                            <span style={{ ...STATUS_BADGE_STYLE, background: '#D1E7DD', color: '#198754', border: '1px solid #A3CFBB' }}>Activated</span>
+                                                            <span style={{ color: '#6C757D', fontSize: '0.8rem' }}>-</span>
                                                         )}
                                                     </td>
-                                                    <td style={{ padding: '0.75rem 1rem', wordBreak: 'break-word' }}>{entry.reason || '-'}</td>
-                                                    <td style={{ padding: '0.75rem 1rem', color: '#6C757D', fontSize: '0.8rem' }}>
-                                                        {entry.suspendedAt && `Suspended: ${moment(entry.suspendedAt).format('MMM DD, YYYY HH:mm')}`}
-                                                        {entry.activatedAt && (
-                                                            <>
-                                                                <br />
-                                                                Activated: {moment(entry.activatedAt).format('MMM DD, YYYY HH:mm')}
-                                                            </>
+                                                    <td style={{ padding: '0.75rem 1rem' }}>{getActivityStatusBadge(activity.status)}</td>
+                                                    <td style={{ padding: '0.75rem 1rem' }}>
+                                                        {activity.rewarded ? (
+                                                            <span style={{ ...STATUS_BADGE_STYLE, background: '#D1E7DD', color: '#198754', border: '1px solid #A3CFBB' }}>Yes</span>
+                                                        ) : (
+                                                            <span style={{ ...STATUS_BADGE_STYLE, background: '#F1F3F5', color: '#6C757D', border: '1px solid #DEE2E6' }}>No</span>
                                                         )}
+                                                    </td>
+                                                    <td style={{ padding: '0.75rem 1rem', color: '#6C757D', fontSize: '0.8rem' }}>
+                                                        {moment(activity.createdAt).format('MMM DD, YYYY HH:mm')}
                                                     </td>
                                                 </tr>
                                             );
@@ -496,8 +599,17 @@ export function UserDetails({ userId }) {
                                 </tbody>
                             </table>
                         </div>
+                        <Pagination
+                            currentPage={activityPagination.currentPage}
+                            totalPages={activityPagination.totalPages}
+                            totalCount={activityPagination.totalCount}
+                            limit={activityPagination.limit}
+                            onPageChange={handleActivityPageChange}
+                            loading={activityLoading}
+                            itemLabel="activities"
+                        />
                     </div>
-                    <div style={{ height: '1px', background: '#DEE2E6', marginBottom: '1rem', marginTop: '1rem' }} /> */}
+                    <div style={{ height: '1px', background: '#DEE2E6', marginBottom: '1rem', marginTop: '1rem' }} />
                     <div>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.25rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>

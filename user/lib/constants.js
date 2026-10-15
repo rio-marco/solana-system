@@ -67,4 +67,10 @@ module.exports = {
         CONFIRMED: 3,
         FAILED: 4,
     },
+
+    ACTIVITY_STATUS: {
+        PENDING: 0,
+        VERIFIED: 1,
+        FAILED: 2,
+    },
 };

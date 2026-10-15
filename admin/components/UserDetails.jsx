@@ -368,7 +368,6 @@ export function UserDetails({ userId }) {
                         {user.suspendReason ? <InfoRow label="Current Suspend Reason" value={user.suspendReason} /> : null}
                         {user.lastLogin ? <InfoRow label="Last Login" value={moment(user.lastLogin).format('MMM DD, YYYY HH:mm:ss')} /> : null}
                         <InfoRow label="Created At" value={moment(user.createdAt).format('MMM DD, YYYY HH:mm:ss')} />
-                        <InfoRow label="Updated At" value={moment(user.updatedAt).format('MMM DD, YYYY HH:mm:ss')} />
                     </div>
                 </div>
                 <div style={{

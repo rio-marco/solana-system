@@ -92,6 +92,12 @@ module.exports = {
         FAILED: 4,
     },
 
+    ACTIVITY_STATUS: {
+        PENDING: 0,
+        VERIFIED: 1,
+        FAILED: 1,
+    },
+
     COUNTRY_PHONE_LENGTHS: {
         '+1': { min: 10, max: 10 },
         '+7': { min: 10, max: 10 },

@@ -7,6 +7,8 @@ if (global._bitcore) {
 const { NextResponse } = require('next/server');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
+const path = require('path');
 
 function errorResponse(msg = '', data = {}) {
     return NextResponse.json(
@@ -103,6 +105,30 @@ function generateOTP(length = 6) {
     return otp;
 };
 
+function buildProfilePhotoUrl(profilePhoto) {
+    const value = (profilePhoto || '').trim();
+
+    if (!value) return '';
+    if (/^(https?:\/\/|data:)/i.test(value)) return value;
+
+    const clean = value.replace(/^\/+/, '');
+    const adminBase = (process.env.NODE_URL || '').replace(/\/+$/, '');
+    const userBase = (process.env.USER_URL || '').replace(/\/+$/, '');
+
+    try {
+        const isHostedHere = fs.existsSync(path.join(process.cwd(), 'public', clean));
+        if (isHostedHere && adminBase) {
+            return `${adminBase}/${clean}`;
+        };
+    } catch (e) {
+        // fall through to legacy host
+    };
+
+    if (userBase) return `${userBase}/${clean}`;
+
+    return `/${clean}`;
+};
+
 function generateAuthToken(payload) {
     try {
         const token = jwt.sign(payload, process.env.AUTH_SECRET, {
@@ -128,4 +154,5 @@ module.exports = {
     generateRandomToken,
     generateOTP,
     generateAuthToken,
+    buildProfilePhotoUrl,
 };

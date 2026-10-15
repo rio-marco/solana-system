@@ -2,7 +2,7 @@
 
 const messages = require('../../../../lib/messages');
 const { verifySession } = require('../../../../lib/session');
-const { errorResponse, successResponse, authErrorResponse, log1 } = require('../../../../lib/general');
+const { errorResponse, successResponse, authErrorResponse, log1, buildProfilePhotoUrl } = require('../../../../lib/general');
 const User = require('../../../../lib/models/user.model');
 const constants = require('../../../../lib/constants');
 
@@ -58,26 +58,10 @@ async function GET(req) {
             User.countDocuments(query),
         ]);
 
-        const backendUrl = process.env.USER_URL;
-
-        const updatedUsers = users.map((user) => {
-            const profilePhoto = user.profilePhoto?.trim() || '';
-
-            let profilePhotoUrl = '';
-
-            if (profilePhoto) {
-                if (/^https?:\/\//i.test(profilePhoto)) {
-                    profilePhotoUrl = profilePhoto;
-                } else if (backendUrl) {
-                    profilePhotoUrl = `${backendUrl}/${profilePhoto.replace(/^\/+/, '')}`;
-                };
-            };
-
-            return {
-                ...user,
-                profilePhoto: profilePhotoUrl,
-            };
-        });
+        const updatedUsers = users.map((user) => ({
+            ...user,
+            profilePhoto: buildProfilePhotoUrl(user.profilePhoto),
+        }));
 
         const totalPages = Math.ceil(totalCount / limit);
 

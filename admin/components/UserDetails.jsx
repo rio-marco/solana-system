@@ -16,6 +16,7 @@ import {
     Clock,
     ShieldCheck,
     ExternalLink,
+    Pencil,
 } from 'lucide-react';
 import {
     USER_STATUS,
@@ -28,6 +29,7 @@ import {
 } from './ui-constants.mjs';
 import { Pagination } from './Pagination';
 import SuspendModal from './modal/SuspendModal.jsx';
+import EditUserModal from './modal/EditUserModal.jsx';
 
 const STATUS_BADGE_STYLE = {
     padding: '0.25rem 0.7rem',
@@ -116,7 +118,7 @@ function InfoRow({ label, value, mono }) {
 };
 
 export function UserDetails({ userId }) {
-    const { toastError } = useToast();
+    const { toastError, toastSuccess } = useToast();
     const [loading, setLoading] = useState(true);
     const [transactionLoading, setTransactionLoading] = useState(false);
     const [user, setUser] = useState(null);
@@ -133,6 +135,8 @@ export function UserDetails({ userId }) {
     const [userStatus, setUserStatus] = useState(USER_STATUS.INACTIVE);
 
     const [suspendModal, setSuspendModal] = useState(null);
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [savingUser, setSavingUser] = useState(false);
 
     const fetchDetails = useCallback(async () => {
         if (!userId) return;
@@ -240,6 +244,34 @@ export function UserDetails({ userId }) {
         };
     };
 
+    const handleEditUser = async ({ fullName, file }) => {
+        setSavingUser(true);
+
+        try {
+            const formData = new FormData();
+            formData.append('fullName', fullName);
+            // formData.append('twoFAStatus', String(twoFAStatus));
+            if (file) {
+                formData.append('profilePhoto', file);
+            };
+
+            const res = await axios.patch(`/api/admin/users/${userId}`, formData);
+
+            if (res.data?.flag) {
+                toastSuccess(res.data?.msg || 'User details updated successfully.');
+                setEditModalOpen(false);
+                await fetchDetails();
+            } else {
+                toastError(res.data?.msg || res.data?.message || 'Failed to update user details');
+            };
+        } catch (err) {
+            const errMsg = err.response?.data?.msg || err.response?.data?.message || 'Failed to update user details.';
+            toastError(errMsg);
+        } finally {
+            setSavingUser(false);
+        };
+    };
+
     const handleTxTypeChange = (e) => {
         const type = e.target.value;
 
@@ -332,6 +364,31 @@ export function UserDetails({ userId }) {
                     borderRadius: '6px',
                     padding: '1.25rem',
                 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <User size={16} style={{ color: '#0D6EFD' }} />
+                            <h2 style={{ color: '#212529', fontSize: '1rem', fontWeight: 600, margin: 0 }}>User Information</h2>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setEditModalOpen(true)}
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.35rem',
+                                background: '#E7F1FF',
+                                border: '1px solid #9EC5FE',
+                                color: '#0D6EFD',
+                                padding: '0.4rem 0.85rem',
+                                borderRadius: '8px',
+                                cursor: 'pointer',
+                                fontSize: '0.8rem',
+                                fontWeight: 600,
+                            }}
+                        >
+                            <Pencil size={13} /> Edit
+                        </button>
+                    </div>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
                         {user.profilePhoto ? (
                             <img
@@ -626,6 +683,15 @@ export function UserDetails({ userId }) {
                     </div>
                 </div>
             </div>
+
+            {editModalOpen && (
+                <EditUserModal
+                    user={user}
+                    onConfirm={handleEditUser}
+                    onClose={() => setEditModalOpen(false)}
+                    loading={savingUser}
+                />
+            )}
 
             {suspendModal && (
                 <SuspendModal

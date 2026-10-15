@@ -100,6 +100,7 @@ async function POST(req) {
             body = {
                 name: formData.get('name'),
                 email: formData.get('email'),
+                countryCode: formData.get('countryCode'),
                 phoneNumber: formData.get('phoneNumber'),
                 status: formData.get('status'),
             };

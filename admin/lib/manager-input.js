@@ -36,11 +36,21 @@ function parseManagerInput(body, { partial = false } = {}) {
         data.email = email;
     };
 
+    if (!partial || source.countryCode !== undefined) {
+        const countryCode = (source.countryCode === undefined || source.countryCode === null ? '' : String(source.countryCode)).trim();
+
+        if (countryCode && !constants.COUNTRY_CODE_REGEX.test(countryCode)) {
+            return { error: 'Please select a valid country code.', data: null };
+        };
+
+        data.countryCode = countryCode;
+    };
+
     if (source.phoneNumber !== undefined) {
         const phone = (source.phoneNumber === undefined || source.phoneNumber === null ? '' : String(source.phoneNumber)).trim();
 
-        if (phone && !constants.PHONE_REGEX.test(phone)) {
-            return { error: 'Please enter a valid phone number.', data: null };
+        if (phone && !constants.PHONE_DIGITS_REGEX.test(phone)) {
+            return { error: 'Please enter a valid phone number (digits only).', data: null };
         };
 
         data.phoneNumber = phone;
@@ -53,11 +63,19 @@ function parseManagerInput(body, { partial = false } = {}) {
 
         const status = Number(source.status);
 
-        if (!Object.values(constants.USER_STATUS).includes(status)) {
+        if (!Object.values(constants.MANAGER_STATUS).includes(status)) {
             return { error: 'Invalid status value.', data: null };
         };
 
         data.status = status;
+    };
+
+    if (data.phoneNumber && !data.countryCode) {
+        return { error: 'Country code is required when a phone number is provided.', data: null };
+    };
+
+    if (!data.phoneNumber && data.countryCode !== undefined) {
+        data.countryCode = '';
     };
 
     return { error: null, data };

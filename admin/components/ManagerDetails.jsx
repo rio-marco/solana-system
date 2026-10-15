@@ -126,13 +126,14 @@ export function ManagerDetails({ managerId }) {
         };
     };
 
-    const handleEditManager = async ({ name, email, phoneNumber, status, file }) => {
+    const handleEditManager = async ({ name, email, countryCode, phoneNumber, status, file }) => {
         setSavingManager(true);
 
         try {
             const formData = new FormData();
             formData.append('name', name);
             formData.append('email', email);
+            formData.append('countryCode', countryCode || '');
             formData.append('phoneNumber', phoneNumber || '');
             formData.append('status', String(status));
 
@@ -250,7 +251,7 @@ export function ManagerDetails({ managerId }) {
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <InfoRow label="Name" value={manager.name} />
                     <InfoRow label="Email" value={manager.email} mono icon={Mail} />
-                    <InfoRow label="Phone Number" value={manager.phoneNumber || '-'} icon={Phone} />
+                    <InfoRow label="Phone Number" value={manager.phoneNumber ? `${manager.countryCode || ''} ${manager.phoneNumber}`.trim() : '-'} icon={Phone} />
                     <InfoRow label="Account Status" value={getStatusBadge(manager.status)} />
                     <InfoRow label="Created At" value={moment(manager.createdAt).format('MMM DD, YYYY HH:mm:ss')} icon={Calendar} />
                 </div>

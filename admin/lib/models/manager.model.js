@@ -23,6 +23,11 @@ const ManagerSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        countryCode: {
+            type: String,
+            default: '',
+            trim: true,
+        },
         phoneNumber: {
             type: String,
             default: '',

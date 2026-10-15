@@ -21,6 +21,9 @@ module.exports = {
     FULL_NAME_REGEX: /^[a-zA-Z\s]{2,60}$/,
     EMAIL_REGEX: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/,
     PHONE_REGEX: /^\+?[0-9][0-9\s\-()]{6,19}$/,
+    COUNTRY_CODE_REGEX: /^\+\d{1,4}$/,
+    PHONE_DIGITS_REGEX: /^\d{6,15}$/,
+    DEFAULT_COUNTRY_CODE: '+1',
 
     OTP_TYPE: {
         SIGNUP: 1,

@@ -138,6 +138,7 @@ export function ManagerManagement() {
             const formData = new FormData();
             formData.append('name', payload.name);
             formData.append('email', payload.email);
+            formData.append('countryCode', payload.countryCode || '');
             formData.append('phoneNumber', payload.phoneNumber || '');
             formData.append('status', String(payload.status));
 
@@ -343,7 +344,7 @@ export function ManagerManagement() {
                                     </td>
                                     {/* Phone */}
                                     <td style={{ padding: '0.85rem 1rem', color: '#64748b', fontSize: '0.8rem' }}>
-                                        {manager.phoneNumber || '—'}
+                                        {manager.phoneNumber ? `${manager.countryCode || ''} ${manager.phoneNumber}`.trim() : '—'}
                                     </td>
                                     {/* Status */}
                                     <td style={{ padding: '0.85rem 1rem' }}>

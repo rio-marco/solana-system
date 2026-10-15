@@ -11,17 +11,43 @@ import {
 } from 'lucide-react';
 import {
     MANAGER_STATUS,
-    PHONE_REGEX,
     EMAIL_REGEX,
     MANAGER,
+    COUNTRY_CODES,
+    COUNTRY_CODE_REGEX,
+    PHONE_DIGITS_REGEX,
+    DEFAULT_COUNTRY_CODE,
 } from '../ui-constants.mjs';
+
+function resolveInitialPhone(manager) {
+    const raw = manager?.phoneNumber || '';
+    let cc = manager?.countryCode || '';
+    let num = raw;
+
+    if (!cc) {
+        const match = raw.match(/^\+\d{1,4}/);
+        if (match) {
+            cc = match[0];
+            num = raw.slice(match[0].length);
+        };
+    };
+
+    num = String(num).replace(/\D/g, '');
+
+    if (!cc) cc = DEFAULT_COUNTRY_CODE;
+
+    return { countryCode: cc, phoneNumber: num };
+};
 
 export default function ManagerModal({ manager, onConfirm, onClose, loading }) {
     const isEdit = Boolean(manager?._id);
 
+    const initialPhone = resolveInitialPhone(manager);
+
     const [name, setName] = useState(manager?.name || '');
     const [email, setEmail] = useState(manager?.email || '');
-    const [phoneNumber, setPhoneNumber] = useState(manager?.phoneNumber || '');
+    const [countryCode, setCountryCode] = useState(initialPhone.countryCode);
+    const [phoneNumber, setPhoneNumber] = useState(initialPhone.phoneNumber);
     const [status, setStatus] = useState(
         manager?.status !== undefined && manager?.status !== null ? String(manager.status) : String(MANAGER_STATUS.INACTIVE)
     );
@@ -73,7 +99,7 @@ export default function ManagerModal({ manager, onConfirm, onClose, loading }) {
     const isEmailValid = EMAIL_REGEX.test(cleanEmail);
 
     const cleanPhone = phoneNumber.trim();
-    const isPhoneValid = cleanPhone === '' || PHONE_REGEX.test(cleanPhone);
+    const isPhoneValid = cleanPhone === '' || (PHONE_DIGITS_REGEX.test(cleanPhone) && COUNTRY_CODE_REGEX.test(countryCode));
 
     const disabled = loading || !isNameValid || !isEmailValid || !isPhoneValid;
 
@@ -82,6 +108,7 @@ export default function ManagerModal({ manager, onConfirm, onClose, loading }) {
         onConfirm({
             name: cleanName,
             email: cleanEmail,
+            countryCode: cleanPhone ? countryCode : '',
             phoneNumber: cleanPhone,
             status: Number(status),
             file,
@@ -193,15 +220,30 @@ export default function ManagerModal({ manager, onConfirm, onClose, loading }) {
                     <label style={{ display: 'block', color: '#171D25', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.5rem' }}>
                         Phone Number
                     </label>
-                    <div style={{ position: 'relative' }}>
-                        <Phone size={15} style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-                        <input
-                            type="text"
-                            value={phoneNumber}
-                            onChange={(e) => setPhoneNumber(e.target.value)}
-                            placeholder="+1 555 123 4567"
-                            style={{ ...inputStyle, paddingLeft: '2.4rem', border: `1px solid ${phoneNumber && !isPhoneValid ? '#ef4444' : '#DEE2E6'}` }}
-                        />
+                    <div style={{ display: 'flex', gap: '0.6rem' }}>
+                        <select
+                            value={countryCode}
+                            onChange={(e) => setCountryCode(e.target.value)}
+                            style={{ ...inputStyle, width: '170px', flexShrink: 0, cursor: 'pointer', padding: '0.75rem 0.6rem' }}
+                        >
+                            {COUNTRY_CODES.map((country) => (
+                                <option key={`${country.code}-${country.dial}`} value={country.dial}>
+                                    {country.dial} · {country.name}
+                                </option>
+                            ))}
+                        </select>
+                        <div style={{ position: 'relative', flex: 1 }}>
+                            <Phone size={15} style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                            <input
+                                type="text"
+                                inputMode="numeric"
+                                value={phoneNumber}
+                                maxLength={15}
+                                onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
+                                placeholder="5551234567"
+                                style={{ ...inputStyle, paddingLeft: '2.4rem', border: `1px solid ${phoneNumber && !isPhoneValid ? '#ef4444' : '#DEE2E6'}` }}
+                            />
+                        </div>
                     </div>
                     {phoneNumber && !isPhoneValid && (
                         <p style={{ color: '#ef4444', fontSize: '0.75rem', margin: '0.4rem 0 0' }}>

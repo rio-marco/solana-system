@@ -78,7 +78,7 @@ async function POST(req) {
                     email: updatedUser.email,
                     profilePhoto: updatedUser.profilePhoto || "",
                     memo: updatedUser.memo,
-                    walletBalance: updatedUser.walletBalance,
+                    solBalance: updatedUser.solBalance,
                 },
             },
         );

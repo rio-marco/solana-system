@@ -36,7 +36,12 @@ const UserSchema = new mongoose.Schema(
             index: true,
             match: /^\d{8}$/,
         },
-        walletBalance: {
+        solBalance: {
+            type: Number,
+            default: 0,
+            min: 0,
+        },
+        btcrBalance: {
             type: Number,
             default: 0,
             min: 0,

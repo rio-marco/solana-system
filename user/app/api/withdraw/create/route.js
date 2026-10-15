@@ -37,8 +37,8 @@ async function POST(req) {
         };
 
         const freshUser = await User.findById(user._id).lean();
-        if (!freshUser || (freshUser.walletBalance || 0) < amountVal.numericAmount) {
-            const avail = freshUser ? freshUser.walletBalance : 0;
+        if (!freshUser || (freshUser.solBalance || 0) < amountVal.numericAmount) {
+            const avail = freshUser ? freshUser.solBalance : 0;
             return errorResponse(`Insufficient account balance. Available: ${avail} SOL, Requested: ${amountVal.numericAmount} SOL.`);
         };
 
@@ -91,7 +91,7 @@ async function POST(req) {
 
         const updatedUser = await User.findByIdAndUpdate(
             user._id,
-            { $inc: { walletBalance: -amountVal.numericAmount } },
+            { $inc: { solBalance: -amountVal.numericAmount } },
             { new: true }
         );
 
@@ -119,7 +119,7 @@ async function POST(req) {
                 amount: withdrawal.amount,
                 signature: withdrawal.transactionSignature,
                 status: withdrawal.status,
-                updatedWalletBalance: updatedUser.walletBalance,
+                updatedSolBalance: updatedUser.solBalance,
                 explorerUrl: `https://explorer.solana.com/tx/${withdrawal.transactionSignature}?cluster=devnet`,
             },
         );

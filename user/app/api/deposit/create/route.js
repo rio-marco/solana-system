@@ -97,7 +97,7 @@ async function POST(req) {
 
         const updatedUser = await User.findByIdAndUpdate(
             user._id,
-            { $inc: { walletBalance: amountVal.numericAmount } },
+            { $inc: { solBalance: amountVal.numericAmount } },
             { new: true }
         );
 
@@ -124,7 +124,7 @@ async function POST(req) {
                 amount: deposit.amount,
                 signature: deposit.transactionSignature,
                 status: deposit.status,
-                updatedWalletBalance: updatedUser.walletBalance,
+                updatedSolBalance: updatedUser.solBalance,
                 explorerUrl: `https://explorer.solana.com/tx/${deposit.transactionSignature}?cluster=devnet`,
             },
         );

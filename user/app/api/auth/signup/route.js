@@ -66,7 +66,8 @@ async function POST(req) {
             email: cleanEmail,
             memo: uniqueMemo,
             recoveryPhrase: recoveryPhrase,
-            walletBalance: 0,
+            solBalance: 0,
+            btcrBalance: 0,
             status: constants.USER_STATUS.INACTIVE,
             twoFAStatus: constants.TWOFA_STATUS.DISABLED,
         };

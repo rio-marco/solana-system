@@ -40,7 +40,7 @@ async function POST(req) {
                 fullName: user.fullName,
                 profilePhoto: user.profilePhoto || "",
                 memo: user.memo,
-                walletBalance: user.walletBalance,
+                solBalance: user.solBalance,
                 is2FAEnabled: false,
             },
         });

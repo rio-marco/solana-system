@@ -362,7 +362,7 @@ export function UserDetails({ userId }) {
                         {user.referralCode ? <InfoRow label="Referral Code" value={user.referralCode} /> : null}
                         {user.memo ? <InfoRow label="Memo" value={user.memo} /> : null}
                         {user.walletAddress ? <InfoRow label="Wallet Address" value={user.walletAddress} mono /> : null}
-                        {user.walletBalance !== undefined ? <InfoRow label="Available SOL Balance" value={Number(user.walletBalance).toFixed(8) + ' SOL'} /> : null}
+                        {user.btcrBalance !== undefined ? <InfoRow label="Available BTCR Balance" value={Number(user.btcrBalance).toFixed(8) + ' BTCR'} /> : null}
                         <InfoRow label="Account Status" value={getStatusBadge(user.status)} />
                         <InfoRow label="2FA Status" value={getTwoFABadge(user.twoFAStatus)} />
                         {user.suspendReason ? <InfoRow label="Current Suspend Reason" value={user.suspendReason} /> : null}
@@ -500,7 +500,7 @@ export function UserDetails({ userId }) {
                             </div>
                         </div>
                         <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid #DEE2E6' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+                            <table style={{ width: '100%', minWidth: '880px', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
                                 <thead>
                                     <tr
                                         style={{
@@ -513,7 +513,7 @@ export function UserDetails({ userId }) {
                                         <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Trx Hash</th>
                                         <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>From</th>
                                         <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>To</th>
-                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Amount (SOL)</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Amount (BTCR)</th>
                                         <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Type</th>
                                         <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Status</th>
                                         <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Date & Time</th>
@@ -544,7 +544,7 @@ export function UserDetails({ userId }) {
                                             const sig = tx.transactionSignature;
                                             const explorerUrl = sig ? `${explorerBase}/tx/${sig}${clusterParam}` : null;
                                             const start = (pagination.currentPage - 1) * pagination.limit + idx + 1;
-                                            const fromAddress = tx.platformAddress || '-';
+                                            const fromAddress = tx.fromAddress || '-';
                                             const toAddress = tx.toAddress || '-';
 
                                             return (

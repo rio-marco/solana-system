@@ -74,7 +74,7 @@ async function GET(req, { params }) {
                 submittedAt: d.submittedAt,
                 requestedAt: d.requestedAt,
                 failureReason: d.failureReason,
-                platformAddress: d.platformAddress,
+                fromAddress: d.platformAddress,
                 blockTime: d.blockTime,
             });
         };

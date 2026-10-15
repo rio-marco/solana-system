@@ -20,7 +20,7 @@ async function GET(req) {
                     fullName: user.fullName,
                     profilePhoto: user.profilePhoto || "",
                     memo: user.memo,
-                    walletBalance: user.walletBalance,
+                    solBalance: user.solBalance,
                     is2FAEnabled: user.twoFAStatus === constants.TWOFA_STATUS.ENABLED,
                 },
                 network: process.env.SOLANA_NETWORK || 'devnet',

@@ -75,8 +75,8 @@ export const DepositSection = ({ onDepositSuccess }) => {
                 toastSuccess(succMsg);
                 setAmount('');
 
-                if (res.data.data && res.data.data.updatedWalletBalance !== undefined) {
-                    updateUserData({ walletBalance: res.data.data.updatedWalletBalance });
+                if (res.data.data && res.data.data.updatedSolBalance !== undefined) {
+                    updateUserData({ solBalance: res.data.data.updatedSolBalance });
                 };
 
                 if (onDepositSuccess) onDepositSuccess();

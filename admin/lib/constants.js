@@ -67,4 +67,11 @@ module.exports = {
         CONFIRMED: "CONFIRMED",
         FAILED: "FAILED",
     },
+
+    CAMPAIGN: {
+        NAME_MIN_LENGTH: 2,
+        NAME_MAX_LENGTH: 120,
+        MAX_COMMENTS: 100,
+        COMMENT_MAX_LENGTH: 500,
+    },
 };

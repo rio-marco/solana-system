@@ -9,6 +9,7 @@ import {
     Users,
     ArrowDownLeft,
     ArrowUpRight,
+    Megaphone,
     Settings,
     LogOut,
     Shield,
@@ -20,6 +21,7 @@ const NAV_ITEMS = [
     { id: 'users',     label: 'User Management',     icon: Users,           href: '/user' },
     { id: 'deposits',  label: 'Deposit Management',  icon: ArrowDownLeft,   href: '/deposit' },
     { id: 'withdrawals', label: 'Withdraw Management', icon: ArrowUpRight,  href: '/withdraw' },
+    { id: 'campaigns', label: 'Campaign Management', icon: Megaphone,       href: '/campaign' },
     { id: 'settings',  label: 'Settings',            icon: Settings,        href: '/setting' },
 ];
 

@@ -74,6 +74,15 @@ function parseManagerInput(body, { partial = false } = {}) {
         return { error: 'Country code is required when a phone number is provided.', data: null };
     };
 
+    if (data.phoneNumber) {
+        const length = constants.COUNTRY_PHONE_LENGTHS[data.countryCode] || constants.DEFAULT_PHONE_LENGTH;
+
+        if (data.phoneNumber.length < length.min || data.phoneNumber.length > length.max) {
+            const expected = length.min === length.max ? `${length.min}` : `${length.min}-${length.max}`;
+            return { error: `Phone number must be ${expected} digits for the selected country.`, data: null };
+        };
+    };
+
     if (!data.phoneNumber && data.countryCode !== undefined) {
         data.countryCode = '';
     };

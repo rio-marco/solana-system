@@ -15,7 +15,8 @@ import {
     MANAGER,
     COUNTRY_CODES,
     COUNTRY_CODE_REGEX,
-    PHONE_DIGITS_REGEX,
+    COUNTRY_PHONE_LENGTHS,
+    DEFAULT_PHONE_LENGTH,
     DEFAULT_COUNTRY_CODE,
 } from '../ui-constants.mjs';
 
@@ -99,7 +100,9 @@ export default function ManagerModal({ manager, onConfirm, onClose, loading }) {
     const isEmailValid = EMAIL_REGEX.test(cleanEmail);
 
     const cleanPhone = phoneNumber.trim();
-    const isPhoneValid = cleanPhone === '' || (PHONE_DIGITS_REGEX.test(cleanPhone) && COUNTRY_CODE_REGEX.test(countryCode));
+    const phoneLength = COUNTRY_PHONE_LENGTHS[countryCode] || DEFAULT_PHONE_LENGTH;
+    const phoneLengthHint = phoneLength.min === phoneLength.max ? `${phoneLength.min}` : `${phoneLength.min}-${phoneLength.max}`;
+    const isPhoneValid = cleanPhone === '' || (COUNTRY_CODE_REGEX.test(countryCode) && cleanPhone.length >= phoneLength.min && cleanPhone.length <= phoneLength.max);
 
     const disabled = loading || !isNameValid || !isEmailValid || !isPhoneValid;
 
@@ -223,7 +226,11 @@ export default function ManagerModal({ manager, onConfirm, onClose, loading }) {
                     <div style={{ display: 'flex', gap: '0.6rem' }}>
                         <select
                             value={countryCode}
-                            onChange={(e) => setCountryCode(e.target.value)}
+                            onChange={(e) => {
+                                setCountryCode(e.target.value);
+                                const nextLength = COUNTRY_PHONE_LENGTHS[e.target.value] || DEFAULT_PHONE_LENGTH;
+                                setPhoneNumber((prev) => prev.slice(0, nextLength.max));
+                            }}
                             style={{ ...inputStyle, width: '170px', flexShrink: 0, cursor: 'pointer', padding: '0.75rem 0.6rem' }}
                         >
                             {COUNTRY_CODES.map((country) => (
@@ -238,16 +245,20 @@ export default function ManagerModal({ manager, onConfirm, onClose, loading }) {
                                 type="text"
                                 inputMode="numeric"
                                 value={phoneNumber}
-                                maxLength={15}
-                                onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
-                                placeholder="5551234567"
+                                maxLength={phoneLength.max}
+                                onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, phoneLength.max))}
+                                placeholder={phoneLength.min === phoneLength.max ? `${phoneLength.min}-digit number` : `${phoneLength.min}-${phoneLength.max} digits`}
                                 style={{ ...inputStyle, paddingLeft: '2.4rem', border: `1px solid ${phoneNumber && !isPhoneValid ? '#ef4444' : '#DEE2E6'}` }}
                             />
                         </div>
                     </div>
-                    {phoneNumber && !isPhoneValid && (
+                    {phoneNumber && !isPhoneValid ? (
                         <p style={{ color: '#ef4444', fontSize: '0.75rem', margin: '0.4rem 0 0' }}>
-                            Please enter a valid phone number.
+                            Phone number must be {phoneLengthHint} digits for the selected country.
+                        </p>
+                    ) : (
+                        <p style={{ color: '#94a3b8', fontSize: '0.72rem', margin: '0.4rem 0 0' }}>
+                            Expected {phoneLengthHint} digits for {countryCode}.
                         </p>
                     )}
                 </div>

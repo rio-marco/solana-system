@@ -569,7 +569,7 @@ export function UserDetails({ userId }) {
                                         <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Trx Hash</th>
                                         <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>From</th>
                                         <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>To</th>
-                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Amount (BTCR)</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Amount</th>
                                         <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Type</th>
                                         <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Status</th>
                                         <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Date & Time</th>

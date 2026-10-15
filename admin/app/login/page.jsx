@@ -85,22 +85,22 @@ export default function AdminLoginPage() {
 
     return (
         <div className="auth-page-wrapper">
-            <div className="solana-auth-card" style={{ border: '1px solid rgba(239, 68, 68, 0.3)', boxShadow: '0 25px 60px rgba(0, 0, 0, 0.6)' }}>
+            <div className="solana-auth-card" style={{ border: '1px solid #E7F1FF' }}>
                 {/* Header Branding */}
                 <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
                     <div
                         className="solana-brand-pill"
                         style={{
                             marginBottom: '0.75rem',
-                            background: 'rgba(239, 68, 68, 0.15)',
-                            color: '#fca5a5',
-                            border: '1px solid rgba(239, 68, 68, 0.3)',
+                            background: '#0D6EFD',
+                            color: '#FFFFFF',
+                            border: '1px solid #E7F1FF',
                         }}
                     >
-                        <Shield size={16} style={{ color: '#ef4444' }} />
+                        <Shield size={16} style={{ color: '#E7F1FF' }} />
                         <span>SOLANA SYSTEM - ADMIN PANEL</span>
                     </div>
-                    <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#ffffff', marginBottom: '0.35rem' }}>
+                    <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#000000', marginBottom: '0.35rem' }}>
                         Admin Portal Login
                     </h2>
                     <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
@@ -120,7 +120,7 @@ export default function AdminLoginPage() {
                     <div className="form-group-custom">
                         <label className="solana-input-label">Email Address</label>
                         <div className="solana-input-icon-wrapper">
-                            <Mail className="input-svg-icon" style={{ color: '#ef4444' }} />
+                            <Mail className="input-svg-icon" style={{ color: '#0D6EFD' }} />
                             <input
                                 type="email"
                                 className="solana-input-field"
@@ -136,7 +136,7 @@ export default function AdminLoginPage() {
                     <div className="form-group-custom">
                         <label className="solana-input-label">Password</label>
                         <div className="solana-input-icon-wrapper" style={{ position: 'relative' }}>
-                            <Lock className="input-svg-icon" style={{ color: '#ef4444' }} />
+                            <Lock className="input-svg-icon" style={{ color: '#0D6EFD' }} />
                             <input
                                 type={showPassword ? 'text' : 'password'}
                                 className="solana-input-field"
@@ -177,8 +177,7 @@ export default function AdminLoginPage() {
                         className="solana-btn-primary"
                         style={{
                             marginTop: '0.75rem',
-                            background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                            boxShadow: '0 8px 24px rgba(239, 68, 68, 0.35)',
+                            background: 'linear-gradient(135deg, #0D6EFD 0%, #0B5ED7 100%)',
                         }}
                     >
                         {loading ? (

@@ -15,8 +15,6 @@ import {
     ShieldOff,
     Clock,
     ShieldCheck,
-    ChevronLeft,
-    ChevronRight,
     ExternalLink,
 } from 'lucide-react';
 import {
@@ -28,6 +26,7 @@ import {
     DEFAULT_CURRENT_PAGE,
     DEFAULT_ITEM_PER_PAGE,
 } from './ui-constants.mjs';
+import { Pagination } from './Pagination';
 import SuspendModal from './modal/SuspendModal.jsx';
 
 const STATUS_BADGE_STYLE = {
@@ -271,25 +270,6 @@ export function UserDetails({ userId }) {
         setPagination((p) => ({ ...p, currentPage: pg }));
     };
 
-    const getPageNumbers = () => {
-        const total = pagination.totalPages;
-        const current = pagination.currentPage;
-
-        if (total <= 5) {
-            return Array.from({ length: total }, (_, i) => i + 1);
-        };
-
-        if (current <= 2) {
-            return [1, 2, 3, '...', total];
-        };
-
-        if (current >= total - 1) {
-            return [1, '...', total - 2, total - 1, total];
-        };
-
-        return [1, '...', current - 1, current, current + 1, '...', total];
-    };
-
     if (loading && !user) {
         return (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
@@ -309,9 +289,6 @@ export function UserDetails({ userId }) {
 
     const explorerBase = 'https://explorer.solana.com';
     const clusterParam = user.network ? `?cluster=${user.network}` : '?cluster=devnet';
-
-    const startEntry = pagination.totalCount === 0 ? 0 : (pagination.currentPage - 1) * pagination.limit + 1;
-    const endEntry = Math.min(pagination.currentPage * pagination.limit, pagination.totalCount);
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -638,88 +615,15 @@ export function UserDetails({ userId }) {
                                 </tbody>
                             </table>
                         </div>
-                        {pagination.totalCount > 0 && (
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.08)', flexWrap: 'wrap', gap: '1rem' }}>
-                                <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
-                                    Showing <strong style={{ color: '#212529' }}>{startEntry}</strong> to <strong style={{ color: '#212529' }}>{endEntry}</strong> of <strong style={{ color: '#212529' }}>{pagination.totalCount}</strong> transactions
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                                    <button
-                                        type="button"
-                                        onClick={() => handlePageChange(pagination.currentPage - 1)}
-                                        disabled={pagination.currentPage <= 1 || transactionLoading}
-                                        style={{
-                                            width: '36px',
-                                            height: '36px',
-                                            borderRadius: '10px',
-                                            background: '#F5F9FC',
-                                            border: '1px solid #D8DFE4',
-                                            color: pagination.currentPage <= 1 ? '#cbd5e1' : '#475569',
-                                            cursor: pagination.currentPage <= 1 ? 'not-allowed' : 'pointer',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                        }}
-                                    >
-                                        <ChevronLeft size={16} />
-                                    </button>
-                                    {getPageNumbers().map((p, idx) => (
-                                        p === '...'
-                                            ? <span
-                                                key={`e-${idx}`}
-                                                style={{
-                                                    width: '32px',
-                                                    textAlign: 'center',
-                                                    color: '#cbd5e1'
-                                                }}
-                                            >...</span>
-                                            :
-                                            <button
-                                                key={`p-${p}`}
-                                                type="button"
-                                                onClick={() => handlePageChange(p)}
-                                                disabled={transactionLoading || p === pagination.currentPage}
-                                                style={{
-                                                    minWidth: '36px',
-                                                    height: '36px',
-                                                    padding: '0 0.5rem',
-                                                    borderRadius: '10px',
-                                                    fontSize: '0.85rem',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    background: p === pagination.currentPage ? 'rgb(13, 110, 253)' : '#F5F9FC',
-                                                    color: p === pagination.currentPage ? '#FFFFFF' : '#212529',
-                                                    border: p === pagination.currentPage ? 'none' : '1px solid #D8DFE4',
-                                                    fontWeight: p === pagination.currentPage ? 800 : 500,
-                                                    cursor: p === pagination.currentPage ? 'default' : 'pointer',
-                                                }}
-                                            >
-                                                {p}
-                                            </button>
-                                    ))}
-                                    <button
-                                        type="button"
-                                        onClick={() => handlePageChange(pagination.currentPage + 1)}
-                                        disabled={pagination.currentPage >= pagination.totalPages || transactionLoading}
-                                        style={{
-                                            width: '36px',
-                                            height: '36px',
-                                            borderRadius: '10px',
-                                            background: '#F5F9FC',
-                                            border: '1px solid #D8DFE4',
-                                            color: pagination.currentPage >= pagination.totalPages ? '#cbd5e1' : '#475569',
-                                            cursor: pagination.currentPage >= pagination.totalPages ? 'not-allowed' : 'pointer',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
-                                        }}
-                                    >
-                                        <ChevronRight size={16} />
-                                    </button>
-                                </div>
-                            </div>
-                        )}
+                        <Pagination
+                            currentPage={pagination.currentPage}
+                            totalPages={pagination.totalPages}
+                            totalCount={pagination.totalCount}
+                            limit={pagination.limit}
+                            onPageChange={handlePageChange}
+                            loading={transactionLoading}
+                            itemLabel="transactions"
+                        />
                     </div>
                 </div>
             </div>

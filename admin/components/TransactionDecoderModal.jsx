@@ -87,7 +87,7 @@ export const TransactionDecoderModal = ({ isOpen, initialSignature = '', signatu
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem', marginBottom: '1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <Code style={{ color: '#00C2FF' }} size={20} />
-                        <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#fff' }}>Solana Transaction Decoder</h3>
+                        <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#0D6EFD' }}>Solana Transaction Decoder</h3>
                     </div>
                     <button type="button" onClick={handleClose} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
                         <X size={20} />

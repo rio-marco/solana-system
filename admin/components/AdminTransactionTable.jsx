@@ -9,8 +9,6 @@ import {
     ArrowUpRight,
     Search,
     Filter,
-    ChevronLeft,
-    ChevronRight,
     ExternalLink,
     Clock,
     CheckCircle2,
@@ -19,6 +17,7 @@ import {
     RefreshCw,
 } from 'lucide-react';
 import moment from 'moment';
+import { Pagination } from './Pagination';
 
 export function AdminTransactionTable({ refreshTrigger }) {
     const [activeTab, setActiveTab] = useState('deposit'); // 'deposit' | 'withdraw'
@@ -103,34 +102,6 @@ export function AdminTransactionTable({ refreshTrigger }) {
         };
     };
 
-    const getPageNumbers = () => {
-        const pages = [];
-        const maxVisible = 5;
-        const totalPages = pagination.totalPages;
-        const currentPage = pagination.currentPage;
-
-        if (totalPages <= maxVisible + 2) {
-            for (let i = 1; i <= totalPages; i++) pages.push(i);
-        } else {
-            pages.push(1);
-            let start = Math.max(2, currentPage - 1);
-            let end = Math.min(totalPages - 1, currentPage + 1);
-
-            if (currentPage <= 3) {
-                end = 4;
-            } else if (currentPage >= totalPages - 2) {
-                start = totalPages - 3;
-            };
-
-            if (start > 2) pages.push('...');
-            for (let i = start; i <= end; i++) pages.push(i);
-            if (end < totalPages - 1) pages.push('...');
-            pages.push(totalPages);
-        };
-
-        return pages;
-    };
-
     const getStatusBadge = (status) => {
         switch (status) {
             case 'CONFIRMED':
@@ -195,9 +166,6 @@ export function AdminTransactionTable({ refreshTrigger }) {
                 );
         };
     };
-
-    const startEntry = pagination.totalCount === 0 ? 0 : (pagination.currentPage - 1) * pagination.limit + 1;
-    const endEntry = Math.min(pagination.currentPage * pagination.limit, pagination.totalCount);
 
     return (
         <div
@@ -501,126 +469,16 @@ export function AdminTransactionTable({ refreshTrigger }) {
             </div>
 
             {/* Pagination Controls */}
-            {
-                pagination.totalCount > 0 && (
-                    <div
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            marginTop: '1.25rem',
-                            paddingTop: '1rem',
-                            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-                            flexWrap: 'wrap',
-                            gap: '1rem',
-                        }}
-                    >
-                        <div style={{ fontSize: '0.88rem', color: '#94a3b8' }} className="font-mono">
-                            Showing <strong style={{ color: '#ffffff', fontWeight: 800 }}>{startEntry}</strong> to{' '}
-                            <strong style={{ color: '#ffffff', fontWeight: 800 }}>{endEntry}</strong> of{' '}
-                            <strong style={{ color: '#ffffff', fontWeight: 800 }}>{pagination.totalCount}</strong> entries
-                        </div>
-
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                            {/* Previous Button (<) */}
-                            <button
-                                type="button"
-                                onClick={() => handlePageChange(pagination.currentPage - 1)}
-                                disabled={pagination.currentPage <= 1 || loading}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    width: '36px',
-                                    height: '36px',
-                                    borderRadius: '10px',
-                                    background: 'rgba(255, 255, 255, 0.05)',
-                                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                                    color: pagination.currentPage <= 1 || loading ? '#475569' : '#cbd5e1',
-                                    cursor: pagination.currentPage <= 1 || loading ? 'not-allowed' : 'pointer',
-                                    transition: 'all 0.2s ease',
-                                }}
-                                title="Previous Page"
-                            >
-                                <ChevronLeft size={16} />
-                            </button>
-
-                            {/* Page Numbers */}
-                            {getPageNumbers().map((p, idx) => {
-                                if (p === '...') {
-                                    return (
-                                        <span
-                                            key={`ellipsis-${idx}`}
-                                            style={{
-                                                width: '32px',
-                                                textAlign: 'center',
-                                                color: '#64748b',
-                                                fontSize: '0.85rem',
-                                            }}
-                                        >
-                                            ...
-                                        </span>
-                                    );
-                                };
-
-                                const isActive = p === pagination.currentPage;
-                                return (
-                                    <button
-                                        key={`page-${p}`}
-                                        type="button"
-                                        onClick={() => handlePageChange(p)}
-                                        disabled={loading || isActive}
-                                        style={{
-                                            minWidth: '36px',
-                                            height: '36px',
-                                            padding: '0 0.5rem',
-                                            borderRadius: '10px',
-                                            background: isActive
-                                                ? 'linear-gradient(135deg, #00C2FF 0%, #9945FF 100%)'
-                                                : 'rgba(255, 255, 255, 0.05)',
-                                            border: isActive ? 'none' : '1px solid rgba(255, 255, 255, 0.12)',
-                                            color: isActive ? '#ffffff' : '#cbd5e1',
-                                            fontWeight: isActive ? 800 : 600,
-                                            fontSize: '0.88rem',
-                                            cursor: isActive || loading ? 'default' : 'pointer',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            boxShadow: isActive ? '0 4px 14px rgba(153, 69, 255, 0.4)' : 'none',
-                                            transition: 'all 0.2s ease',
-                                        }}
-                                    >
-                                        {p}
-                                    </button>
-                                );
-                            })}
-
-                            {/* Next Button (>) */}
-                            <button
-                                type="button"
-                                onClick={() => handlePageChange(pagination.currentPage + 1)}
-                                disabled={pagination.currentPage >= pagination.totalPages || loading}
-                                style={{
-                                    width: '36px',
-                                    height: '36px',
-                                    borderRadius: '10px',
-                                    background: 'rgba(255, 255, 255, 0.05)',
-                                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                                    color: pagination.currentPage >= pagination.totalPages || loading ? '#475569' : '#cbd5e1',
-                                    cursor: pagination.currentPage >= pagination.totalPages || loading ? 'not-allowed' : 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    transition: 'all 0.2s ease',
-                                }}
-                                title="Next Page"
-                            >
-                                <ChevronRight size={16} />
-                            </button>
-                        </div>
-                    </div>
-                )
-            }
+            <Pagination
+                currentPage={pagination.currentPage}
+                totalPages={pagination.totalPages}
+                totalCount={pagination.totalCount}
+                limit={pagination.limit}
+                onPageChange={handlePageChange}
+                loading={loading}
+                theme="dark"
+                itemLabel="entries"
+            />
 
             {/* Transaction Decoder Modal */}
             {selectedTxSig && (

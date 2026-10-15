@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { RefreshCw, ExternalLink, ListFilter, Copy, Check, ArrowDownLeft, ArrowUpRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { RefreshCw, ExternalLink, ListFilter, Copy, Check, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { copyTextToClipboard } from '../lib/clipboard';
+import { Pagination } from './Pagination';
 
 export const TransactionListTable = ({ type = 'withdraw', refreshTrigger }) => {
     const [items, setItems] = useState([]);
@@ -59,16 +60,9 @@ export const TransactionListTable = ({ type = 'withdraw', refreshTrigger }) => {
         };
     };
 
-    const handlePageChange = (e, newPage) => {
-        if (e && e.preventDefault) e.preventDefault();
-        if (e && e.stopPropagation) e.stopPropagation();
-        if (newPage >= 1 && newPage <= totalPages && newPage !== currentPage && !isFetchingPage) {
-            setCurrentPage(newPage);
-        };
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
     };
-
-    const startEntry = totalCount === 0 ? 0 : (currentPage - 1) * limit + 1;
-    const endEntry = Math.min(currentPage * limit, totalCount);
 
     return (
         <div style={{ background: 'rgba(15, 20, 34, 0.85)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '24px', padding: '1.5rem 1.75rem', marginTop: 0, boxShadow: '0 20px 40px rgba(0,0,0,0.5)', overflow: 'hidden' }}>
@@ -195,94 +189,19 @@ export const TransactionListTable = ({ type = 'withdraw', refreshTrigger }) => {
                     </div>
 
                     {/* Pagination Controls */}
-                    <div
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            marginTop: '1.5rem',
-                            paddingTop: '1rem',
-                            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-                            flexWrap: 'wrap',
-                            gap: '1rem',
-                        }}
-                    >
-                        <div style={{ fontSize: '0.8rem', color: '#94a3b8' }} className="font-mono">
-                            Showing <span style={{ color: '#fff', fontWeight: 600 }}>{startEntry}</span> to <span style={{ color: '#fff', fontWeight: 600 }}>{endEntry}</span> of <span style={{ color: '#fff', fontWeight: 600 }}>{totalCount}</span> entries
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <button
-                                type="button"
-                                onClick={(e) => handlePageChange(e, currentPage - 1)}
-                                disabled={currentPage === 1 || loading || isFetchingPage}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    width: '32px',
-                                    height: '32px',
-                                    padding: 0,
-                                    borderRadius: '8px',
-                                    background: 'rgba(255, 255, 255, 0.05)',
-                                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                                    color: currentPage === 1 ? '#475569' : '#e2e8f0',
-                                    cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-                                    transition: 'all 0.2s ease',
-                                }}
-                                title="Previous Page"
-                            >
-                                <ChevronLeft size={16} />
-                            </button>
-
-                            {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((pageNum) => (
-                                <button
-                                    key={pageNum}
-                                    type="button"
-                                    onClick={(e) => handlePageChange(e, pageNum)}
-                                    disabled={loading || isFetchingPage}
-                                    style={{
-                                        minWidth: '32px',
-                                        height: '32px',
-                                        borderRadius: '8px',
-                                        background: pageNum === currentPage ? (isDeposit ? 'linear-gradient(135deg, #14F195 0%, #9945FF 100%)' : 'linear-gradient(135deg, #9945FF 0%, #14F195 100%)') : 'rgba(255, 255, 255, 0.05)',
-                                        border: pageNum === currentPage ? 'none' : '1px solid rgba(255, 255, 255, 0.1)',
-                                        color: pageNum === currentPage ? '#0f172a' : '#e2e8f0',
-                                        fontWeight: pageNum === currentPage ? 700 : 500,
-                                        fontSize: '0.8rem',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.2s ease',
-                                        lineHeight: 1,
-                                        textAlign: 'center',
-                                    }}
-                                >
-                                    {pageNum}
-                                </button>
-                            ))}
-
-                            <button
-                                type="button"
-                                onClick={(e) => handlePageChange(e, currentPage + 1)}
-                                disabled={currentPage >= totalPages || loading || isFetchingPage}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    minWidth: '32px',
-                                    height: '32px',
-                                    padding: 0,
-                                    borderRadius: '8px',
-                                    background: 'rgba(255, 255, 255, 0.05)',
-                                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                                    color: currentPage >= totalPages ? '#475569' : '#e2e8f0',
-                                    cursor: currentPage >= totalPages ? 'not-allowed' : 'pointer',
-                                    transition: 'all 0.2s ease',
-                                }}
-                                title="Next Page"
-                            >
-                                <ChevronRight size={16} />
-                            </button>
-                        </div>
-                    </div>
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        totalCount={totalCount}
+                        limit={limit}
+                        onPageChange={handlePageChange}
+                        loading={loading || isFetchingPage}
+                        theme="dark"
+                        size={32}
+                        itemLabel="entries"
+                        activeBg={isDeposit ? 'linear-gradient(135deg, #14F195 0%, #9945FF 100%)' : 'linear-gradient(135deg, #9945FF 0%, #14F195 100%)'}
+                        activeColor="#0f172a"
+                    />
                 </>
             )}
         </div>

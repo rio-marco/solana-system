@@ -6,8 +6,6 @@ import moment from 'moment';
 import Link from 'next/link';
 import {
     Search,
-    ChevronLeft,
-    ChevronRight,
     CheckCircle2,
     Clock,
     ShieldOff,
@@ -21,6 +19,7 @@ import {
     DEFAULT_CURRENT_PAGE,
     DEFAULT_ITEM_PER_PAGE,
 } from './ui-constants.mjs';
+import { Pagination } from './Pagination';
 
 function getStatusBadge(status) {
     if (status === USER_STATUS.ACTIVE) {
@@ -134,43 +133,6 @@ export function UserManagement() {
             setPagination(p => ({ ...p, currentPage: pg }));
         };
     };
-
-    const getPageNumbers = () => {
-        const pages = [];
-        const total = pagination.totalPages;
-        const cur = pagination.currentPage;
-        if (total <= 7) {
-            for (let i = 1; i <= total; i++) pages.push(i);
-        } else {
-            pages.push(1);
-            let s = Math.max(2, cur - 1), e = Math.min(total - 1, cur + 1);
-
-            if (cur <= 3) {
-                e = 4;
-            } else if (cur >= total - 2) {
-                s = total - 3;
-            };
-
-            if (s > 2) {
-                pages.push('...');
-            };
-
-            for (let i = s; i <= e; i++) {
-                pages.push(i);
-            };
-
-            if (e < total - 1) {
-                pages.push('...');
-            };
-
-            pages.push(total);
-        };
-
-        return pages;
-    };
-
-    const startEntry = pagination.totalCount === 0 ? 0 : (pagination.currentPage - 1) * pagination.limit + 1;
-    const endEntry = Math.min(pagination.currentPage * pagination.limit, pagination.totalCount);
 
     const selectStyle = {
         background: '#FFFFFF',
@@ -372,88 +334,15 @@ export function UserManagement() {
                 </div>
 
                 {/* Pagination */}
-                {pagination.totalCount > 0 && (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.08)', flexWrap: 'wrap', gap: '1rem' }}>
-                        <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
-                            Showing <strong style={{ color: '#212529' }}>{startEntry}</strong> to <strong style={{ color: '#212529' }}>{endEntry}</strong> of <strong style={{ color: '#212529' }}>{pagination.totalCount}</strong> users
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                            <button
-                                type="button"
-                                onClick={() => handlePageChange(pagination.currentPage - 1)}
-                                disabled={pagination.currentPage <= 1 || loading}
-                                style={{
-                                    width: '36px',
-                                    height: '36px',
-                                    borderRadius: '10px',
-                                    background: '#F5F9FC',
-                                    border: '1px solid #D8DFE4',
-                                    color: pagination.currentPage <= 1 ? '#cbd5e1' : '#475569',
-                                    cursor: pagination.currentPage <= 1 ? 'not-allowed' : 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <ChevronLeft size={16} />
-                            </button>
-                            {getPageNumbers().map((p, idx) => (
-                                p === '...'
-                                    ? <span
-                                        key={`e-${idx}`}
-                                        style={{
-                                            width: '32px',
-                                            textAlign: 'center',
-                                            color: '#cbd5e1'
-                                        }}
-                                    >...</span>
-                                    :
-                                    <button
-                                        key={`p-${p}`}
-                                        type="button"
-                                        onClick={() => handlePageChange(p)}
-                                        disabled={loading || p === pagination.currentPage}
-                                        style={{
-                                            minWidth: '36px',
-                                            height: '36px',
-                                            padding: '0 0.5rem',
-                                            borderRadius: '10px',
-                                            fontSize: '0.85rem',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            background: p === pagination.currentPage ? 'rgb(13, 110, 253)' : '#F5F9FC',
-                                            color: p === pagination.currentPage ? '#FFFFFF' : '#212529',
-                                            border: p === pagination.currentPage ? 'none' : '1px solid #D8DFE4',
-                                            fontWeight: p === pagination.currentPage ? 800 : 500,
-                                            cursor: p === pagination.currentPage ? 'default' : 'pointer',
-                                        }}
-                                    >
-                                        {p}
-                                    </button>
-                            ))}
-                            <button
-                                type="button"
-                                onClick={() => handlePageChange(pagination.currentPage + 1)}
-                                disabled={pagination.currentPage >= pagination.totalPages || loading}
-                                style={{
-                                    width: '36px',
-                                    height: '36px',
-                                    borderRadius: '10px',
-                                    background: '#F5F9FC',
-                                    border: '1px solid #D8DFE4',
-                                    color: pagination.currentPage >= pagination.totalPages ? '#cbd5e1' : '#475569',
-                                    cursor: pagination.currentPage >= pagination.totalPages ? 'not-allowed' : 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}
-                            >
-                                <ChevronRight size={16} />
-                            </button>
-                        </div>
-                    </div>
-                )}
+                <Pagination
+                    currentPage={pagination.currentPage}
+                    totalPages={pagination.totalPages}
+                    totalCount={pagination.totalCount}
+                    limit={pagination.limit}
+                    onPageChange={handlePageChange}
+                    loading={loading}
+                    itemLabel="users"
+                />
             </div>
         </div>
     );

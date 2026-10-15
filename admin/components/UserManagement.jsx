@@ -291,7 +291,7 @@ export function UserManagement() {
                                     </td>
                                     {/* Wallet Balance */}
                                     <td style={{ padding: '0.85rem 1rem', fontWeight: 800, color: '#00C2FF' }}>
-                                        {(user.solBalance || 0).toFixed(6)} <span style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem' }}>SOL</span>
+                                        {(user.btcrBalance || 0).toFixed(6)} <span style={{ color: '#64748b', fontWeight: 600, fontSize: '0.75rem' }}>BTCR</span>
                                     </td>
                                     {/* Status */}
                                     <td style={{ padding: '0.85rem 1rem' }}>

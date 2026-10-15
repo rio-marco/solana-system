@@ -21,8 +21,7 @@ import {
 import {
     USER_STATUS,
     TWOFA_STATUS,
-    DEPOSIT_STATUS,
-    WITHDRAW_STATUS,
+    TRANSACTION_STATUS,
     TRX_TYPE,
     DEFAULT_CURRENT_PAGE,
     DEFAULT_ITEM_PER_PAGE,
@@ -83,15 +82,15 @@ function getTwoFABadge(twoFAStatus) {
 
 function getTxStatusBadge(status) {
     const st = status?.toUpperCase();
-    if (st === DEPOSIT_STATUS.CONFIRMED || st === WITHDRAW_STATUS.CONFIRMED) {
+    if (st === TRANSACTION_STATUS.CONFIRMED) {
         return <span style={{ ...STATUS_BADGE_STYLE, background: '#D1E7DD', color: '#198754', border: '1px solid #A3CFBB' }}>Confirmed</span>;
     };
 
-    if (st === DEPOSIT_STATUS.PENDING || st === WITHDRAW_STATUS.PENDING) {
+    if (st === TRANSACTION_STATUS.PENDING) {
         return <span style={{ ...STATUS_BADGE_STYLE, background: '#FFF3CD', color: '#664D03', border: '1px solid #FFECB5' }}>Pending</span>;
     };
 
-    if (st === DEPOSIT_STATUS.FAILED || st === WITHDRAW_STATUS.FAILED) {
+    if (st === TRANSACTION_STATUS.FAILED) {
         return <span style={{ ...STATUS_BADGE_STYLE, background: '#F8D7DA', color: '#DC3545', border: '1px solid #F1AEB5' }}>Failed</span>;
     };
 
@@ -657,7 +656,7 @@ export function UserDetails({ userId }) {
                                                         {Number(tx.amount).toFixed(8)}
                                                     </td>
                                                     <td style={{ padding: '0.75rem 1rem' }}>
-                                                        {getTxTypeBadge(tx.transactionType)}
+                                                        {getTxTypeBadge(tx.type)}
                                                     </td>
                                                     <td style={{ padding: '0.75rem 1rem' }}>
                                                         {getTxStatusBadge(tx.status)}

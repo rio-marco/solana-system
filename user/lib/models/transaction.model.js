@@ -1,20 +1,41 @@
 'use strict';
 
 const mongoose = require('mongoose');
+const constants = require('../constants');
 
-const DepositSchema = new mongoose.Schema(
+const TransactionSchema = new mongoose.Schema(
     {
         userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
             index: true,
         },
-        depositId: {
+        txId: {
             type: String,
             required: true,
             unique: true,
             trim: true,
             index: true,
+        },
+        type: {
+            type: Number,
+            enum: Object.values(constants.TRX_TYPE),
+            required: true,
+            index: true,
+        },
+        coin: {
+            type: String,
+            enum: Object.values(constants.COIN),
+            default: constants.COIN.SOL,
+        },
+        amount: {
+            type: Number,
+            required: true,
+            min: 0.000000001,
+        },
+        platformFee: {
+            type: Number,
+            default: 0,
         },
         memo: {
             type: String,
@@ -22,19 +43,20 @@ const DepositSchema = new mongoose.Schema(
             trim: true,
             index: true,
         },
-        amount: {
-            type: Number,
-            required: true,
-            min: 0.000000001,
-        },
-        currency: {
-            type: String,
-            default: 'SOL',
-        },
         platformAddress: {
             type: String,
-            required: true,
             trim: true,
+            default: '',
+        },
+        fromAddress: {
+            type: String,
+            trim: true,
+            default: '',
+        },
+        toAddress: {
+            type: String,
+            trim: true,
+            default: '',
         },
         transactionSignature: {
             type: String,
@@ -44,10 +66,9 @@ const DepositSchema = new mongoose.Schema(
             index: true,
         },
         status: {
-            type: String,
-            enum: ['PENDING', 'PROCESSING', 'CONFIRMED', 'FAILED'],
-            default: 'PENDING',
-            index: true,
+            type: Number,
+            enum: Object.values(constants.TRANSACTION_STATUS),
+            default: constants.TRANSACTION_STATUS.PENDING,
         },
         requestedAt: {
             type: Date,
@@ -77,9 +98,8 @@ const DepositSchema = new mongoose.Schema(
     },
 );
 
-DepositSchema.index({
-    status: 1,
-    createdAt: -1,
-});
+TransactionSchema.index({ type: 1, status: 1, createdAt: -1 });
+TransactionSchema.index({ userId: 1, type: 1, createdAt: -1 });
+TransactionSchema.index({ platformAddress: 1 });
 
-module.exports = mongoose.models.Deposit || mongoose.model('Deposit', DepositSchema);
+module.exports = mongoose.models.Transaction || mongoose.model('Transaction', TransactionSchema);

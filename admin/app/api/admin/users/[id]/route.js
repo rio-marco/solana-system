@@ -8,8 +8,6 @@ const constants = require('../../../../../lib/constants');
 const { verifySession } = require('../../../../../lib/session');
 const { errorResponse, successResponse, authErrorResponse, log1, buildProfilePhotoUrl } = require('../../../../../lib/general');
 const User = require('../../../../../lib/models/user.model');
-const Deposit = require('../../../../../lib/models/deposit.model');
-const Withdrawal = require('../../../../../lib/models/withdrawal.model');
 
 const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
 

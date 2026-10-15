@@ -3,10 +3,10 @@ const constants = require('../../../../lib/constants');
 const messages = require('../../../../lib/messages');
 const { verifySession } = require('../../../../lib/session');
 const { validateMemo, validateAmount, isValidSolanaAddress } = require('../../../../lib/validation');
-const { executeWithdrawalTransaction } = require('../../../../lib/services/solana.service');
+const { executeWithdrawalTransaction, getPlatformReceivingAddress } = require('../../../../lib/services/solana.service');
 const { errorResponse, successResponse, authErrorResponse, log1 } = require("../../../../lib/general");
 const { emitToUser } = require('../../../../lib/socket');
-const Withdrawal = require('../../../../lib/models/withdrawal.model');
+const Transaction = require('../../../../lib/models/transaction.model');
 const User = require('../../../../lib/models/user.model');
 const Notification = require('../../../../lib/models/notification.model');
 const Setting = require('../../../../lib/models/setting.model');
@@ -50,24 +50,29 @@ async function POST(req) {
             return errorResponse("Invalid withdraw amount. Please enter valid amount.");
         };
 
-        const withdrawId = `WTH-${uuidv4().substring(0, 8).toUpperCase()}`;
+        const txId = `WTH-${uuidv4().substring(0, 8).toUpperCase()}`;
 
-        const withdrawal = new Withdrawal({
+        const platformPubKey = await getPlatformReceivingAddress(true);
+        const platformAddressStr = platformPubKey ? platformPubKey.toBase58() : '';
+
+        const transaction = new Transaction({
             userId: user._id,
-            withdrawId,
+            txId,
+            type: constants.TRX_TYPE.WITHDRAW,
+            coin: constants.COIN.SOL,
             toAddress: toAddress.trim(),
             memo: memoVal.cleanMemo,
             amount: amountVal.numericAmount,
             platformFee: Number(withdrawFee),
-            currency: 'SOL',
+            platformAddress: platformAddressStr,
             status: 'PENDING',
         });
-        await withdrawal.save();
+        await transaction.save();
 
         let txResult;
         try {
-            withdrawal.status = 'PROCESSING';
-            await withdrawal.save();
+            transaction.status = 'PROCESSING';
+            await transaction.save();
 
             txResult = await executeWithdrawalTransaction({
                 toAddress: toAddress.trim(),
@@ -75,15 +80,15 @@ async function POST(req) {
                 amount: totalWithdrawAmount,
             });
 
-            withdrawal.transactionSignature = txResult.signature;
-            withdrawal.fromAddress = txResult.fromAddress;
-            withdrawal.status = 'CONFIRMED';
-            withdrawal.confirmedAt = new Date();
-            await withdrawal.save();
+            transaction.transactionSignature = txResult.signature;
+            transaction.fromAddress = txResult.fromAddress;
+            transaction.status = 'CONFIRMED';
+            transaction.confirmedAt = new Date();
+            await transaction.save();
         } catch (txErr) {
-            withdrawal.status = 'FAILED';
-            withdrawal.failureReason = txErr.message;
-            await withdrawal.save();
+            transaction.status = 'FAILED';
+            transaction.failureReason = txErr.message;
+            await transaction.save();
 
             log1(["Withdrawal execution failed:", txErr.message]);
             return errorResponse("Withdrawal execution failed");
@@ -107,7 +112,7 @@ async function POST(req) {
 
         emitToUser(user._id, 'newNotification', newNotif);
         emitToUser(user._id, 'withdrawal_confirmed', {
-            withdrawId: withdrawal.withdrawId,
+            txId: transaction.txId,
             amount: amountVal.numericAmount,
             signature: txResult.signature,
         });
@@ -115,12 +120,12 @@ async function POST(req) {
         return successResponse(
             `Successfully withdrew ${amountVal.numericAmount} SOL!`,
             {
-                withdrawId: withdrawal.withdrawId,
-                amount: withdrawal.amount,
-                signature: withdrawal.transactionSignature,
-                status: withdrawal.status,
+                txId: transaction.txId,
+                amount: transaction.amount,
+                signature: transaction.transactionSignature,
+                status: transaction.status,
                 updatedSolBalance: updatedUser.solBalance,
-                explorerUrl: `https://explorer.solana.com/tx/${withdrawal.transactionSignature}?cluster=devnet`,
+                explorerUrl: `https://explorer.solana.com/tx/${transaction.transactionSignature}?cluster=devnet`,
             },
         );
     } catch (err) {

@@ -2,7 +2,7 @@ const constants = require('../../../../lib/constants');
 const messages = require('../../../../lib/messages');
 const { verifySession } = require('../../../../lib/session');
 const { errorResponse, successResponse, authErrorResponse, log1 } = require("../../../../lib/general");
-const Withdrawal = require('../../../../lib/models/withdrawal.model');
+const Transaction = require('../../../../lib/models/transaction.model');
 
 async function GET(req) {
     try {
@@ -16,10 +16,12 @@ async function GET(req) {
         const limit = Math.max(1, Math.min(100, parseInt(searchParams.get('limit') || '10', 10)));
         const skip = (page - 1) * limit;
 
-        const totalCount = await Withdrawal.countDocuments({ userId: sessionAuth.userId });
+        const filter = { userId: sessionAuth.userId, type: constants.TRX_TYPE.WITHDRAW };
+
+        const totalCount = await Transaction.countDocuments(filter);
         const totalPages = Math.ceil(totalCount / limit) || 0;
 
-        const withdrawals = await Withdrawal.find({ userId: sessionAuth.userId })
+        const withdrawals = await Transaction.find(filter)
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)

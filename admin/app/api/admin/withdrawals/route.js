@@ -1,7 +1,8 @@
 const messages = require('../../../../lib/messages');
+const constants = require('../../../../lib/constants');
 const { verifySession } = require('../../../../lib/session');
 const { errorResponse, successResponse, authErrorResponse, log1 } = require("../../../../lib/general");
-const Withdrawal = require('../../../../lib/models/withdrawal.model');
+const Transaction = require('../../../../lib/models/transaction.model');
 const User = require('../../../../lib/models/user.model');
 const Setting = require('../../../../lib/models/setting.model');
 
@@ -22,7 +23,8 @@ async function GET(req) {
         const pubKeyStr = (await Setting.getVal('SOLANA_PLATFORM_PUBLIC_KEY'));
 
         const filter = {
-            fromAddress: pubKeyStr,
+            type: constants.TRX_TYPE.WITHDRAW,
+            platformAddress: pubKeyStr,
         };
 
         if (statusFilter && statusFilter !== 'ALL') {
@@ -40,7 +42,7 @@ async function GET(req) {
             const userIds = matchedUsers.map((u) => u._id);
 
             filter.$or = [
-                { withdrawId: { $regex: searchQuery, $options: 'i' } },
+                { txId: { $regex: searchQuery, $options: 'i' } },
                 { memo: { $regex: searchQuery, $options: 'i' } },
                 { toAddress: { $regex: searchQuery, $options: 'i' } },
                 { transactionSignature: { $regex: searchQuery, $options: 'i' } },
@@ -51,10 +53,10 @@ async function GET(req) {
             };
         };
 
-        const totalCount = await Withdrawal.countDocuments(filter);
+        const totalCount = await Transaction.countDocuments(filter);
         const totalPages = Math.ceil(totalCount / limit) || 0;
 
-        const withdrawals = await Withdrawal.find(filter)
+        const withdrawals = await Transaction.find(filter)
             .populate('userId', 'fullName email memo')
             .sort({ createdAt: -1 })
             .skip(skip)

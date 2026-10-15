@@ -107,7 +107,7 @@ export const TransactionListTable = ({ type = 'withdraw', refreshTrigger }) => {
                             </thead>
                             <tbody style={{ opacity: isFetchingPage ? 0.35 : 1, transition: 'opacity 0.2s ease', pointerEvents: isFetchingPage ? 'none' : 'auto' }}>
                                 {items.map((w) => {
-                                    const rowId = w._id || w.withdrawId || w.depositId;
+                                    const rowId = w.txId || w._id;
                                     return (
                                         <tr key={rowId} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                                             <td style={{ padding: '0.65rem 0.35rem' }}>

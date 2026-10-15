@@ -1,11 +1,27 @@
-/**
- * ui-constants.js — Client-safe constants (ES Module)
- * Placed in components/ so Next.js webpack treats it as ESM (not CJS).
- * Import this in React client components.
- */
-
 export const DEFAULT_ITEM_PER_PAGE = 10;
 export const DEFAULT_CURRENT_PAGE = 1;
+
+export const PHONE_REGEX = /^\+?[0-9][0-9\s\-()]{6,19}$/;
+export const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/;
+
+export const COUNTRY_CODE_REGEX = /^\+\d{1,4}$/;
+export const PHONE_DIGITS_REGEX = /^\d{4,15}$/;
+export const DEFAULT_COUNTRY_CODE = '+1';
+
+export const DEFAULT_PHONE_LENGTH = { min: 6, max: 15 };
+
+export const CAMPAIGN = {
+    NAME_MIN_LENGTH: 2,
+    NAME_MAX_LENGTH: 120,
+    MAX_COMMENTS: 100,
+    COMMENT_MAX_LENGTH: 500,
+};
+
+export const MANAGER = {
+    NAME_MIN_LENGTH: 2,
+    NAME_MAX_LENGTH: 100,
+    PASSWORD_LENGTH: 8,
+};
 
 export const USER_STATUS = {
     INACTIVE: 1,
@@ -29,31 +45,12 @@ export const TRX_TYPE = {
     WITHDRAW: 1,
 };
 
-export const DEPOSIT_STATUS = {
-    PENDING: 'PENDING',
-    CONFIRMED: 'CONFIRMED',
-    FAILED: 'FAILED',
+export const TRANSACTION_STATUS = {
+    PENDING: 1,
+    PROCESSING: 2,
+    CONFIRMED: 3,
+    FAILED: 4,
 };
-
-export const WITHDRAW_STATUS = {
-    PENDING: 'PENDING',
-    CONFIRMED: 'CONFIRMED',
-    FAILED: 'FAILED',
-};
-
-export const CAMPAIGN = {
-    NAME_MIN_LENGTH: 2,
-    NAME_MAX_LENGTH: 120,
-    MAX_COMMENTS: 100,
-    COMMENT_MAX_LENGTH: 500,
-};
-
-export const PHONE_REGEX = /^\+?[0-9][0-9\s\-()]{6,19}$/;
-export const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/;
-
-export const COUNTRY_CODE_REGEX = /^\+\d{1,4}$/;
-export const PHONE_DIGITS_REGEX = /^\d{4,15}$/;
-export const DEFAULT_COUNTRY_CODE = '+1';
 
 export const COUNTRY_PHONE_LENGTHS = {
     '+1': { min: 10, max: 10 },
@@ -151,8 +148,6 @@ export const COUNTRY_PHONE_LENGTHS = {
     '+995': { min: 9, max: 9 },
     '+998': { min: 9, max: 9 },
 };
-
-export const DEFAULT_PHONE_LENGTH = { min: 6, max: 15 };
 
 export const COUNTRY_CODES = [
     { code: 'US', name: 'United States', dial: '+1' },
@@ -252,9 +247,3 @@ export const COUNTRY_CODES = [
     { code: 'YE', name: 'Yemen', dial: '+967' },
     { code: 'ZW', name: 'Zimbabwe', dial: '+263' },
 ];
-
-export const MANAGER = {
-    NAME_MIN_LENGTH: 2,
-    NAME_MAX_LENGTH: 100,
-    PASSWORD_LENGTH: 8,
-};

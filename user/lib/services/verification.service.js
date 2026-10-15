@@ -4,7 +4,8 @@ const bs58 = require('bs58');
 const { connection, MEMO_PROGRAM_ID } = require('../solana');
 const { solToLamports } = require('../validation');
 const { log1, } = require('../general');
-const Deposit = require('../models/deposit.model');
+const constants = require('../constants');
+const Transaction = require('../models/transaction.model');
 
 const verifyDepositTransaction = async ({
     signature,
@@ -12,8 +13,9 @@ const verifyDepositTransaction = async ({
     expectedAmount,
     expectedMemo,
 }) => {
-    const existingConfirmed = await Deposit.findOne({
+    const existingConfirmed = await Transaction.findOne({
         transactionSignature: signature,
+        type: constants.TRX_TYPE.DEPOSIT,
         status: 'CONFIRMED',
     });
 

@@ -1,6 +1,6 @@
 const messages = require('../../../../lib/messages');
 const { verifySession } = require('../../../../lib/session');
-const Deposit = require('../../../../lib/models/deposit.model');
+const Transaction = require('../../../../lib/models/transaction.model');
 const { errorResponse, successResponse, authErrorResponse, log1 } = require("../../../../lib/general");
 
 async function GET(req, { params }) {
@@ -11,7 +11,7 @@ async function GET(req, { params }) {
         };
 
         const { depositId } = params;
-        const deposit = await Deposit.findOne({ depositId }).lean();
+        const deposit = await Transaction.findOne({ txId: depositId }).lean();
 
         if (!deposit) {
             return errorResponse("Deposit record not found.");

@@ -2,7 +2,8 @@ const constants = require('../../../../lib/constants');
 const messages = require('../../../../lib/messages');
 const { verifySession } = require('../../../../lib/session');
 const { errorResponse, successResponse, authErrorResponse, log1 } = require("../../../../lib/general");
-const Withdrawal = require('../../../../lib/models/withdrawal.model');
+const Transaction = require('../../../../lib/models/transaction.model');
+const Setting = require('../../../../lib/models/setting.model');
 
 async function GET(req) {
     try {
@@ -18,10 +19,12 @@ async function GET(req) {
 
         const pubKeyStr = (await Setting.getVal('SOLANA_PLATFORM_PUBLIC_KEY'));
 
-        const totalCount = await Withdrawal.countDocuments({ fromAddress: pubKeyStr });
+        const filter = { type: constants.TRX_TYPE.WITHDRAW, platformAddress: pubKeyStr };
+
+        const totalCount = await Transaction.countDocuments(filter);
         const totalPages = Math.ceil(totalCount / limit) || 1;
 
-        const withdrawals = await Withdrawal.find({ fromAddress: pubKeyStr })
+        const withdrawals = await Transaction.find(filter)
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)

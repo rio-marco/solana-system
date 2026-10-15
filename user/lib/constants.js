@@ -50,4 +50,21 @@ module.exports = {
         EXPIRED: 0,
         ACTIVE: 1,
     },
+
+    TRX_TYPE: {
+        DEPOSIT: 0,
+        WITHDRAW: 1,
+    },
+
+    COIN: {
+        SOL: 1,
+        BTCR: 2,
+    },
+
+    TRANSACTION_STATUS: {
+        PENDING: 1,
+        PROCESSING: 2,
+        CONFIRMED: 3,
+        FAILED: 4,
+    },
 };

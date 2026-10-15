@@ -16,7 +16,7 @@ import {
     RefreshCw,
 } from 'lucide-react';
 import {
-    WITHDRAW_STATUS,
+    TRANSACTION_STATUS,
     DEFAULT_CURRENT_PAGE,
     DEFAULT_ITEM_PER_PAGE
 } from './ui-constants.mjs';
@@ -24,9 +24,9 @@ import { Pagination } from './Pagination';
 
 function getStatusBadge(status) {
     switch (status) {
-        case WITHDRAW_STATUS.CONFIRMED:
+        case TRANSACTION_STATUS.CONFIRMED:
             return <span style={{ background: 'rgba(20,241,149,0.12)', color: '#0D6EFD', border: '1px solid rgba(20,241,149,0.3)', padding: '0.2rem 0.65rem', borderRadius: '20px', fontSize: '0.73rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><CheckCircle2 size={11} />Confirmed</span>;
-        case WITHDRAW_STATUS.FAILED:
+        case TRANSACTION_STATUS.FAILED:
             return <span style={{ background: 'rgba(239,68,68,0.12)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)', padding: '0.2rem 0.65rem', borderRadius: '20px', fontSize: '0.73rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><XCircle size={11} />Failed</span>;
         default:
             return <span style={{ background: 'rgba(245,158,11,0.12)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.3)', padding: '0.2rem 0.65rem', borderRadius: '20px', fontSize: '0.73rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><Clock size={11} />{status || 'Pending'}</span>;
@@ -144,9 +144,9 @@ export function WithdrawManagement() {
                         style={selectStyle}
                     >
                         <option value="ALL">All Statuses</option>
-                        <option value={WITHDRAW_STATUS.CONFIRMED}>Confirmed</option>
-                        <option value={WITHDRAW_STATUS.PENDING}>Pending</option>
-                        <option value={WITHDRAW_STATUS.FAILED}>Failed</option>
+                        <option value={TRANSACTION_STATUS.PENDING}>Pending</option>
+                        <option value={TRANSACTION_STATUS.CONFIRMED}>Confirmed</option>
+                        <option value={TRANSACTION_STATUS.FAILED}>Failed</option>
                     </select>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#94a3b8', fontSize: '0.8rem' }}>
                         <span>Per page:</span>
@@ -196,7 +196,7 @@ export function WithdrawManagement() {
                                     <td colSpan={8} style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>No withdrawal transactions found.</td>
                                 </tr>
                             ) : items.map((item) => {
-                                const id = item.withdrawId || item._id;
+                                const id = item.txId || item._id;
                                 const userEmail = item.userId?.email || 'N/A';
                                 const userName = item.userId?.fullName || '';
                                 const txSig = item.transactionSignature;

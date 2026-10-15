@@ -1,9 +1,9 @@
 const messages = require('../../../../lib/messages');
+const constants = require('../../../../lib/constants');
 const { verifySession } = require('../../../../lib/session');
 const { errorResponse, successResponse, authErrorResponse, log1 } = require("../../../../lib/general");
 const { getPlatformReceivingAddress, getOnChainBalance } = require('../../../../lib/services/solana.service');
-const Deposit = require('../../../../lib/models/deposit.model');
-const Withdrawal = require('../../../../lib/models/withdrawal.model');
+const Transaction = require('../../../../lib/models/transaction.model');
 const User = require('../../../../lib/models/user.model');
 
 async function GET(req) {
@@ -29,10 +29,11 @@ async function GET(req) {
         const totalUsers = await User.countDocuments();
 
         // Deposits Stats (matching addressStr if present, or all platform deposits)
-        const depositMatchQuery = addressStr ? { platformAddress: addressStr } : {};
-        const withdrawMatchQuery = addressStr ? { fromAddress: addressStr } : {};
+        const baseMatchQuery = addressStr ? { platformAddress: addressStr } : {};
+        const depositMatchQuery = { ...baseMatchQuery, type: constants.TRX_TYPE.DEPOSIT };
+        const withdrawMatchQuery = { ...baseMatchQuery, type: constants.TRX_TYPE.WITHDRAW };
 
-        const depositAgg = await Deposit.aggregate([
+        const depositAgg = await Transaction.aggregate([
             { $match: depositMatchQuery },
             {
                 $group: {
@@ -68,7 +69,7 @@ async function GET(req) {
         });
 
         // Withdrawal Stats
-        const withdrawalAgg = await Withdrawal.aggregate([
+        const withdrawalAgg = await Transaction.aggregate([
             { $match: withdrawMatchQuery },
             {
                 $group: {

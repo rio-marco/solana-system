@@ -24,6 +24,73 @@ module.exports = {
     COUNTRY_CODE_REGEX: /^\+\d{1,4}$/,
     PHONE_DIGITS_REGEX: /^\d{4,15}$/,
     DEFAULT_COUNTRY_CODE: '+1',
+    DEFAULT_PHONE_LENGTH: { min: 6, max: 15 },
+
+    CAMPAIGN: {
+        NAME_MIN_LENGTH: 2,
+        NAME_MAX_LENGTH: 120,
+        MAX_COMMENTS: 100,
+        COMMENT_MAX_LENGTH: 500,
+    },
+
+    MANAGER: {
+        NAME_MIN_LENGTH: 2,
+        NAME_MAX_LENGTH: 100,
+        PASSWORD_LENGTH: 8,
+    },
+
+    OTP_TYPE: {
+        SIGNUP: 1,
+        LOGIN: 2,
+    },
+
+    TWOFA_STATUS: {
+        DISABLED: 0,
+        ENABLED: 1,
+    },
+
+    STATUS: {
+        OK: 200,
+        BAD_REQUEST: 400,
+        UNAUTHORIZED: 401,
+        NOT_FOUND: 404,
+        INTERNAL_SERVER_ERROR: 500,
+        MAINTENANCE_ERROR: 503,
+    },
+
+    USER_STATUS: {
+        INACTIVE: 1,
+        ACTIVE: 2,
+        SUSPENDED: 3,
+    },
+
+    MANAGER_STATUS: {
+        INACTIVE: 0,
+        ACTIVE: 1,
+        SUSPENDED: 2,
+    },
+
+    SESSION_STATUS: {
+        EXPIRED: 0,
+        ACTIVE: 1,
+    },
+
+    TRX_TYPE: {
+        DEPOSIT: 0,
+        WITHDRAW: 1,
+    },
+
+    COIN: {
+        SOL: 1,
+        BTCR: 2,
+    },
+
+    TRANSACTION_STATUS: {
+        PENDING: 1,
+        PROCESSING: 2,
+        CONFIRMED: 3,
+        FAILED: 4,
+    },
 
     COUNTRY_PHONE_LENGTHS: {
         '+1': { min: 10, max: 10 },
@@ -120,73 +187,5 @@ module.exports = {
         '+994': { min: 9, max: 9 },
         '+995': { min: 9, max: 9 },
         '+998': { min: 9, max: 9 },
-    },
-
-    DEFAULT_PHONE_LENGTH: { min: 6, max: 15 },
-
-    OTP_TYPE: {
-        SIGNUP: 1,
-        LOGIN: 2,
-    },
-
-    TWOFA_STATUS: {
-        DISABLED: 0,
-        ENABLED: 1,
-    },
-
-    STATUS: {
-        OK: 200,
-        BAD_REQUEST: 400,
-        UNAUTHORIZED: 401,
-        NOT_FOUND: 404,
-        INTERNAL_SERVER_ERROR: 500,
-        MAINTENANCE_ERROR: 503,
-    },
-
-    USER_STATUS: {
-        INACTIVE: 1,
-        ACTIVE: 2,
-        SUSPENDED: 3,
-    },
-
-    MANAGER_STATUS: {
-        INACTIVE: 0,
-        ACTIVE: 1,
-        SUSPENDED: 2,
-    },
-
-    SESSION_STATUS: {
-        EXPIRED: 0,
-        ACTIVE: 1,
-    },
-
-    TRX_TYPE: {
-        DEPOSIT: 0,
-        WITHDRAW: 1,
-    },
-
-    DEPOSIT_STATUS: {
-        PENDING: "PENDING",
-        CONFIRMED: "CONFIRMED",
-        FAILED: "FAILED",
-    },
-
-    WITHDRAW_STATUS: {
-        PENDING: "PENDING",
-        CONFIRMED: "CONFIRMED",
-        FAILED: "FAILED",
-    },
-
-    CAMPAIGN: {
-        NAME_MIN_LENGTH: 2,
-        NAME_MAX_LENGTH: 120,
-        MAX_COMMENTS: 100,
-        COMMENT_MAX_LENGTH: 500,
-    },
-
-    MANAGER: {
-        NAME_MIN_LENGTH: 2,
-        NAME_MAX_LENGTH: 100,
-        PASSWORD_LENGTH: 8,
     },
 };

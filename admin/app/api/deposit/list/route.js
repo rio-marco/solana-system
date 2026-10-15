@@ -2,7 +2,7 @@ const constants = require('../../../../lib/constants');
 const messages = require('../../../../lib/messages');
 const { verifySession } = require('../../../../lib/session');
 const { errorResponse, successResponse, authErrorResponse, log1 } = require("../../../../lib/general");
-const Deposit = require('../../../../lib/models/deposit.model');
+const Transaction = require('../../../../lib/models/transaction.model');
 const Setting = require("../../../../lib/models/setting.model");
 
 async function GET(req) {
@@ -19,10 +19,12 @@ async function GET(req) {
 
         const pubKeyStr = (await Setting.getVal('SOLANA_PLATFORM_PUBLIC_KEY'));
 
-        const totalCount = await Deposit.countDocuments({ platformAddress: pubKeyStr });
+        const filter = { type: constants.TRX_TYPE.DEPOSIT, platformAddress: pubKeyStr };
+
+        const totalCount = await Transaction.countDocuments(filter);
         const totalPages = Math.ceil(totalCount / limit) || 1;
 
-        const deposits = await Deposit.find({ platformAddress: pubKeyStr })
+        const deposits = await Transaction.find(filter)
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)

@@ -359,7 +359,7 @@ export function AdminTransactionTable({ refreshTrigger }) {
                             </tr>
                         ) : (
                             items.map((item) => {
-                                const id = item.depositId || item.withdrawId || item._id;
+                                const id = item.txId || item._id;
                                 const userEmail = item.userId?.email || 'N/A';
                                 const userName = item.userId?.fullName || '';
                                 const txSig = item.transactionSignature;

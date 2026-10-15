@@ -5,11 +5,9 @@ const messages = require('../../../../lib/messages');
 const constants = require('../../../../lib/constants');
 const { verifySession } = require('../../../../lib/session');
 const { errorResponse, successResponse, authErrorResponse, log1 } = require('../../../../lib/general');
-const User = require('../../../../lib/models/user.model');
-const Deposit = require('../../../../lib/models/deposit.model');
-const Withdrawal = require('../../../../lib/models/withdrawal.model');
+const Transaction = require('../../../../lib/models/transaction.model');
 
-async function GET(req, { params }) {
+async function GET(req) {
     try {
         const sessionAuth = await verifySession(req);
         if (!sessionAuth || !sessionAuth.adminId) {
@@ -20,103 +18,51 @@ async function GET(req, { params }) {
 
         const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
         const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '10', 10)));
-        const skip = (page - 1) * limit;
 
         const txType = (searchParams.get('txType') || 'ALL').toUpperCase();
         const txStatus = searchParams.get('txStatus') || '';
         const userId = searchParams.get('userId') || '';
 
-        let transactions = [];
-        let txPagination = {
-            totalCount: 0,
-            totalPages: 0,
-            currentPage: page,
-            limit: limit,
-        };
-
-        const depositQuery = {};
-        const withdrawalQuery = {};
+        const filter = {};
 
         if (txStatus && txStatus !== 'ALL') {
-            depositQuery.status = txStatus;
-            withdrawalQuery.status = txStatus;
+            filter.status = txStatus;
         };
 
         if (userId && mongoose.isValidObjectId(userId)) {
-            depositQuery.userId = userId;
-            withdrawalQuery.userId = userId;
+            filter.userId = userId;
         };
 
-        const fetchDeposits = (txType === 'ALL' || txType === 'DEPOSIT')
-            ? Deposit.find(depositQuery).lean()
-            : Promise.resolve([]);
-        const fetchWithdrawals = (txType === 'ALL' || txType === 'WITHDRAW')
-            ? Withdrawal.find(withdrawalQuery).lean()
-            : Promise.resolve([]);
-
-        const [deposits, withdrawals] = await Promise.all([fetchDeposits, fetchWithdrawals]);
-
-        let combined = [];
-
-        for (const d of deposits) {
-            combined.push({
-                _id: d._id,
-                transactionType: constants.TRX_TYPE.DEPOSIT,
-                amount: d.amount,
-                currency: d.currency,
-                status: d.status,
-                transactionSignature: d.transactionSignature,
-                memo: d.memo,
-                depositId: d.depositId,
-                createdAt: d.createdAt,
-                updatedAt: d.updatedAt,
-                confirmedAt: d.confirmedAt,
-                submittedAt: d.submittedAt,
-                requestedAt: d.requestedAt,
-                failureReason: d.failureReason,
-                fromAddress: d.platformAddress,
-                blockTime: d.blockTime,
-            });
+        if (txType === 'DEPOSIT') {
+            filter.type = constants.TRX_TYPE.DEPOSIT;
+        } else if (txType === 'WITHDRAW') {
+            filter.type = constants.TRX_TYPE.WITHDRAW;
         };
 
-        for (const w of withdrawals) {
-            combined.push({
-                _id: w._id,
-                transactionType: constants.TRX_TYPE.WITHDRAW,
-                amount: w.amount,
-                currency: w.currency,
-                status: w.status,
-                transactionSignature: w.transactionSignature,
-                memo: w.memo,
-                withdrawId: w.withdrawId,
-                toAddress: w.toAddress,
-                fromAddress: w.fromAddress,
-                platformFee: w.platformFee,
-                createdAt: w.createdAt,
-                updatedAt: w.updatedAt,
-                confirmedAt: w.confirmedAt,
-                failureReason: w.failureReason,
-                blockTime: w.blockTime,
-            });
+        const totalCount = await Transaction.countDocuments(filter);
+        const totalPages = Math.ceil(totalCount / limit) || 0;
+
+        let currentPage = page;
+        if (totalPages > 0 && page > totalPages) {
+            currentPage = totalPages;
         };
 
-        combined.sort((a, b) => {
-            const dateA = new Date(a.createdAt || a.confirmedAt || a.blockTime || 0);
-            const dateB = new Date(b.createdAt || b.confirmedAt || b.blockTime || 0);
-            return dateB - dateA;
-        });
+        const skip = (currentPage - 1) * limit;
 
-        txPagination.totalCount = combined.length;
-        txPagination.totalPages = Math.ceil(combined.length / limit) || 0;
-        if (page > txPagination.totalPages && txPagination.totalPages > 0) {
-            txPagination.currentPage = txPagination.totalPages;
-        };
-
-        transactions = combined.slice(skip, skip + limit);
+        const transactions = await Transaction.find(filter)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean();
 
         return successResponse('Transaction details fetched successfully.', {
             transactions,
-            pagination: txPagination,
+            pagination: {
+                totalCount,
+                totalPages,
+                currentPage,
+                limit,
+            },
         });
     } catch (error) {
         log1(['Error in admin transaction details GET:', error.message]);

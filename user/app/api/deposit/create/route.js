@@ -7,7 +7,7 @@ const { getPlatformReceivingAddress, executeDepositTransaction } = require('../.
 const { verifyDepositTransaction } = require('../../../../lib/services/verification.service');
 const { emitToUser } = require('../../../../lib/socket');
 const { errorResponse, successResponse, authErrorResponse, log1 } = require("../../../../lib/general");
-const Deposit = require('../../../../lib/models/deposit.model');
+const Transaction = require('../../../../lib/models/transaction.model');
 const User = require('../../../../lib/models/user.model');
 const Notification = require('../../../../lib/models/notification.model');
 
@@ -35,26 +35,28 @@ async function POST(req) {
         const platformPubKey = await getPlatformReceivingAddress(true);
         const platformAddressStr = platformPubKey.toBase58();
 
-        const depositId = `DEP-${uuidv4().substring(0, 8).toUpperCase()}`;
+        const txId = `DEP-${uuidv4().substring(0, 8).toUpperCase()}`;
 
-        const deposit = new Deposit({
+        const transaction = new Transaction({
             userId: user._id,
-            depositId,
+            txId,
+            type: constants.TRX_TYPE.DEPOSIT,
+            coin: constants.COIN.SOL,
             memo: memoVal.cleanMemo,
             amount: amountVal.numericAmount,
-            currency: 'SOL',
             platformAddress: platformAddressStr,
+            toAddress: platformAddressStr,
             status: 'PENDING',
         });
 
-        await deposit.save();
+        await transaction.save();
 
         let txResult;
         try {
-            deposit.status = 'PROCESSING';
-            deposit.submittedAt = new Date();
+            transaction.status = 'PROCESSING';
+            transaction.submittedAt = new Date();
 
-            await deposit.save();
+            await transaction.save();
 
             txResult = await executeDepositTransaction({
                 memo: memoVal.cleanMemo,
@@ -62,12 +64,12 @@ async function POST(req) {
                 recipientPublicKey: platformPubKey,
             });
 
-            deposit.transactionSignature = txResult.signature;
-            await deposit.save();
+            transaction.transactionSignature = txResult.signature;
+            await transaction.save();
         } catch (txErr) {
-            deposit.status = 'FAILED';
-            deposit.failureReason = `Transaction Execution Error: ${txErr.message}`;
-            await deposit.save();
+            transaction.status = 'FAILED';
+            transaction.failureReason = `Transaction Execution Error: ${txErr.message}`;
+            await transaction.save();
 
             log1(["Deposit execution failed:", txErr.message]);
             return errorResponse("Deposit execution failed");
@@ -81,19 +83,19 @@ async function POST(req) {
         });
 
         if (!verifyResult.isValid) {
-            deposit.status = 'FAILED';
-            deposit.failureReason = verifyResult.failureReason;
-            await deposit.save();
+            transaction.status = 'FAILED';
+            transaction.failureReason = verifyResult.failureReason;
+            await transaction.save();
 
             log1(["Deposit verification failed:", verifyResult.failureReason]);
             return errorResponse("Deposit verification failed");
         };
 
-        deposit.status = 'CONFIRMED';
-        deposit.confirmedAt = new Date();
-        deposit.slot = verifyResult.slot;
-        deposit.blockTime = verifyResult.blockTime;
-        await deposit.save();
+        transaction.status = 'CONFIRMED';
+        transaction.confirmedAt = new Date();
+        transaction.slot = verifyResult.slot;
+        transaction.blockTime = verifyResult.blockTime;
+        await transaction.save();
 
         const updatedUser = await User.findByIdAndUpdate(
             user._id,
@@ -113,19 +115,19 @@ async function POST(req) {
 
         emitToUser(user._id, 'newNotification', newNotif);
         emitToUser(user._id, 'deposit_confirmed', {
-            depositId: deposit.depositId,
+            txId: transaction.txId,
             amount: amountVal.numericAmount,
             signature: txResult.signature,
         });
 
         return successResponse(`Successfully deposited ${amountVal.numericAmount} SOL!`,
             {
-                depositId: deposit.depositId,
-                amount: deposit.amount,
-                signature: deposit.transactionSignature,
-                status: deposit.status,
+                txId: transaction.txId,
+                amount: transaction.amount,
+                signature: transaction.transactionSignature,
+                status: transaction.status,
                 updatedSolBalance: updatedUser.solBalance,
-                explorerUrl: `https://explorer.solana.com/tx/${deposit.transactionSignature}?cluster=devnet`,
+                explorerUrl: `https://explorer.solana.com/tx/${transaction.transactionSignature}?cluster=devnet`,
             },
         );
     } catch (err) {

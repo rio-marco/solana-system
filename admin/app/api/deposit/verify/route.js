@@ -3,7 +3,6 @@ const messages = require('../../../../lib/messages');
 const { verifySession } = require('../../../../lib/session');
 const { verifyDepositTransaction } = require('../../../../lib/services/verification.service');
 const { errorResponse, successResponse, authErrorResponse, log1 } = require("../../../../lib/general");
-const Deposit = require('../../../../lib/models/deposit.model');
 
 async function POST(req) {
     try {

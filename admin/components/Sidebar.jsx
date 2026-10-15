@@ -10,6 +10,7 @@ import {
     ArrowDownLeft,
     ArrowUpRight,
     Megaphone,
+    UserCog,
     Settings,
     LogOut,
     Shield,
@@ -17,12 +18,13 @@ import {
 } from 'lucide-react';
 
 const NAV_ITEMS = [
-    { id: 'dashboard', label: 'Dashboard',           icon: LayoutDashboard, href: '/' },
-    { id: 'users',     label: 'User Management',     icon: Users,           href: '/user' },
-    { id: 'deposits',  label: 'Deposit Management',  icon: ArrowDownLeft,   href: '/deposit' },
-    { id: 'withdrawals', label: 'Withdraw Management', icon: ArrowUpRight,  href: '/withdraw' },
-    { id: 'campaigns', label: 'Campaign Management', icon: Megaphone,       href: '/campaign' },
-    { id: 'settings',  label: 'Settings',            icon: Settings,        href: '/setting' },
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, href: '/' },
+    { id: 'users', label: 'User Management', icon: Users, href: '/user' },
+    { id: 'managers', label: 'Manager Management', icon: UserCog, href: '/manager' },
+    { id: 'deposits', label: 'Deposit Management', icon: ArrowDownLeft, href: '/deposit' },
+    { id: 'withdrawals', label: 'Withdraw Management', icon: ArrowUpRight, href: '/withdraw' },
+    { id: 'campaigns', label: 'Campaign Management', icon: Megaphone, href: '/campaign' },
+    { id: 'settings', label: 'Settings', icon: Settings, href: '/setting' },
 ];
 
 export function Sidebar() {
@@ -59,19 +61,19 @@ export function Sidebar() {
             >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
                     <div
-                            style={{
-                                width: '44px',
-                                height: '44px',
-                                borderRadius: '6px',
-                                background: '#E7F1FF',
-                                padding: '0',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                flexShrink: 0,
-                            }}
-                        >
-                            <Shield size={22} style={{ color: '#0D6EFD' }} />
+                        style={{
+                            width: '44px',
+                            height: '44px',
+                            borderRadius: '6px',
+                            background: '#E7F1FF',
+                            padding: '0',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                        }}
+                    >
+                        <Shield size={22} style={{ color: '#0D6EFD' }} />
                     </div>
                     <div>
                         <div
@@ -196,19 +198,19 @@ export function Sidebar() {
                             }}
                         >
                             <div
-                            style={{
-                                width: '36px',
-                                height: '36px',
-                                borderRadius: '6px',
-                                background: '#0D6EFD',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: '0.9rem',
-                                fontWeight: 800,
-                                color: '#FFFFFF',
-                                flexShrink: 0,
-                            }}
+                                style={{
+                                    width: '36px',
+                                    height: '36px',
+                                    borderRadius: '6px',
+                                    background: '#0D6EFD',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '0.9rem',
+                                    fontWeight: 800,
+                                    color: '#FFFFFF',
+                                    flexShrink: 0,
+                                }}
                             >
                                 {admin.name ? admin.name[0].toUpperCase() : 'A'}
                             </div>

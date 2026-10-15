@@ -92,6 +92,17 @@ function generateRandomToken(length) {
     return result;
 };
 
+function generatePassword(length = 8) {
+    const charset = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+    let password = '';
+
+    for (let i = 0; i < length; i++) {
+        password += charset.charAt(crypto.randomInt(0, charset.length));
+    };
+
+    return password;
+};
+
 function generateOTP(length = 6) {
     if (process.env.NODE_ENV === 'development') return '123456';
 
@@ -152,6 +163,7 @@ module.exports = {
     isValidIp,
     getIp,
     generateRandomToken,
+    generatePassword,
     generateOTP,
     generateAuthToken,
     buildProfilePhotoUrl,

@@ -20,6 +20,7 @@ module.exports = {
 
     FULL_NAME_REGEX: /^[a-zA-Z\s]{2,60}$/,
     EMAIL_REGEX: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/,
+    PHONE_REGEX: /^\+?[0-9][0-9\s\-()]{6,19}$/,
 
     OTP_TYPE: {
         SIGNUP: 1,
@@ -44,6 +45,12 @@ module.exports = {
         INACTIVE: 1,
         ACTIVE: 2,
         SUSPENDED: 3,
+    },
+
+    MANAGER_STATUS: {
+        INACTIVE: 0,
+        ACTIVE: 1,
+        SUSPENDED: 2,
     },
 
     SESSION_STATUS: {
@@ -73,5 +80,11 @@ module.exports = {
         NAME_MAX_LENGTH: 120,
         MAX_COMMENTS: 100,
         COMMENT_MAX_LENGTH: 500,
+    },
+
+    MANAGER: {
+        NAME_MIN_LENGTH: 2,
+        NAME_MAX_LENGTH: 100,
+        PASSWORD_LENGTH: 8,
     },
 };

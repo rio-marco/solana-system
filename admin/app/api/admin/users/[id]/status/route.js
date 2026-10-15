@@ -22,7 +22,7 @@ async function PATCH(req, { params }) {
         const { action, reason } = body;
 
         const validActions = Object.values(constants.USER_STATUS);
-        if (!validActions.includes(action)) {
+        if (!validActions.includes(Number(action))) {
             return errorResponse('Invalid action.');
         };
 
@@ -31,19 +31,20 @@ async function PATCH(req, { params }) {
             return errorResponse('User not found.');
         };
 
-        if (action === constants.USER_STATUS.SUSPENDED) {
+        user.status = Number(action);
+
+        if (Number(action) === constants.USER_STATUS.SUSPENDED) {
             if (!reason || reason.trim().length < 3) {
                 return errorResponse('Suspend reason is required and must be at least 3 characters.');
             };
 
-            user.status = constants.USER_STATUS.SUSPENDED;
             user.suspendReason = reason.trim();
             user.suspendHistory.push({
                 reason: reason.trim(),
                 suspendedAt: new Date(),
                 activatedAt: null,
             });
-        } else if (action === constants.USER_STATUS.ACTIVE) {
+        } else if (Number(action) === constants.USER_STATUS.ACTIVE) {
             // Close last open suspend entry
             if (user.suspendHistory && user.suspendHistory.length > 0) {
                 const lastEntry = user.suspendHistory[user.suspendHistory.length - 1];
@@ -52,7 +53,6 @@ async function PATCH(req, { params }) {
                 };
             };
 
-            user.status = constants.USER_STATUS.ACTIVE;
             user.suspendReason = null;
         };
 
@@ -62,7 +62,7 @@ async function PATCH(req, { params }) {
             .select('-twoFASecret -recoveryPhrase')
             .lean();
 
-        return successResponse(`User ${action === constants.USER_STATUS.SUSPENDED ? 'suspended' : 'activated'} successfully.`, {
+        return successResponse(`User ${Number(action) === constants.USER_STATUS.SUSPENDED ? 'suspended' : 'activated'} successfully.`, {
             user: updatedUser,
         });
     } catch (error) {

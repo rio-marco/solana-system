@@ -5,6 +5,7 @@ import Link from 'next/link';
 import axios from 'axios';
 import moment from 'moment';
 import { useToast } from '../context/ToastContext';
+import { CopyButton } from '../lib/clipboard';
 import {
     ArrowLeft,
     User,
@@ -27,6 +28,7 @@ import {
     DEFAULT_CURRENT_PAGE,
     DEFAULT_ITEM_PER_PAGE,
 } from './ui-constants.mjs';
+import SuspendModal from './modal/SuspendModal.jsx';
 
 const STATUS_BADGE_STYLE = {
     padding: '0.25rem 0.7rem',
@@ -117,6 +119,7 @@ function InfoRow({ label, value, mono }) {
 export function UserDetails({ userId }) {
     const { toastError } = useToast();
     const [loading, setLoading] = useState(true);
+    const [transactionLoading, setTransactionLoading] = useState(false);
     const [user, setUser] = useState(null);
     const [suspendHistory, setSuspendHistory] = useState([]);
     const [transactions, setTransactions] = useState([]);
@@ -128,6 +131,9 @@ export function UserDetails({ userId }) {
     });
     const [txType, setTxType] = useState('ALL');
     const [txStatus, setTxStatus] = useState('ALL');
+    const [userStatus, setUserStatus] = useState(USER_STATUS.INACTIVE);
+
+    const [suspendModal, setSuspendModal] = useState(null);
 
     const fetchDetails = useCallback(async () => {
         if (!userId) return;
@@ -135,18 +141,13 @@ export function UserDetails({ userId }) {
         setLoading(true);
         try {
             const params = new URLSearchParams();
-            params.set('txPage', String(pagination.currentPage));
-            params.set('txLimit', String(pagination.limit));
-            params.set('txType', txType);
-            params.set('txStatus', txStatus);
 
             const res = await axios.get(`/api/admin/users/${userId}?${params.toString()}`);
             if (res.data?.flag && res.data?.data) {
                 const d = res.data.data;
                 setUser(d.user);
-                setSuspendHistory(d.suspendHistory || []);
-                setTransactions(d.transactions || []);
-                setPagination(d.pagination || { totalCount: 0, totalPages: 0, currentPage: DEFAULT_CURRENT_PAGE, limit: DEFAULT_ITEM_PER_PAGE });
+                setUserStatus(d.user?.status ?? USER_STATUS.INACTIVE);
+                setSuspendHistory(d.user?.suspendHistory || []);
             } else {
                 toastError(res.data?.msg || res.data?.message || 'Failed to load user details');
             };
@@ -156,20 +157,109 @@ export function UserDetails({ userId }) {
         } finally {
             setLoading(false);
         };
+    }, [userId, toastError]);
+
+    const fetchTrxDetails = useCallback(async () => {
+        if (!userId) return;
+
+        setTransactionLoading(true);
+        try {
+            const params = new URLSearchParams();
+            params.set('page', String(pagination.currentPage));
+            params.set('limit', String(pagination.limit));
+            params.set('txType', txType);
+            params.set('txStatus', txStatus);
+            params.set('userId', userId);
+
+            const res = await axios.get(`/api/admin/transaction?${params.toString()}`);
+            if (res.data?.flag && res.data?.data) {
+                const d = res.data.data;
+                setTransactions(d.transactions || []);
+                setPagination(d.pagination || { totalCount: 0, totalPages: 0, currentPage: DEFAULT_CURRENT_PAGE, limit: DEFAULT_ITEM_PER_PAGE });
+            } else {
+                toastError(res.data?.msg || res.data?.message || 'Failed to load transaction details');
+            };
+        } catch (err) {
+            const errMsg = err.response?.data?.msg || err.response?.data?.message || 'Failed to load transaction details.';
+            toastError(errMsg);
+        } finally {
+            setTransactionLoading(false);
+        };
     }, [userId, pagination.currentPage, pagination.limit, txType, txStatus, toastError]);
 
     useEffect(() => {
         fetchDetails();
     }, [fetchDetails]);
 
+    useEffect(() => {
+        fetchTrxDetails();
+    }, [fetchTrxDetails]);
+
+    const handleStatusChange = async (e) => {
+        const statusVal = Number(e.target.value);
+
+        if (statusVal === USER_STATUS.SUSPENDED) {
+            setSuspendModal(user);
+            return;
+        };
+
+        handleStatusAction({ statusVal });
+    };
+
+    const handleStatusAction = async ({ statusVal, reason = "" }) => {
+        if (!user?._id || !statusVal) return;
+
+        const numericStatus = Number(statusVal);
+
+        if (numericStatus === USER_STATUS.SUSPENDED) {
+            if (!reason || reason.trim().length < 3) {
+                toastError('Suspend reason is required and must be at least 3 characters.');
+                return;
+            };
+        };
+
+        setLoading(true);
+
+        try {
+            const payload = {
+                action: numericStatus,
+                reason: reason.trim(),
+            };
+
+            const res = await axios.patch(`/api/admin/users/${user._id}/status`, payload);
+            if (res.data?.flag) {
+                setSuspendModal(null);
+                await fetchDetails();
+            } else {
+                toastError(res.data?.msg || res.data?.message || 'Failed to update user status');
+            };
+        } catch (err) {
+            const errMsg = err.response?.data?.msg || err.response?.data?.message || 'Failed to update user status.';
+            toastError(errMsg);
+        } finally {
+            setLoading(false);
+        };
+    };
+
     const handleTxTypeChange = (e) => {
-        setTxType(e.target.value);
-        setPagination((p) => ({ ...p, currentPage: DEFAULT_CURRENT_PAGE }));
+        const type = e.target.value;
+
+        setPagination((prev) => ({
+            ...prev,
+            currentPage: DEFAULT_CURRENT_PAGE,
+        }));
+
+        setTxType(type);
     };
 
     const handleTxStatusChange = (e) => {
-        setTxStatus(e.target.value);
-        setPagination((p) => ({ ...p, currentPage: DEFAULT_CURRENT_PAGE }));
+        const status = e.target.value;
+        setPagination((prev) => ({
+            ...prev,
+            currentPage: DEFAULT_CURRENT_PAGE,
+        }));
+
+        setTxStatus(status);
     };
 
     const handleLimitChange = (e) => {
@@ -200,7 +290,7 @@ export function UserDetails({ userId }) {
         return [1, '...', current - 1, current, current + 1, '...', total];
     };
 
-    if (loading) {
+    if (loading && !user) {
         return (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
                 <div style={{ color: '#6C757D', fontSize: '0.9rem' }}>Loading user details...</div>
@@ -233,7 +323,23 @@ export function UserDetails({ userId }) {
                     <h1 style={{ color: '#212529', fontSize: '1.4rem', fontWeight: 700, margin: 0 }}>User Details</h1>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    {getStatusBadge(user.status)}
+                    <select
+                        value={userStatus}
+                        onChange={handleStatusChange}
+                        style={{
+                            background: '#FFFFFF',
+                            border: '1px solid #DEE2E6',
+                            padding: '0.6rem 1rem',
+                            borderRadius: '6px',
+                            fontSize: '0.83rem',
+                            outline: 'none',
+                            cursor: 'pointer',
+                        }}
+                    >
+                        <option value={USER_STATUS.INACTIVE}>Inactive</option>
+                        <option value={USER_STATUS.ACTIVE}>Active</option>
+                        <option value={USER_STATUS.SUSPENDED}>Suspended</option>
+                    </select>
                     <Link
                         href="/user"
                         style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: '#FFFFFF', border: '1px solid #DEE2E6', color: '#212529', padding: '0.5rem 1rem', borderRadius: '6px', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500 }}
@@ -275,7 +381,6 @@ export function UserDetails({ userId }) {
                     <div style={{ height: '1px', background: '#DEE2E6', marginBottom: '1rem' }} />
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <InfoRow label="Email" value={user.email} mono />
-                        <InfoRow label="User ID" value={user._id} mono />
                         {user.mobileNumber ? <InfoRow label="Mobile Number" value={user.mobileNumber} /> : null}
                         {user.referralCode ? <InfoRow label="Referral Code" value={user.referralCode} /> : null}
                         {user.memo ? <InfoRow label="Memo" value={user.memo} /> : null}
@@ -299,7 +404,7 @@ export function UserDetails({ userId }) {
                     gap: '1rem',
                     minWidth: 0,
                 }}>
-                    <div>
+                    {/* <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                             <History size={16} style={{ color: '#6C757D' }} />
                             <h2 style={{ color: '#212529', fontSize: '1rem', fontWeight: 600, margin: 0 }}>Suspend History</h2>
@@ -360,7 +465,7 @@ export function UserDetails({ userId }) {
                             </table>
                         </div>
                     </div>
-                    <div style={{ height: '1px', background: '#DEE2E6', marginBottom: '1rem', marginTop: '1rem' }} />
+                    <div style={{ height: '1px', background: '#DEE2E6', marginBottom: '1rem', marginTop: '1rem' }} /> */}
                     <div>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.25rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -417,7 +522,7 @@ export function UserDetails({ userId }) {
                                 </select>
                             </div>
                         </div>
-                        <div style={{ overflowX: 'auto' }}>
+                        <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid #DEE2E6' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
                                 <thead>
                                     <tr
@@ -428,17 +533,32 @@ export function UserDetails({ userId }) {
                                         }}
                                     >
                                         <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>#</th>
-                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Type</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Trx Hash</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>From</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>To</th>
                                         <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Amount (SOL)</th>
+                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Type</th>
                                         <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Status</th>
-                                        <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Transaction Hash</th>
                                         <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Date & Time</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {transactions.length === 0 ? (
+                                    {transactionLoading ? (
                                         <tr>
-                                            <td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: '#6C757D' }}>
+                                            <td
+                                                colSpan={8}
+                                                style={{
+                                                    padding: '2rem',
+                                                    textAlign: 'center',
+                                                    color: '#6C757D',
+                                                }}
+                                            >
+                                                Loading transactions...
+                                            </td>
+                                        </tr>
+                                    ) : transactions.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={8} style={{ padding: '2rem', textAlign: 'center', color: '#6C757D' }}>
                                                 No transactions found.
                                             </td>
                                         </tr>
@@ -447,6 +567,8 @@ export function UserDetails({ userId }) {
                                             const sig = tx.transactionSignature;
                                             const explorerUrl = sig ? `${explorerBase}/tx/${sig}${clusterParam}` : null;
                                             const start = (pagination.currentPage - 1) * pagination.limit + idx + 1;
+                                            const fromAddress = tx.platformAddress || '-';
+                                            const toAddress = tx.toAddress || '-';
 
                                             return (
                                                 <tr
@@ -456,15 +578,6 @@ export function UserDetails({ userId }) {
                                                 >
                                                     <td style={{ padding: '0.75rem 1rem' }}>
                                                         {start}
-                                                    </td>
-                                                    <td style={{ padding: '0.75rem 1rem' }}>
-                                                        {getTxTypeBadge(tx.transactionType)}
-                                                    </td>
-                                                    <td style={{ padding: '0.75rem 1rem', fontWeight: 500 }}>
-                                                        {Number(tx.amount).toFixed(8)}
-                                                    </td>
-                                                    <td style={{ padding: '0.75rem 1rem' }}>
-                                                        {getTxStatusBadge(tx.status)}
                                                     </td>
                                                     <td style={{ padding: '0.75rem 1rem' }}>
                                                         {sig ? (
@@ -491,6 +604,31 @@ export function UserDetails({ userId }) {
                                                             <span style={{ color: '#6C757D', fontFamily: 'monospace', fontSize: '0.8rem' }}>-</span>
                                                         )}
                                                     </td>
+                                                    <td style={{ padding: '0.85rem 1rem' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                                            <span style={{ fontFamily: 'monospace', color: '#6C757D', fontSize: '0.75rem' }}>
+                                                                {fromAddress.length > 12 ? `${fromAddress.slice(0, 6)}...${fromAddress.slice(-6)}` : fromAddress}
+                                                            </span>
+                                                            {fromAddress !== '-' && <CopyButton text={fromAddress} />}
+                                                        </div>
+                                                    </td>
+                                                    <td style={{ padding: '0.85rem 1rem' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                                            <span style={{ fontFamily: 'monospace', color: '#6C757D', fontSize: '0.75rem' }}>
+                                                                {toAddress.length > 12 ? `${toAddress.slice(0, 6)}...${toAddress.slice(-6)}` : toAddress}
+                                                            </span>
+                                                            {toAddress !== '-' && <CopyButton text={toAddress} />}
+                                                        </div>
+                                                    </td>
+                                                    <td style={{ padding: '0.75rem 1rem', fontWeight: 500 }}>
+                                                        {Number(tx.amount).toFixed(8)}
+                                                    </td>
+                                                    <td style={{ padding: '0.75rem 1rem' }}>
+                                                        {getTxTypeBadge(tx.transactionType)}
+                                                    </td>
+                                                    <td style={{ padding: '0.75rem 1rem' }}>
+                                                        {getTxStatusBadge(tx.status)}
+                                                    </td>
                                                     <td style={{ padding: '0.75rem 1rem', color: '#6C757D', fontSize: '0.8rem' }}>
                                                         {moment(tx.createdAt).format('MMM DD, YYYY HH:mm')}
                                                     </td>
@@ -503,13 +641,13 @@ export function UserDetails({ userId }) {
                         {pagination.totalCount > 0 && (
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.08)', flexWrap: 'wrap', gap: '1rem' }}>
                                 <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
-                                    Showing <strong style={{ color: '#212529' }}>{startEntry}</strong> to <strong style={{ color: '#212529' }}>{endEntry}</strong> of <strong style={{ color: '#212529' }}>{pagination.totalCount}</strong> users
+                                    Showing <strong style={{ color: '#212529' }}>{startEntry}</strong> to <strong style={{ color: '#212529' }}>{endEntry}</strong> of <strong style={{ color: '#212529' }}>{pagination.totalCount}</strong> transactions
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                     <button
                                         type="button"
                                         onClick={() => handlePageChange(pagination.currentPage - 1)}
-                                        disabled={pagination.currentPage <= 1 || loading}
+                                        disabled={pagination.currentPage <= 1 || transactionLoading}
                                         style={{
                                             width: '36px',
                                             height: '36px',
@@ -540,7 +678,7 @@ export function UserDetails({ userId }) {
                                                 key={`p-${p}`}
                                                 type="button"
                                                 onClick={() => handlePageChange(p)}
-                                                disabled={loading || p === pagination.currentPage}
+                                                disabled={transactionLoading || p === pagination.currentPage}
                                                 style={{
                                                     minWidth: '36px',
                                                     height: '36px',
@@ -563,7 +701,7 @@ export function UserDetails({ userId }) {
                                     <button
                                         type="button"
                                         onClick={() => handlePageChange(pagination.currentPage + 1)}
-                                        disabled={pagination.currentPage >= pagination.totalPages || loading}
+                                        disabled={pagination.currentPage >= pagination.totalPages || transactionLoading}
                                         style={{
                                             width: '36px',
                                             height: '36px',
@@ -585,6 +723,15 @@ export function UserDetails({ userId }) {
                     </div>
                 </div>
             </div>
+
+            {suspendModal && (
+                <SuspendModal
+                    user={suspendModal}
+                    onConfirm={handleStatusAction}
+                    onClose={() => setSuspendModal(null)}
+                    loading={loading}
+                />
+            )}
         </div>
     );
 };

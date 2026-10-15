@@ -9,17 +9,11 @@ import {
     ChevronLeft,
     ChevronRight,
     CheckCircle2,
-    XCircle,
     Clock,
     ShieldOff,
-    ShieldCheck,
-    X,
-    AlertTriangle,
     Users,
     Eye,
     RefreshCw,
-    Filter,
-    History,
 } from 'lucide-react';
 import {
     USER_STATUS,
@@ -52,144 +46,6 @@ function getStatusBadge(status) {
     );
 };
 
-function getTwoFABadge(twoFAStatus) {
-    if (twoFAStatus === TWOFA_STATUS.ENABLED) {
-        return (
-            <span style={{ background: 'rgba(153,69,255,0.12)', color: '#9945FF', border: '1px solid rgba(153,69,255,0.3)', padding: '0.2rem 0.55rem', borderRadius: '20px', fontSize: '0.73rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
-                <ShieldCheck size={11} /> ON
-            </span>
-        );
-    };
-
-    return (
-        <span style={{ background: 'rgba(100,116,139,0.12)', color: '#64748b', border: '1px solid rgba(100,116,139,0.2)', padding: '0.2rem 0.55rem', borderRadius: '20px', fontSize: '0.73rem', fontWeight: 700 }}>
-            OFF
-        </span>
-    );
-};
-
-// Suspend Modal
-function SuspendModal({ user, onConfirm, onClose, loading }) {
-    const [reason, setReason] = useState('');
-
-    return (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-            <div style={{ background: '#0f1422', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '6px', width: '100%', maxWidth: '480px', padding: '2rem', boxShadow: '0 25px 60px rgba(0,0,0,0.7)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                        <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(239,68,68,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <AlertTriangle size={20} style={{ color: '#ef4444' }} />
-                        </div>
-                        <div>
-                            <h3 style={{ color: '#212529', fontWeight: 800, fontSize: '1.05rem', margin: 0 }}>Suspend User</h3>
-                            <p style={{ color: '#94a3b8', fontSize: '0.78rem', margin: 0 }}>{user?.email}</p>
-                        </div>
-                    </div>
-                    <button type="button" onClick={onClose} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8', padding: '0.4rem', borderRadius: '8px', cursor: 'pointer' }}>
-                        <X size={16} />
-                    </button>
-                </div>
-
-                <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '12px', padding: '0.85rem 1rem', marginBottom: '1.25rem' }}>
-                    <p style={{ color: '#fca5a5', fontSize: '0.83rem', margin: 0, lineHeight: 1.5 }}>
-                        This will immediately restrict the user&apos;s access to the platform. Please provide a reason for suspension.
-                    </p>
-                </div>
-
-                <div style={{ marginBottom: '1.5rem' }}>
-                    <label style={{ display: 'block', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-                        Suspension Reason <span style={{ color: '#ef4444' }}>*</span>
-                    </label>
-                    <textarea
-                        value={reason}
-                        onChange={(e) => setReason(e.target.value)}
-                        placeholder="Enter reason for suspension (e.g., Suspicious activity, Terms violation...)"
-                        rows={3}
-                        style={{
-                            width: '100%',
-                            background: 'rgba(7,9,14,0.8)',
-                            border: '1px solid rgba(255,255,255,0.12)',
-                            borderRadius: '12px',
-                            padding: '0.75rem 1rem',
-                            color: '#212529',
-                            fontSize: '0.88rem',
-                            outline: 'none',
-                            resize: 'vertical',
-                            fontFamily: 'inherit',
-                            minHeight: '80px',
-                        }}
-                    />
-                </div>
-
-                <div style={{ display: 'flex', gap: '0.75rem' }}>
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        style={{ flex: 1, padding: '0.75rem', borderRadius: '12px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8', fontWeight: 600, cursor: 'pointer', fontSize: '0.88rem' }}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => onConfirm(reason)}
-                        disabled={loading || reason.trim().length < 3}
-                        style={{ flex: 1, padding: '0.75rem', borderRadius: '12px', background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', border: 'none', color: '#212529', fontWeight: 700, cursor: reason.trim().length < 3 || loading ? 'not-allowed' : 'pointer', fontSize: '0.88rem', opacity: reason.trim().length < 3 || loading ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
-                    >
-                        <ShieldOff size={15} />
-                        {loading ? 'Suspending...' : 'Confirm Suspend'}
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-// Suspend History Modal
-function SuspendHistoryModal({ user, onClose }) {
-    return (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-            <div style={{ background: '#0f1422', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', width: '100%', maxWidth: '520px', maxHeight: '80vh', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 60px rgba(0,0,0,0.7)' }}>
-                <div style={{ padding: '1.5rem', borderBottom: '1px solid #DEE2E6', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                        <History size={20} style={{ color: '#9945FF' }} />
-                        <div>
-                            <h3 style={{ color: '#212529', fontWeight: 800, fontSize: '1rem', margin: 0 }}>Suspend History</h3>
-                            <p style={{ color: '#94a3b8', fontSize: '0.75rem', margin: 0 }}>{user?.email}</p>
-                        </div>
-                    </div>
-                    <button type="button" onClick={onClose} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8', padding: '0.4rem', borderRadius: '8px', cursor: 'pointer' }}>
-                        <X size={16} />
-                    </button>
-                </div>
-                <div style={{ padding: '1.25rem', overflowY: 'auto', flex: 1 }}>
-                    {(!user?.suspendHistory || user.suspendHistory.length === 0) ? (
-                        <div style={{ textAlign: 'center', color: '#64748b', padding: '2rem', fontSize: '0.88rem' }}>
-                            No suspension history found.
-                        </div>
-                    ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                            {[...user.suspendHistory].reverse().map((entry, i) => (
-                                <div key={i} style={{ background: 'rgba(10,14,26,0.6)', borderRadius: '12px', padding: '0.9rem 1rem', border: '1px solid rgba(255,255,255,0.07)' }}>
-                                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                                        <span style={{ color: '#fca5a5', fontSize: '0.8rem', fontWeight: 600 }}>Reason:</span>
-                                        <span style={{ color: '#cbd5e1', fontSize: '0.82rem', textAlign: 'right', flex: 1 }}>{entry.reason}</span>
-                                    </div>
-                                    <div style={{ display: 'flex', gap: '1rem', fontSize: '0.75rem', color: '#64748b', flexWrap: 'wrap' }}>
-                                        <span>🔴 Suspended: {moment(entry.suspendedAt).format('MMM DD, YYYY HH:mm')}</span>
-                                        {entry.activatedAt && (
-                                            <span>🟢 Activated: {moment(entry.activatedAt).format('MMM DD, YYYY HH:mm')}</span>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-};
-
 export function UserManagement() {
     const [loading, setLoading] = useState(false);
     const [users, setUsers] = useState([]);
@@ -208,11 +64,6 @@ export function UserManagement() {
 
     const [debouncedName, setDebouncedName] = useState('');
     const [debouncedEmail, setDebouncedEmail] = useState('');
-
-    // Modals
-    const [suspendModal, setSuspendModal] = useState(null);
-    const [historyModal, setHistoryModal] = useState(null);
-    const [actionLoading, setActionLoading] = useState(false);
 
     useEffect(() => {
         const t = setTimeout(() => {
@@ -281,46 +132,6 @@ export function UserManagement() {
     const handlePageChange = (pg) => {
         if (pg >= 1 && pg <= pagination.totalPages && !loading) {
             setPagination(p => ({ ...p, currentPage: pg }));
-        };
-    };
-
-    const handleConfirmSuspend = async (reason) => {
-        if (!suspendModal) return;
-
-        setActionLoading(true);
-
-        try {
-            const payload = {
-                action: USER_STATUS.SUSPENDED,
-                reason,
-            };
-            const res = await axios.patch(`/api/admin/users/${suspendModal._id}/status`, payload);
-            if (res.data?.flag) {
-                setUsers(prev => prev.map(u => u._id === suspendModal._id ? res.data.data.user : u));
-                setSuspendModal(null);
-            };
-        } catch (err) {
-            console.error('Failed to suspend user:', err);
-        } finally {
-            setActionLoading(false);
-        };
-    };
-
-    const handleActivate = async (user) => {
-        setActionLoading(true);
-        try {
-            const payload = {
-                action: USER_STATUS.ACTIVE
-            };
-
-            const res = await axios.patch(`/api/admin/users/${user._id}/status`, payload);
-            if (res.data?.flag) {
-                setUsers(prev => prev.map(u => u._id === user._id ? res.data.data.user : u));
-            };
-        } catch (err) {
-            console.error('Failed to activate user:', err);
-        } finally {
-            setActionLoading(false);
         };
     };
 
@@ -552,26 +363,6 @@ export function UserManagement() {
                                             >
                                                 <Eye size={13} /> View Details
                                             </Link>
-                                            {/* Suspend / Activate */}
-                                            {user.status === USER_STATUS.SUSPENDED ? (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleActivate(user)}
-                                                    disabled={actionLoading}
-                                                    style={{ background: 'rgba(20,241,149,0.12)', border: '1px solid rgba(20,241,149,0.25)', color: '#0D6EFD', padding: '0.35rem 0.7rem', borderRadius: '8px', cursor: actionLoading ? 'not-allowed' : 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.73rem', fontWeight: 700 }}
-                                                >
-                                                    <ShieldCheck size={13} /> Activate
-                                                </button>
-                                            ) : (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setSuspendModal(user)}
-                                                    disabled={actionLoading}
-                                                    style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.25)', color: '#ef4444', padding: '0.35rem 0.7rem', borderRadius: '8px', cursor: actionLoading ? 'not-allowed' : 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.73rem', fontWeight: 700 }}
-                                                >
-                                                    <ShieldOff size={13} /> Suspend
-                                                </button>
-                                            )}
                                         </div>
                                     </td>
                                 </tr>
@@ -664,22 +455,6 @@ export function UserManagement() {
                     </div>
                 )}
             </div>
-
-            {/* Modals */}
-            {suspendModal && (
-                <SuspendModal
-                    user={suspendModal}
-                    onConfirm={handleConfirmSuspend}
-                    onClose={() => setSuspendModal(null)}
-                    loading={actionLoading}
-                />
-            )}
-            {historyModal && (
-                <SuspendHistoryModal
-                    user={historyModal}
-                    onClose={() => setHistoryModal(null)}
-                />
-            )}
         </div>
     );
 };

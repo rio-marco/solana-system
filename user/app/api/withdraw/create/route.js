@@ -65,13 +65,13 @@ async function POST(req) {
             amount: amountVal.numericAmount,
             platformFee: Number(withdrawFee),
             platformAddress: platformAddressStr,
-            status: 'PENDING',
+            status: constants.TRANSACTION_STATUS.PENDING,
         });
         await transaction.save();
 
         let txResult;
         try {
-            transaction.status = 'PROCESSING';
+            transaction.status = constants.TRANSACTION_STATUS.PROCESSING;
             await transaction.save();
 
             txResult = await executeWithdrawalTransaction({
@@ -82,11 +82,11 @@ async function POST(req) {
 
             transaction.transactionSignature = txResult.signature;
             transaction.fromAddress = txResult.fromAddress;
-            transaction.status = 'CONFIRMED';
+            transaction.status = constants.TRANSACTION_STATUS.CONFIRMED;
             transaction.confirmedAt = new Date();
             await transaction.save();
         } catch (txErr) {
-            transaction.status = 'FAILED';
+            transaction.status = constants.TRANSACTION_STATUS.FAILED;
             transaction.failureReason = txErr.message;
             await transaction.save();
 

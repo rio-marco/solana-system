@@ -10,6 +10,7 @@ const cookieParser = require('cookie-parser');
 const next = require('next');
 const connectDB = require('./lib/db');
 const { log1 } = require("./lib/general");
+const { startDepositWatcher } = require('./lib/services/deposit.watcher.service');
 
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const dev = process.env.NODE_ENV !== 'production';
@@ -64,6 +65,8 @@ nextApp.prepare().then(async () => {
     });
 
     await connectDB();
+
+    startDepositWatcher();
 
     httpServer.listen(PORT, '0.0.0.0', () => {
         log1(['Next.js System running on PORT ----->', PORT]);

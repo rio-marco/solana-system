@@ -56,15 +56,15 @@ async function GET(req) {
 
         depositAgg.forEach((item) => {
             depositStats.totalCount += item.count;
-            if (item._id === 'CONFIRMED') {
+            if (item._id === constants.TRANSACTION_STATUS.CONFIRMED) {
                 depositStats.confirmedCount = item.count;
                 depositStats.confirmedAmount = item.totalAmount;
-            } else if (item._id === 'PENDING' || item._id === 'PROCESSING') {
+            } else if (item._id === constants.TRANSACTION_STATUS.PENDING || item._id === constants.TRANSACTION_STATUS.PROCESSING) {
                 depositStats.pendingCount += item.count;
                 depositStats.pendingAmount += item.totalAmount;
-            } else if (item._id === 'FAILED') {
-                depositStats.failedCount = item.count;
-                depositStats.failedAmount = item.totalAmount;
+            } else if (item._id === constants.TRANSACTION_STATUS.FAILED) {
+                depositStats.failedCount += item.count;
+                depositStats.failedAmount += item.totalAmount;
             };
         });
 
@@ -92,15 +92,15 @@ async function GET(req) {
 
         withdrawalAgg.forEach((item) => {
             withdrawalStats.totalCount += item.count;
-            if (item._id === 'CONFIRMED') {
+            if (item._id === constants.TRANSACTION_STATUS.CONFIRMED) {
                 withdrawalStats.confirmedCount = item.count;
                 withdrawalStats.confirmedAmount = item.totalAmount;
-            } else if (item._id === 'PENDING' || item._id === 'PROCESSING') {
+            } else if (item._id === constants.TRANSACTION_STATUS.PENDING || item._id === constants.TRANSACTION_STATUS.PROCESSING) {
                 withdrawalStats.pendingCount += item.count;
                 withdrawalStats.pendingAmount += item.totalAmount;
-            } else if (item._id === 'FAILED') {
-                withdrawalStats.failedCount = item.count;
-                withdrawalStats.failedAmount = item.totalAmount;
+            } else if (item._id === constants.TRANSACTION_STATUS.FAILED) {
+                withdrawalStats.failedCount += item.count;
+                withdrawalStats.failedAmount += item.totalAmount;
             };
         });
 

@@ -16,7 +16,7 @@ const verifyDepositTransaction = async ({
     const existingConfirmed = await Transaction.findOne({
         transactionSignature: signature,
         type: constants.TRX_TYPE.CREDIT,
-        status: 'CONFIRMED',
+        status: constants.TRANSACTION_STATUS.CONFIRMED,
     });
 
     if (existingConfirmed) {

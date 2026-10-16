@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import moment from 'moment';
 import { Pagination } from './Pagination';
+import { TRANSACTION_STATUS } from './ui-constants.mjs';
 
 export function AdminTransactionTable({ refreshTrigger }) {
     const [activeTab, setActiveTab] = useState('deposit'); // 'deposit' | 'withdraw'
@@ -104,7 +105,7 @@ export function AdminTransactionTable({ refreshTrigger }) {
 
     const getStatusBadge = (status) => {
         switch (status) {
-            case 'CONFIRMED':
+            case TRANSACTION_STATUS.CONFIRMED:
                 return (
                     <span
                         style={{
@@ -124,7 +125,7 @@ export function AdminTransactionTable({ refreshTrigger }) {
                         <span>Confirmed</span>
                     </span>
                 );
-            case 'FAILED':
+            case TRANSACTION_STATUS.FAILED:
                 return (
                     <span
                         style={{
@@ -161,7 +162,7 @@ export function AdminTransactionTable({ refreshTrigger }) {
                         }}
                     >
                         <Clock size={12} />
-                        <span>{status || 'Pending'}</span>
+                        <span>Pending</span>
                     </span>
                 );
         };

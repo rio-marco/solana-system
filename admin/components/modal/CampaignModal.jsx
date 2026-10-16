@@ -51,7 +51,7 @@ export default function CampaignModal({ campaign, onConfirm, onClose, loading })
 
     const rewardsTrimmed = String(rewards).trim();
     const rewardsNum = Number(rewardsTrimmed);
-    const isRewardsValid = rewardsTrimmed !== '' && Number.isFinite(rewardsNum) && rewardsNum >= 0;
+    const isRewardsValid = rewardsTrimmed !== '' && Number.isFinite(rewardsNum) && rewardsNum > 0;
 
     const cleanComments = comments.map((c) => c.trim()).filter((c) => c !== '');
     const hasOverlongComment = cleanComments.some((c) => c.length > CAMPAIGN.COMMENT_MAX_LENGTH);
@@ -113,18 +113,24 @@ export default function CampaignModal({ campaign, onConfirm, onClose, loading })
                     <div style={{ position: 'relative' }}>
                         <Gift size={15} style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
                         <input
-                            type="number"
-                            min="0"
+                            type="text"
+                            inputMode="decimal"
                             step="any"
                             value={rewards}
-                            onChange={(e) => setRewards(e.target.value)}
+                            onChange={e => {
+                                const value = e.target.value;
+
+                                if (/^\d*\.?\d*$/.test(value)) {
+                                    setRewards(value);
+                                };
+                            }}
                             placeholder="e.g. 100"
                             style={{ ...inputStyle, paddingLeft: '2.4rem', border: `1px solid ${rewardsTrimmed !== '' && !isRewardsValid ? '#ef4444' : '#DEE2E6'}` }}
                         />
                     </div>
                     {rewardsTrimmed !== '' && !isRewardsValid && (
                         <p style={{ color: '#ef4444', fontSize: '0.75rem', margin: '0.4rem 0 0' }}>
-                            Rewards must be a valid non-negative number.
+                            Rewards must be greater than 0.
                         </p>
                     )}
                 </div>

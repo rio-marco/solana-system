@@ -10,6 +10,7 @@ const ALLOWED_KEYS = [
     'SOLANA_SENDER_PUBLIC_KEY',
     'WITHDRAWAL_PLATFORM_FEE',
     'SOLANA_PLATFORM_PUBLIC_KEY',
+    'UNLOCK_PERIOD_IN_DAYS',
 ];
 
 async function GET(req) {
@@ -56,7 +57,7 @@ async function PATCH(req) {
                 };
 
                 updatePromises.push(
-                    Setting.setVal(key, val, `Platform setting: ${key}`)
+                    Setting.setVal(key, val)
                 );
             };
         };

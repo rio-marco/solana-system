@@ -91,7 +91,8 @@ export function SettingsPanel() {
         SOLANA_SENDER_PRIVATE_KEY: '',
         SOLANA_SENDER_PUBLIC_KEY: '',
         SOLANA_PLATFORM_PUBLIC_KEY: '',
-        WITHDRAWAL_PLATFORM_FEE: '',
+        WITHDRAWAL_PLATFORM_FEE: 0,
+        UNLOCK_PERIOD_IN_DAYS: 1,
         SOLANA_NETWORK: '',
     });
     const [settingsLoading, setSettingsLoading] = useState(false);
@@ -220,6 +221,15 @@ export function SettingsPanel() {
     const explorerUrl = settings.SOLANA_PLATFORM_PUBLIC_KEY
         ? `https://explorer.solana.com/address/${settings.SOLANA_PLATFORM_PUBLIC_KEY}?cluster=${settings.SOLANA_NETWORK || 'devnet'}`
         : '#';
+
+    const handleNumericInput = (key, value) => {
+        if (/^\d*\.?\d*$/.test(value)) {
+            setSettings(prev => ({
+                ...prev,
+                [key]: value,
+            }));
+        };
+    };
 
     return (
         <div>
@@ -465,7 +475,7 @@ export function SettingsPanel() {
                                 {/* Public Key */}
                                 <div style={{ marginBottom: '1rem' }}>
                                     <label style={{ display: 'block', color: '#6C757D', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.45rem' }}>
-                                        SOLANA_SENDER_PUBLIC_KEY
+                                        Solana Sender Public Key
                                         <span style={{ marginLeft: '0.5rem', padding: '0.1rem 0.45rem', borderRadius: '6px', background: 'rgba(20,241,149,0.1)', color: '#14F195', fontSize: '0.68rem' }}>Public</span>
                                     </label>
                                     <input
@@ -480,7 +490,7 @@ export function SettingsPanel() {
                                 {/* Private Key */}
                                 <div style={{ marginBottom: '1rem' }}>
                                     <label style={{ display: 'block', color: '#6C757D', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.45rem' }}>
-                                        SOLANA_SENDER_PRIVATE_KEY
+                                        Solana Sender Private Key
                                         <span style={{ marginLeft: '0.5rem', padding: '0.1rem 0.45rem', borderRadius: '6px', background: 'rgba(239,68,68,0.1)', color: '#fca5a5', fontSize: '0.68rem' }}>Secret</span>
                                     </label>
                                     <div style={{ position: 'relative' }}>
@@ -500,17 +510,56 @@ export function SettingsPanel() {
                                 {/* Platform Fee */}
                                 <div style={{ marginBottom: '1.5rem' }}>
                                     <label style={{ display: 'block', color: '#6C757D', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.45rem' }}>
-                                        WITHDRAWAL_PLATFORM_FEE
-                                        <span style={{ marginLeft: '0.5rem', padding: '0.1rem 0.45rem', borderRadius: '6px', background: 'rgba(245,158,11,0.1)', color: '#f59e0b', fontSize: '0.68rem' }}>SOL amount</span>
+                                        Withdrawal Platform Fee
+                                        <span style={{ marginLeft: '0.5rem', padding: '0.1rem 0.45rem', borderRadius: '6px', background: 'rgba(245,158,11,0.1)', color: '#f59e0b', fontSize: '0.68rem' }}>BTCR amount</span>
                                     </label>
                                     <input
                                         type="text"
+                                        inputMode="decimal"
                                         value={settings.WITHDRAWAL_PLATFORM_FEE}
-                                        onChange={e => setSettings(s => ({ ...s, WITHDRAWAL_PLATFORM_FEE: e.target.value }))}
+                                        onChange={e => handleNumericInput('WITHDRAWAL_PLATFORM_FEE', e.target.value)}
                                         placeholder="e.g. 0.001"
                                         style={inputStyle}
                                     />
-                                    <p style={{ color: '#475569', fontSize: '0.75rem', marginTop: '0.4rem' }}>Fee deducted per withdrawal transaction (in SOL).</p>
+                                    <p style={{ color: '#475569', fontSize: '0.75rem', marginTop: '0.4rem' }}>
+                                        Fee deducted per withdrawal transaction (in BTCR).
+                                    </p>
+                                </div>
+
+                                {/* Unlock Period */}
+                                <div style={{ marginBottom: '1.5rem' }}>
+                                    <label style={{ display: 'block', color: '#6C757D', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.45rem' }}>
+                                        Unlock Period
+                                        <span
+                                            style={{
+                                                marginLeft: '0.5rem',
+                                                padding: '0.2rem 0.45rem',
+                                                borderRadius: '6px',
+                                                background: '#E7F1FF',
+                                                color: '#0D6EFD',
+                                                fontSize: '0.68rem',
+                                            }}
+                                        >
+                                            In Days
+                                        </span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        inputMode="decimal"
+                                        value={settings.UNLOCK_PERIOD_IN_DAYS}
+                                        onChange={e => {
+                                            const value = e.target.value;
+
+                                            if (/^\d*$/.test(value)) {
+                                                setSettings(prev => ({ ...prev, UNLOCK_PERIOD_IN_DAYS: value }));
+                                            };
+                                        }}
+                                        placeholder="Enter number of days"
+                                        style={inputStyle}
+                                    />
+                                    <p style={{ color: '#475569', fontSize: '0.75rem', marginTop: '0.4rem' }}>
+                                        Number of days after the amount becomes available.
+                                    </p>
                                 </div>
 
                                 <button

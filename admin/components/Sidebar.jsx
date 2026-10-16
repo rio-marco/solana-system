@@ -19,11 +19,11 @@ import {
 
 const NAV_ITEMS = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, href: '/' },
-    { id: 'users', label: 'User Management', icon: Users, href: '/user' },
-    { id: 'managers', label: 'Manager Management', icon: UserCog, href: '/manager' },
-    { id: 'deposits', label: 'Deposit Management', icon: ArrowDownLeft, href: '/deposit' },
-    { id: 'withdrawals', label: 'Withdraw Management', icon: ArrowUpRight, href: '/withdraw' },
-    { id: 'campaigns', label: 'Campaign Management', icon: Megaphone, href: '/campaign' },
+    { id: 'users', label: 'User', icon: Users, href: '/user' },
+    { id: 'managers', label: 'Manager', icon: UserCog, href: '/manager' },
+    { id: 'deposits', label: 'Deposit', icon: ArrowDownLeft, href: '/deposit' },
+    { id: 'withdrawals', label: 'Withdraw', icon: ArrowUpRight, href: '/withdraw' },
+    { id: 'campaigns', label: 'Campaign', icon: Megaphone, href: '/campaign' },
     { id: 'settings', label: 'Settings', icon: Settings, href: '/setting' },
 ];
 

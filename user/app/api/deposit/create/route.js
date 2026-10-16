@@ -35,25 +35,32 @@ async function POST(req) {
         const platformPubKey = await getPlatformReceivingAddress(true);
         const platformAddressStr = platformPubKey.toBase58();
 
-        const txId = `DEP-${uuidv4().substring(0, 8).toUpperCase()}`;
+        // const txId = `DEP-${uuidv4().substring(0, 8).toUpperCase()}`;
+        const txId = `DEP-${uuidv4().toUpperCase()}`;
 
         const transaction = new Transaction({
             userId: user._id,
             txId,
-            type: constants.TRX_TYPE.DEPOSIT,
-            coin: constants.COIN.SOL,
-            memo: memoVal.cleanMemo,
+            type: constants.TRX_TYPE.CREDIT,
+            coin: constants.COIN.BTCR,
+            memo: {
+                id: memoVal.cleanMemo,
+                coin: constants.COIN.SOL,
+                amount: amountVal.numericAmount,
+                date: new Date(),
+                trx_id: null,
+            },
             amount: amountVal.numericAmount,
             platformAddress: platformAddressStr,
             toAddress: platformAddressStr,
-            status: 'PENDING',
+            status: constants.TRANSACTION_STATUS.PENDING,
         });
 
         await transaction.save();
 
         let txResult;
         try {
-            transaction.status = 'PROCESSING';
+            transaction.status = constants.TRANSACTION_STATUS.PROCESSING;
             transaction.submittedAt = new Date();
 
             await transaction.save();
@@ -63,17 +70,20 @@ async function POST(req) {
                 amount: amountVal.numericAmount,
                 recipientPublicKey: platformPubKey,
             });
-
-            transaction.transactionSignature = txResult.signature;
-            await transaction.save();
         } catch (txErr) {
-            transaction.status = 'FAILED';
+            transaction.status = constants.TRANSACTION_STATUS.FAILED;
             transaction.failureReason = `Transaction Execution Error: ${txErr.message}`;
+
             await transaction.save();
 
             log1(["Deposit execution failed:", txErr.message]);
             return errorResponse("Deposit execution failed");
         };
+
+        transaction.transactionSignature = txResult.signature;
+        transaction.memo.trx_id = txResult.signature;
+
+        await transaction.save();
 
         const verifyResult = await verifyDepositTransaction({
             signature: txResult.signature,
@@ -83,25 +93,50 @@ async function POST(req) {
         });
 
         if (!verifyResult.isValid) {
-            transaction.status = 'FAILED';
+            transaction.status = constants.TRANSACTION_STATUS.FAILED;
             transaction.failureReason = verifyResult.failureReason;
+
             await transaction.save();
 
             log1(["Deposit verification failed:", verifyResult.failureReason]);
             return errorResponse("Deposit verification failed");
         };
 
-        transaction.status = 'CONFIRMED';
-        transaction.confirmedAt = new Date();
-        transaction.slot = verifyResult.slot;
-        transaction.blockTime = verifyResult.blockTime;
-        await transaction.save();
+        const confirmedTransaction = await Transaction.findOneAndUpdate(
+            {
+                _id: transaction._id,
+                status: constants.TRANSACTION_STATUS.PROCESSING,
+                transactionSignature: txResult.signature,
+            },
+            {
+                $set: {
+                    status: constants.TRANSACTION_STATUS.CONFIRMED,
+                    confirmedAt: new Date(),
+                    slot: verifyResult.slot,
+                    blockTime: verifyResult.blockTime,
+                },
+            },
+            { new: true }
+        );
+
+        if (!confirmedTransaction) {
+            return errorResponse("Transaction is not eligible for confirmation or was already processed.");
+        };
 
         const updatedUser = await User.findByIdAndUpdate(
             user._id,
-            { $inc: { solBalance: amountVal.numericAmount } },
+            {
+                $inc: {
+                    solBalance: amountVal.numericAmount,
+                    btcrBalance: amountVal.numericAmount,
+                },
+            },
             { new: true }
         );
+
+        if (!updatedUser) {
+            return errorResponse("User not found while crediting deposit.");
+        };
 
         const newNotif = await Notification.create({
             userId: user._id,

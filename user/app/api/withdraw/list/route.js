@@ -16,7 +16,7 @@ async function GET(req) {
         const limit = Math.max(1, Math.min(100, parseInt(searchParams.get('limit') || '10', 10)));
         const skip = (page - 1) * limit;
 
-        const filter = { userId: sessionAuth.userId, type: constants.TRX_TYPE.WITHDRAW };
+        const filter = { userId: sessionAuth.userId, type: constants.TRX_TYPE.DEBIT };
 
         const totalCount = await Transaction.countDocuments(filter);
         const totalPages = Math.ceil(totalCount / limit) || 0;

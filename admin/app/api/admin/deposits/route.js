@@ -23,7 +23,7 @@ async function GET(req) {
         const pubKeyStr = (await Setting.getVal('SOLANA_PLATFORM_PUBLIC_KEY'));
 
         const filter = {
-            type: constants.TRX_TYPE.DEPOSIT,
+            type: constants.TRX_TYPE.CREDIT,
             platformAddress: pubKeyStr,
         };
 

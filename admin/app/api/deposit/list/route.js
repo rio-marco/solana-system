@@ -19,7 +19,7 @@ async function GET(req) {
 
         const pubKeyStr = (await Setting.getVal('SOLANA_PLATFORM_PUBLIC_KEY'));
 
-        const filter = { type: constants.TRX_TYPE.DEPOSIT, platformAddress: pubKeyStr };
+        const filter = { type: constants.TRX_TYPE.CREDIT, platformAddress: pubKeyStr };
 
         const totalCount = await Transaction.countDocuments(filter);
         const totalPages = Math.ceil(totalCount / limit) || 1;

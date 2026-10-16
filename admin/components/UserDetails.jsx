@@ -99,7 +99,7 @@ function getTxStatusBadge(status) {
 };
 
 function getTxTypeBadge(type) {
-    if (type === TRX_TYPE.DEPOSIT) {
+    if (type === TRX_TYPE.CREDIT) {
         return <span style={{ ...STATUS_BADGE_STYLE, background: '#D1E7DD', color: '#198754', border: '1px solid #A3CFBB' }}>Deposit</span>;
     };
 
@@ -153,8 +153,8 @@ export function UserDetails({ userId }) {
         currentPage: DEFAULT_CURRENT_PAGE,
         limit: DEFAULT_ITEM_PER_PAGE,
     });
-    const [txType, setTxType] = useState('ALL');
-    const [txStatus, setTxStatus] = useState('ALL');
+    const [txType, setTxType] = useState('');
+    const [txStatus, setTxStatus] = useState('');
     const [userStatus, setUserStatus] = useState(USER_STATUS.INACTIVE);
 
     const [suspendModal, setSuspendModal] = useState(null);
@@ -628,9 +628,9 @@ export function UserDetails({ userId }) {
                                         fontSize: '0.8rem',
                                     }}
                                 >
-                                    <option value="ALL">All Transactions</option>
-                                    <option value="DEPOSIT">Deposits</option>
-                                    <option value="WITHDRAW">Withdrawals</option>
+                                    <option value="">All Transactions</option>
+                                    <option value={TRX_TYPE.CREDIT}>Credit</option>
+                                    <option value={TRX_TYPE.DEBIT}>Debit</option>
                                 </select>
                                 <select
                                     value={txStatus}
@@ -643,11 +643,11 @@ export function UserDetails({ userId }) {
                                         fontSize: '0.8rem',
                                     }}
                                 >
-                                    <option value="ALL">All Status</option>
-                                    <option value="PENDING">Pending</option>
-                                    <option value="PROCESSING">Processing</option>
-                                    <option value="CONFIRMED">Confirmed</option>
-                                    <option value="FAILED">Failed</option>
+                                    <option value="">All Status</option>
+                                    <option value={TRANSACTION_STATUS.PENDING}>Pending</option>
+                                    <option value={TRANSACTION_STATUS.PROCESSING}>Processing</option>
+                                    <option value={TRANSACTION_STATUS.CONFIRMED}>Confirmed</option>
+                                    <option value={TRANSACTION_STATUS.FAILED}>Failed</option>
                                 </select>
                                 <select
                                     value={pagination.limit}

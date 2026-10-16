@@ -30,8 +30,8 @@ async function GET(req) {
 
         // Deposits Stats (matching addressStr if present, or all platform deposits)
         const baseMatchQuery = addressStr ? { platformAddress: addressStr } : {};
-        const depositMatchQuery = { ...baseMatchQuery, type: constants.TRX_TYPE.DEPOSIT };
-        const withdrawMatchQuery = { ...baseMatchQuery, type: constants.TRX_TYPE.WITHDRAW };
+        const depositMatchQuery = { ...baseMatchQuery, type: constants.TRX_TYPE.CREDIT };
+        const withdrawMatchQuery = { ...baseMatchQuery, type: constants.TRX_TYPE.DEBIT };
 
         const depositAgg = await Transaction.aggregate([
             { $match: depositMatchQuery },

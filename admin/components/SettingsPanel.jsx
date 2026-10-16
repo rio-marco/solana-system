@@ -88,8 +88,6 @@ export function SettingsPanel() {
 
     // Platform settings state
     const [settings, setSettings] = useState({
-        SOLANA_SENDER_PRIVATE_KEY: '',
-        SOLANA_SENDER_PUBLIC_KEY: '',
         SOLANA_PLATFORM_PUBLIC_KEY: '',
         WITHDRAWAL_PLATFORM_FEE: 0,
         UNLOCK_PERIOD_IN_DAYS: 1,
@@ -98,7 +96,6 @@ export function SettingsPanel() {
     const [settingsLoading, setSettingsLoading] = useState(false);
     const [fetchingSettings, setFetchingSettings] = useState(true);
     const [settingsMsg, setSettingsMsg] = useState(null);
-    const [showPrivKey, setShowPrivKey] = useState(false);
 
     const fetchPlatformSettings = useCallback(async () => {
         setFetchingSettings(true);
@@ -471,41 +468,6 @@ export function SettingsPanel() {
                         ) : (
                             <form onSubmit={handleSettingsSave}>
                                 {settingsMsg && <Alert type={settingsMsg.type} message={settingsMsg.text} />}
-
-                                {/* Public Key */}
-                                <div style={{ marginBottom: '1rem' }}>
-                                    <label style={{ display: 'block', color: '#6C757D', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.45rem' }}>
-                                        Solana Sender Public Key
-                                        <span style={{ marginLeft: '0.5rem', padding: '0.1rem 0.45rem', borderRadius: '6px', background: 'rgba(20,241,149,0.1)', color: '#14F195', fontSize: '0.68rem' }}>Public</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={settings.SOLANA_SENDER_PUBLIC_KEY}
-                                        onChange={e => setSettings(s => ({ ...s, SOLANA_SENDER_PUBLIC_KEY: e.target.value }))}
-                                        placeholder="Solana public key (base58)"
-                                        style={{ ...inputStyle, fontFamily: 'monospace', fontSize: '0.82rem' }}
-                                    />
-                                </div>
-
-                                {/* Private Key */}
-                                <div style={{ marginBottom: '1rem' }}>
-                                    <label style={{ display: 'block', color: '#6C757D', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.45rem' }}>
-                                        Solana Sender Private Key
-                                        <span style={{ marginLeft: '0.5rem', padding: '0.1rem 0.45rem', borderRadius: '6px', background: 'rgba(239,68,68,0.1)', color: '#fca5a5', fontSize: '0.68rem' }}>Secret</span>
-                                    </label>
-                                    <div style={{ position: 'relative' }}>
-                                        <input
-                                            type={showPrivKey ? 'text' : 'password'}
-                                            value={settings.SOLANA_SENDER_PRIVATE_KEY}
-                                            onChange={e => setSettings(s => ({ ...s, SOLANA_SENDER_PRIVATE_KEY: e.target.value }))}
-                                            placeholder="Solana private key (base58)"
-                                            style={{ ...inputStyle, fontFamily: 'monospace', fontSize: '0.82rem', paddingRight: '3rem' }}
-                                        />
-                                        <button type="button" onClick={() => setShowPrivKey(v => !v)} style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: 0 }}>
-                                            {showPrivKey ? <EyeOff size={16} /> : <Eye size={16} />}
-                                        </button>
-                                    </div>
-                                </div>
 
                                 {/* Platform Fee */}
                                 <div style={{ marginBottom: '1.5rem' }}>

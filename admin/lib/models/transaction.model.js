@@ -39,10 +39,28 @@ const TransactionSchema = new mongoose.Schema(
             default: 0,
         },
         memo: {
-            type: String,
-            required: true,
-            trim: true,
-            index: true,
+            _id: false,
+            id: {
+                type: String,
+                default: null,
+            },
+            trx_id: {
+                type: String,
+                default: null,
+            },
+            coin: {
+                type: String,
+                enum: Object.values(constants.COIN),
+                default: null,
+            },
+            amount: {
+                type: Number,
+                default: null,
+            },
+            date: {
+                type: Date,
+                default: null,
+            },
         },
         platformAddress: {
             type: String,
@@ -99,8 +117,12 @@ const TransactionSchema = new mongoose.Schema(
     },
 );
 
-TransactionSchema.index({ type: 1, status: 1, createdAt: -1 });
-TransactionSchema.index({ userId: 1, type: 1, createdAt: -1 });
-TransactionSchema.index({ platformAddress: 1 });
+TransactionSchema.index({
+    userId: 1,
+    type: 1,
+    status: 1,
+    createdAt: -1,
+    platformAddress: 1,
+});
 
 module.exports = mongoose.models.Transaction || mongoose.model('Transaction', TransactionSchema);

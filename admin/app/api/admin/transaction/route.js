@@ -19,24 +19,22 @@ async function GET(req) {
         const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
         const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '10', 10)));
 
-        const txType = (searchParams.get('txType') || 'ALL').toUpperCase();
+        const txType = (searchParams.get('txType') || '');
         const txStatus = searchParams.get('txStatus') || '';
         const userId = searchParams.get('userId') || '';
 
         const filter = {};
 
-        if (txStatus && txStatus !== 'ALL') {
-            filter.status = txStatus;
+        if (txStatus) {
+            filter.status = Number(txStatus);
         };
 
         if (userId && mongoose.isValidObjectId(userId)) {
             filter.userId = userId;
         };
 
-        if (txType === 'DEPOSIT') {
-            filter.type = constants.TRX_TYPE.DEPOSIT;
-        } else if (txType === 'WITHDRAW') {
-            filter.type = constants.TRX_TYPE.WITHDRAW;
+        if (txType) {
+            filter.type = Number(txType);
         };
 
         const totalCount = await Transaction.countDocuments(filter);

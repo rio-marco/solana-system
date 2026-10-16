@@ -52,8 +52,8 @@ module.exports = {
     },
 
     TRX_TYPE: {
-        DEPOSIT: 0,
-        WITHDRAW: 1,
+        CREDIT: 1,
+        DEBIT: 2,
     },
 
     COIN: {

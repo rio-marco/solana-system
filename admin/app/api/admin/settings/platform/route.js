@@ -6,8 +6,6 @@ const { errorResponse, successResponse, authErrorResponse, log1 } = require('../
 const Setting = require('../../../../../lib/models/setting.model');
 
 const ALLOWED_KEYS = [
-    'SOLANA_SENDER_PRIVATE_KEY',
-    'SOLANA_SENDER_PUBLIC_KEY',
     'WITHDRAWAL_PLATFORM_FEE',
     'SOLANA_PLATFORM_PUBLIC_KEY',
     'UNLOCK_PERIOD_IN_DAYS',

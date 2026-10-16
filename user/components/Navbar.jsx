@@ -95,9 +95,6 @@ export const Navbar = () => {
                             <div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                     <span style={{ fontWeight: 900, fontSize: '1.15rem', letterSpacing: '0.5px', color: '#fff' }}>SOLANA SYSTEM</span>
-                                    <span style={{ fontSize: '0.72rem', padding: '0.25rem 0.65rem', borderRadius: '12px', background: 'var(--solana-gradient)', color: '#ffffff', fontWeight: 800 }}>
-                                        USER PANEL
-                                    </span>
                                 </div>
                                 <span style={{ fontSize: '0.65rem', padding: '0.15rem 0.5rem', borderRadius: '20px', background: 'rgba(153,69,255,0.15)', color: '#9945FF', border: '1px solid rgba(153,69,255,0.3)', textTransform: 'uppercase', fontWeight: 700 }}>
                                     {config?.network || 'devnet'}

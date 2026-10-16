@@ -41,8 +41,8 @@ export const TWOFA_STATUS = {
 };
 
 export const TRX_TYPE = {
-    DEPOSIT: 0,
-    WITHDRAW: 1,
+    CREDIT: 1,
+    DEBIT: 2,
 };
 
 export const TRANSACTION_STATUS = {

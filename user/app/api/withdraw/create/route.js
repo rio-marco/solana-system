@@ -58,7 +58,7 @@ async function POST(req) {
         const transaction = new Transaction({
             userId: user._id,
             txId,
-            type: constants.TRX_TYPE.WITHDRAW,
+            type: constants.TRX_TYPE.DEBIT,
             coin: constants.COIN.SOL,
             toAddress: toAddress.trim(),
             memo: memoVal.cleanMemo,

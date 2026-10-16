@@ -204,13 +204,15 @@ export function DepositManagement() {
                                         </td>
                                         <td style={{ padding: '0.85rem 1rem' }}>
                                             <div style={{ color: '#6C757D', fontFamily: 'monospace', fontSize: '0.78rem' }}>{id}</div>
-                                            <div style={{ color: '#0D6EFD', fontWeight: 700, fontSize: '0.75rem' }}>Memo: {item.memo}</div>
+                                            <div style={{ color: '#0D6EFD', fontWeight: 700, fontSize: '0.75rem' }}>Memo: {item.memo.id}</div>
                                         </td>
                                         <td style={{ padding: '0.85rem 1rem', fontWeight: 800, color: '#0D6EFD' }}>+{item.amount} SOL</td>
                                         <td style={{ padding: '0.85rem 1rem' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                                <span style={{ fontFamily: 'monospace', color: '#6C757D', fontSize: '0.75rem' }}>{targetAddr.length > 12 ? `${targetAddr.slice(0, 6)}...${targetAddr.slice(-6)}` : targetAddr}</span>
-                                                <CopyButton text={targetAddr} />
+                                                <span style={{ fontFamily: 'monospace', color: '#6C757D', fontSize: '0.75rem' }}>
+                                                    {targetAddr.length > 12 ? `${targetAddr.slice(0, 6)}...${targetAddr.slice(-6)}` : targetAddr}
+                                                </span>
+                                                {targetAddr !== '-' && <CopyButton text={targetAddr} />}
                                             </div>
                                         </td>
                                         <td style={{ padding: '0.85rem 1rem' }}>

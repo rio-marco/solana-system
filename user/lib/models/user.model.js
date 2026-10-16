@@ -46,6 +46,11 @@ const UserSchema = new mongoose.Schema(
             default: 0,
             min: 0,
         },
+        availableWithdrawBalance: {
+            type: Number,
+            default: 0,
+            min: 0,
+        },
         twoFASecret: {
             type: String,
             default: null,
@@ -59,6 +64,20 @@ const UserSchema = new mongoose.Schema(
             type: Number,
             enum: Object.values(constants.USER_STATUS),
             default: constants.USER_STATUS.INACTIVE,
+        },
+        suspendReason: {
+            type: String,
+            default: null,
+        },
+        suspendHistory: {
+            type: [
+                {
+                    reason: { type: String, required: true },
+                    suspendedAt: { type: Date, default: Date.now },
+                    activatedAt: { type: Date, default: null },
+                },
+            ],
+            default: [],
         },
     },
     {

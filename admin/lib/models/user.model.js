@@ -46,6 +46,11 @@ const UserSchema = new mongoose.Schema(
             default: 0,
             min: 0,
         },
+        availableWithdrawBalance: {
+            type: Number,
+            default: 0,
+            min: 0,
+        },
         twoFASecret: {
             type: String,
             default: null,

@@ -321,3 +321,148 @@ body {
     box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
     padding: 2rem;
 }
+
+/* ===== User Dashboard Shell (Sidebar + Content) ===== */
+.user-dashboard-shell {
+    display: flex;
+    flex: 1;
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto;
+    gap: 1.5rem;
+    padding: 1.5rem 1rem 2.5rem;
+    align-items: flex-start;
+}
+
+.user-sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 90px;
+    background: rgba(15, 20, 34, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 1rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.user-sidebar-title {
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    padding: 0.35rem 0.75rem 0.6rem;
+}
+
+.user-sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 0.85rem;
+    border-radius: 14px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-muted);
+    text-align: left;
+    transition: all 0.2s ease;
+}
+
+.user-sidebar-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+}
+
+.user-sidebar-item.active {
+    background: var(--solana-gradient);
+    color: #05070a;
+    font-weight: 800;
+    box-shadow: 0 8px 24px rgba(153, 69, 255, 0.35);
+}
+
+.user-content {
+    flex: 1;
+    min-width: 0;
+}
+
+/* 4:8 split for Deposit / Withdraw */
+.deposit-withdraw-split {
+    display: grid;
+    grid-template-columns: 4fr 8fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+/* Copy button rendered inside an input's right side */
+.input-inline-copy {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    height: 34px;
+    padding: 0 0.75rem;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.input-inline-copy:hover {
+    color: #fff;
+    border-color: rgba(20, 241, 149, 0.4);
+}
+
+.input-inline-copy.copied {
+    color: #14F195;
+    border-color: rgba(20, 241, 149, 0.4);
+    background: rgba(20, 241, 149, 0.12);
+}
+
+@media (max-width: 1024px) {
+    .deposit-withdraw-split {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .user-dashboard-shell {
+        flex-direction: column;
+        padding: 1rem;
+    }
+
+    .user-sidebar {
+        position: static;
+        width: 100%;
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 0.6rem;
+    }
+
+    .user-sidebar-title {
+        display: none;
+    }
+
+    .user-sidebar-item {
+        width: auto;
+        flex-shrink: 0;
+        white-space: nowrap;
+        padding: 0.6rem 0.9rem;
+    }
+}

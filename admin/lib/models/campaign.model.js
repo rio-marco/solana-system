@@ -4,9 +4,21 @@ const mongoose = require('mongoose');
 
 const CampaignSchema = new mongoose.Schema(
     {
-        name: { type: String, required: true, trim: true },
-        rewards: { type: Number, required: true, min: 0, default: 0 },
-        comments: { type: [String], default: [] },
+        name: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        rewards: {
+            type: Number,
+            required: true,
+            min: 0,
+            default: 0,
+        },
+        comments: {
+            type: [String],
+            default: [],
+        },
     },
     { timestamps: true },
 );

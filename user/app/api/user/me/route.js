@@ -21,6 +21,8 @@ async function GET(req) {
                     profilePhoto: user.profilePhoto || "",
                     memo: user.memo,
                     solBalance: user.solBalance,
+                    btcrBalance: user.btcrBalance,
+                    status: user.status,
                     is2FAEnabled: user.twoFAStatus === constants.TWOFA_STATUS.ENABLED,
                 },
                 network: process.env.SOLANA_NETWORK || 'devnet',

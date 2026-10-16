@@ -4,10 +4,6 @@ import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { DEFAULT_CURRENT_PAGE, DEFAULT_ITEM_PER_PAGE } from './ui-constants.mjs';
 
-/**
- * Build the list of page numbers (and ellipsis markers) to render.
- * Shared by every list view so pagination logic lives in one place.
- */
 export function getPageNumbers(totalPages, currentPage, maxVisible = 5) {
     if (!totalPages || totalPages < 1) return [];
 

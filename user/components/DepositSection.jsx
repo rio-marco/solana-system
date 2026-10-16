@@ -2,21 +2,23 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { QrCode, Copy, Check, Send, AlertCircle, CheckCircle, Tag } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
+import { QrCode, Copy, Check, AlertCircle, Tag, Wallet } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { copyTextToClipboard } from '../lib/clipboard';
 
-export const DepositSection = ({ onDepositSuccess }) => {
-    const { user, updateUserData } = useAuth();
-    const { toastError, toastSuccess, toastInfo } = useToast();
+export const DepositSection = () => {
+    const { user } = useAuth();
+    const { toastError } = useToast();
     const [address, setAddress] = useState('');
-    const [amount, setAmount] = useState('');
-    const [copied, setCopied] = useState(false);
-    const [loading, setLoading] = useState(false);
     const [fetchingAddr, setFetchingAddr] = useState(false);
+    const [copiedAddress, setCopiedAddress] = useState(false);
+    const [copiedMemo, setCopiedMemo] = useState(false);
     const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(null);
+
+    const memo = user?.memo || '';
+    const balance = user?.solBalance !== undefined ? Number(user.solBalance).toFixed(8) : '0.00000000';
 
     const fetchAddress = async () => {
         try {
@@ -38,72 +40,33 @@ export const DepositSection = ({ onDepositSuccess }) => {
         fetchAddress();
     }, []);
 
-    const copyToClipboard = async () => {
-        if (address) {
-            const ok = await copyTextToClipboard(address);
-            if (ok) {
-                setCopied(true);
-                toastInfo('Deposit address copied to clipboard!');
-                setTimeout(() => setCopied(false), 2000);
-            };
+    const copyAddress = async () => {
+        if (!address) return;
+        const ok = await copyTextToClipboard(address);
+        if (ok) {
+            setCopiedAddress(true);
+            setTimeout(() => setCopiedAddress(false), 2000);
         };
     };
 
-    const handleDeposit = async (e) => {
-        e.preventDefault();
-        setError(null);
-        setSuccess(null);
-
-        const numAmount = parseFloat(amount);
-        if (isNaN(numAmount) || numAmount <= 0) {
-            const msg = 'Please enter a valid deposit amount.';
-            setError(msg);
-            toastError(msg);
-            return;
-        };
-
-        try {
-            setLoading(true);
-            const res = await axios.post('/api/deposit/create', {
-                memo: user?.memo || '',
-                amount: numAmount,
-            });
-
-            if (res.data && res.data.flag) {
-                const succMsg = res.data.msg || `Successfully deposited ${numAmount} SOL on Solana network!`;
-                setSuccess(succMsg);
-                toastSuccess(succMsg);
-                setAmount('');
-
-                if (res.data.data && res.data.data.updatedSolBalance !== undefined) {
-                    updateUserData({ solBalance: res.data.data.updatedSolBalance });
-                };
-
-                if (onDepositSuccess) onDepositSuccess();
-
-                setTimeout(() => setSuccess(null), 3000);
-            } else {
-                const errMsg = res.data?.msg || res.data?.message || 'Deposit failed.';
-                setError(errMsg);
-                toastError(errMsg);
-            };
-        } catch (err) {
-            const errMsg = err.response?.data?.msg || err.response?.data?.message || 'Deposit transaction failed on Solana network.';
-            setError(errMsg);
-            toastError(errMsg);
-        } finally {
-            setLoading(false);
+    const copyMemo = async () => {
+        if (!memo) return;
+        const ok = await copyTextToClipboard(memo);
+        if (ok) {
+            setCopiedMemo(true);
+            setTimeout(() => setCopiedMemo(false), 2000);
         };
     };
 
     return (
-        <div style={{ background: 'rgba(15, 20, 34, 0.85)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '24px', padding: '2rem', height: '100%', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <QrCode size={20} style={{ color: '#14F195' }} />
-                    <span>Deposit System</span>
-                </h2>
+        <div style={{ background: 'rgba(15, 20, 34, 0.85)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '24px', padding: '1.5rem', height: '100%', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                <QrCode size={20} style={{ color: '#14F195' }} />
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', margin: 0 }}>Deposit</h2>
             </div>
+
+            <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.08)', marginBottom: '1rem' }} />
 
             {error && (
                 <div className="solana-alert-danger">
@@ -112,95 +75,107 @@ export const DepositSection = ({ onDepositSuccess }) => {
                 </div>
             )}
 
-            {success && (
-                <div className="solana-alert-success">
-                    <CheckCircle size={18} />
-                    <span>{success}</span>
+            {/* Current Balance */}
+            <div style={{ marginBottom: '1.25rem' }}>
+                <span className="solana-input-label" style={{ marginBottom: '0.3rem' }}>Current Balance</span>
+                <div className="font-mono" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#14F195', fontSize: '1.2rem', fontWeight: 800 }}>
+                    <Wallet size={20} />
+                    <span>{balance} SOL</span>
                 </div>
-            )}
+            </div>
 
-            <form onSubmit={handleDeposit}>
-                {/* Deposit SOL Address Box */}
-                <div className="form-group-custom">
-                    <label className="solana-input-label" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                        <QrCode size={14} style={{ color: '#94a3b8' }} />
-                        <span>DEPOSIT SOL ADDRESS</span>
-                    </label>
-                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                        <input
-                            type="text"
-                            className="solana-input-field font-mono"
-                            value={address || (fetchingAddr ? 'Loading deposit address...' : 'No address generated')}
-                            style={{ paddingLeft: '1rem', fontSize: '0.85rem', flex: 1, background: '#07090e', color: '#14F195' }}
-                            readOnly
-                        />
-                        <button
-                            type="button"
-                            onClick={copyToClipboard}
-                            disabled={!address}
-                            className="solana-btn-outline"
-                            style={{ width: 'auto', padding: '0 1.25rem', height: '48px', fontSize: '0.85rem', flexShrink: 0 }}
-                        >
-                            {copied ? <Check size={16} style={{ color: '#14F195' }} /> : <Copy size={16} />}
-                            <span>{copied ? 'Copied' : 'Copy'}</span>
-                        </button>
-                    </div>
-                </div>
-
-                {/* Memo Tag Input Box (Disabled / Readonly) */}
-                <div className="form-group-custom">
-                    <label className="solana-input-label">Memo *</label>
-                    <div className="solana-input-icon-wrapper">
-                        <Tag className="input-svg-icon" style={{ color: '#94a3b8' }} />
-                        <input
-                            type="text"
-                            className="solana-input-field font-mono"
-                            value={user?.memo || ''}
-                            style={{ paddingLeft: '3rem', fontWeight: 700, opacity: 0.85, background: 'rgba(7,9,14,0.6)' }}
-                            disabled
-                            readOnly
-                        />
-                    </div>
-                </div>
-
-                {/* Amount Input Box */}
-                <div className="form-group-custom">
-                    <label className="solana-input-label">Amount *</label>
-                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                        <span className="font-mono" style={{ position: 'absolute', left: '1.1rem', fontWeight: 700, color: '#00C2FF', fontSize: '0.85rem', pointerEvents: 'none' }}>
-                            SOL
-                        </span>
-                        <input
-                            type="number"
-                            step="0.0001"
-                            min="0.0001"
-                            className="solana-input-field font-mono"
-                            placeholder="0.00"
-                            value={amount}
-                            onChange={(e) => setAmount(e.target.value)}
-                            style={{ paddingLeft: '3.5rem' }}
-                            required
-                        />
-                    </div>
-                </div>
-
-                {/* Submit Deposit Button */}
-                <button
-                    type="submit"
-                    disabled={loading || !address}
-                    className="solana-btn-primary"
-                    style={{ marginTop: '0.75rem' }}
-                >
-                    {loading ? (
-                        <span>Processing Deposit...</span>
+            {/* QR Code of admin-set SOL deposit address */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', background: '#ffffff', color: "#000000", }}>
+                <div style={{ padding: '1rem' }}>
+                    {address ? (
+                        <QRCodeSVG value={address} size={130} level="M" />
                     ) : (
-                        <>
-                            <Send size={18} />
-                            <span>Deposit</span>
-                        </>
+                        <div style={{ width: 180, height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '0.8rem', textAlign: 'center' }}>
+                            {fetchingAddr ? 'Loading address...' : 'No address configured'}
+                        </div>
                     )}
-                </button>
-            </form>
+                </div>
+                <div style={{ fontSize: '0.8rem', paddingLeft: '1rem', paddingTop: '2rem' }}>
+                    Scan or copy your SOL deposit address. Always include the memo.
+                </div>
+            </div>
+
+            <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.08)', marginBottom: '1rem' }} />
+
+            {/* Deposit SOL Address */}
+            <div className="form-group-custom">
+                <label className="solana-input-label" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <QrCode size={14} style={{ color: '#94a3b8' }} />
+                    <span>DEPOSIT SOL ADDRESS</span>
+                </label>
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                    <input
+                        type="text"
+                        className="solana-input-field font-mono"
+                        value={address || (fetchingAddr ? 'Loading deposit address...' : 'No address generated')}
+                        style={{ paddingLeft: '1rem', paddingRight: '6.5rem', fontSize: '0.82rem', background: '#07090e', color: '#14F195' }}
+                        readOnly
+                    />
+                    <button
+                        type="button"
+                        onClick={copyAddress}
+                        disabled={!address}
+                        className={`input-inline-copy${copiedAddress ? ' copied' : ''}`}
+                    >
+                        {copiedAddress ? <Check size={14} /> : <Copy size={14} />}
+                        <span>{copiedAddress ? 'Copied' : 'Copy'}</span>
+                    </button>
+                </div>
+            </div>
+
+            {/* Memo Tag (Readonly) */}
+            <div className="form-group-custom">
+                <label className="solana-input-label">Memo</label>
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                    <Tag size={15} style={{ position: 'absolute', left: '1.1rem', color: '#94a3b8', zIndex: 5, pointerEvents: 'none' }} />
+                    <input
+                        type="text"
+                        className="solana-input-field font-mono"
+                        value={memo}
+                        style={{ paddingLeft: '3rem', paddingRight: '6.5rem', fontWeight: 700, opacity: 0.9, background: 'rgba(7,9,14,0.6)' }}
+                        readOnly
+                    />
+                    <button
+                        type="button"
+                        onClick={copyMemo}
+                        disabled={!memo}
+                        className={`input-inline-copy${copiedMemo ? ' copied' : ''}`}
+                    >
+                        {copiedMemo ? <Check size={14} /> : <Copy size={14} />}
+                        <span>{copiedMemo ? 'Copied' : 'Copy'}</span>
+                    </button>
+                </div>
+            </div>
+
+            {/* Important Notice */}
+            <div
+                style={{
+                    marginTop: '1rem',
+                    background: 'rgba(239, 68, 68, 0.12)',
+                    border: '1px solid rgba(239, 68, 68, 0.4)',
+                    borderLeft: '4px solid #ef4444',
+                    borderRadius: '14px',
+                    padding: '1rem',
+                    display: 'flex',
+                    gap: '0.65rem',
+                    alignItems: 'flex-start',
+                }}
+            >
+                <AlertCircle size={18} style={{ color: '#ef4444', flexShrink: 0, marginTop: '2px' }} />
+                <div>
+                    <div style={{ color: '#ef4444', fontWeight: 800, fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: '0.3rem' }}>
+                        Important Notice
+                    </div>
+                    <p style={{ color: '#fca5a5', fontSize: '0.82rem', lineHeight: 1.5, margin: 0 }}>
+                        Only send SOL to this address and make sure to include the correct memo. Deposits sent without a memo or using any other coin/network may result in permanent loss of funds.
+                    </p>
+                </div>
+            </div>
         </div>
     );
 };

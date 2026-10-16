@@ -6,7 +6,7 @@ import { ArrowUpRight, Send, AlertCircle, CheckCircle, Tag, Wallet } from 'lucid
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 
-export const WithdrawSection = ({ onWithdrawSuccess }) => {
+export const WithdrawSection = () => {
     const { user, updateUserData } = useAuth();
     const { toastError, toastSuccess } = useToast();
     const [toAddress, setToAddress] = useState('');
@@ -15,6 +15,24 @@ export const WithdrawSection = ({ onWithdrawSuccess }) => {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
 
+    const memo = user?.memo || '';
+    const balance = user?.btcrBalance !== undefined ? Number(user.btcrBalance).toFixed(8) : '0.00000000';
+
+    const handleAmountChange = (e) => {
+        let val = e.target.value.replace(/[^0-9.]/g, '');
+        const parts = val.split('.');
+
+        if (parts.length > 2) {
+            val = `${parts[0]}.${parts.slice(1).join('')}`;
+        };
+
+        if (parts[1] && parts[1].length > 9) {
+            val = `${parts[0]}.${parts[1].slice(0, 9)}`;
+        };
+
+        setAmount(val);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
@@ -22,14 +40,14 @@ export const WithdrawSection = ({ onWithdrawSuccess }) => {
 
         const numAmount = parseFloat(amount);
         if (!toAddress.trim()) {
-            const msg = 'Target Solana wallet address is required.';
+            const msg = 'Destination address is required.';
             setError(msg);
             toastError(msg);
             return;
         };
 
         if (isNaN(numAmount) || numAmount <= 0) {
-            const msg = 'Please enter a valid SOL withdrawal amount.';
+            const msg = 'Please enter a valid withdrawal amount.';
             setError(msg);
             toastError(msg);
             return;
@@ -40,21 +58,19 @@ export const WithdrawSection = ({ onWithdrawSuccess }) => {
             const res = await axios.post('/api/withdraw/create', {
                 toAddress: toAddress.trim(),
                 amount: numAmount,
-                memo: user?.memo || '',
+                memo: memo,
             });
 
             if (res.data && res.data.flag) {
-                const succMsg = res.data.msg || 'Withdrawal transaction executed & confirmed on Solana!';
+                const succMsg = res.data.msg || 'Withdrawal transaction executed & confirmed!';
                 setSuccess(succMsg);
                 toastSuccess(succMsg);
                 setToAddress('');
                 setAmount('');
 
-                if (res.data.data && res.data.data.updatedSolBalance !== undefined) {
-                    updateUserData({ solBalance: res.data.data.updatedSolBalance });
+                if (res.data.data && res.data.data.updatedBtcrBalance !== undefined) {
+                    updateUserData({ btcrBalance: res.data.data.updatedBtcrBalance });
                 };
-
-                if (onWithdrawSuccess) onWithdrawSuccess();
 
                 setTimeout(() => setSuccess(null), 3000);
             } else {
@@ -63,7 +79,7 @@ export const WithdrawSection = ({ onWithdrawSuccess }) => {
                 toastError(errMsg);
             };
         } catch (err) {
-            const errMsg = err.response?.data?.msg || err.response?.data?.message || 'Error processing Solana withdrawal.';
+            const errMsg = err.response?.data?.msg || err.response?.data?.message || 'Error processing withdrawal.';
             setError(errMsg);
             toastError(errMsg);
         } finally {
@@ -73,15 +89,13 @@ export const WithdrawSection = ({ onWithdrawSuccess }) => {
 
     return (
         <div style={{ background: 'rgba(15, 20, 34, 0.85)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '24px', padding: '2rem', height: '100%', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <ArrowUpRight size={20} style={{ color: '#00C2FF' }} />
-                    <span>Withdraw</span>
-                </h2>
-                <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>
-                    Max Withdrawable: <strong className="font-mono" style={{ color: '#00C2FF' }}>{user?.solBalance !== undefined ? Number(user.solBalance).toFixed(8) : '0.00000000'} SOL</strong>
-                </span>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
+                <ArrowUpRight size={20} style={{ color: '#00C2FF' }} />
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', margin: 0 }}>Withdraw</h2>
             </div>
+
+            <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.08)', marginBottom: '1.5rem' }} />
 
             {error && (
                 <div className="solana-alert-danger">
@@ -97,16 +111,25 @@ export const WithdrawSection = ({ onWithdrawSuccess }) => {
                 </div>
             )}
 
+            {/* Current Balance */}
+            <div style={{ marginBottom: '1.5rem' }}>
+                <span className="solana-input-label" style={{ marginBottom: '0.3rem' }}>Current Balance</span>
+                <div className="font-mono" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#00C2FF', fontSize: '1.6rem', fontWeight: 800 }}>
+                    <Wallet size={22} />
+                    <span>{balance} SOL</span>
+                </div>
+            </div>
+
             <form onSubmit={handleSubmit}>
-                {/* To Address Box */}
+                {/* Destination Address */}
                 <div className="form-group-custom">
-                    <label className="solana-input-label">To Address *</label>
+                    <label className="solana-input-label">DESTINATION ADDRESS *</label>
                     <div className="solana-input-icon-wrapper">
                         <Wallet className="input-svg-icon" style={{ color: '#94a3b8' }} />
                         <input
                             type="text"
                             className="solana-input-field font-mono"
-                            placeholder="Paste recipient Solana wallet address"
+                            placeholder="Paste recipient wallet address"
                             value={toAddress}
                             onChange={(e) => setToAddress(e.target.value)}
                             style={{ fontSize: '0.85rem' }}
@@ -115,23 +138,7 @@ export const WithdrawSection = ({ onWithdrawSuccess }) => {
                     </div>
                 </div>
 
-                {/* Memo Input Box (Disabled / Readonly) */}
-                <div className="form-group-custom">
-                    <label className="solana-input-label">Memo *</label>
-                    <div className="solana-input-icon-wrapper">
-                        <Tag className="input-svg-icon" style={{ color: '#94a3b8' }} />
-                        <input
-                            type="text"
-                            className="solana-input-field font-mono"
-                            value={user?.memo || ''}
-                            style={{ paddingLeft: '3rem', fontWeight: 700, opacity: 0.85, background: 'rgba(7,9,14,0.6)' }}
-                            disabled
-                            readOnly
-                        />
-                    </div>
-                </div>
-
-                {/* Amount Input Box */}
+                {/* Amount (numeric only) */}
                 <div className="form-group-custom">
                     <label className="solana-input-label">Amount *</label>
                     <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -139,15 +146,30 @@ export const WithdrawSection = ({ onWithdrawSuccess }) => {
                             SOL
                         </span>
                         <input
-                            type="number"
-                            step="0.0001"
-                            min="0.0001"
+                            type="text"
+                            inputMode="decimal"
+                            autoComplete="off"
                             className="solana-input-field font-mono"
                             placeholder="Enter withdraw amount"
                             value={amount}
-                            onChange={(e) => setAmount(e.target.value)}
+                            onChange={handleAmountChange}
                             style={{ paddingLeft: '3.5rem' }}
                             required
+                        />
+                    </div>
+                </div>
+
+                {/* Memo (auto-filled, readonly) */}
+                <div className="form-group-custom">
+                    <label className="solana-input-label">Memo</label>
+                    <div className="solana-input-icon-wrapper">
+                        <Tag className="input-svg-icon" style={{ color: '#94a3b8' }} />
+                        <input
+                            type="text"
+                            className="solana-input-field font-mono"
+                            value={memo}
+                            style={{ paddingLeft: '3rem', fontWeight: 700, opacity: 0.85, background: 'rgba(7,9,14,0.6)' }}
+                            readOnly
                         />
                     </div>
                 </div>

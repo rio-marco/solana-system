@@ -161,7 +161,7 @@ async function POST(req) {
                 amount: transaction.amount,
                 signature: transaction.transactionSignature,
                 status: transaction.status,
-                updatedSolBalance: updatedUser.solBalance,
+                updatedBtcrBalance: updatedUser.btcrBalance,
                 explorerUrl: `https://explorer.solana.com/tx/${transaction.transactionSignature}?cluster=devnet`,
             },
         );

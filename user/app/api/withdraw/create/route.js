@@ -39,7 +39,7 @@ async function POST(req) {
         const freshUser = await User.findById(user._id).lean();
         if (!freshUser || (freshUser.btcrBalance || 0) < amountVal.numericAmount) {
             const avail = freshUser ? freshUser.btcrBalance : 0;
-            return errorResponse(`Insufficient account balance. Available: ${avail} SOL, Requested: ${amountVal.numericAmount} SOL.`);
+            return errorResponse(`Insufficient account balance. Available: ${avail} BTCR, Requested: ${amountVal.numericAmount} BTCR.`);
         };
 
         const withdrawFee = (await Setting.getVal('WITHDRAWAL_PLATFORM_FEE'));
@@ -59,7 +59,7 @@ async function POST(req) {
             userId: user._id,
             txId,
             type: constants.TRX_TYPE.DEBIT,
-            coin: constants.COIN.SOL,
+            coin: constants.COIN.BTCR,
             toAddress: toAddress.trim(),
             memo: memoVal.cleanMemo,
             amount: amountVal.numericAmount,
@@ -103,7 +103,7 @@ async function POST(req) {
         const newNotif = await Notification.create({
             userId: user._id,
             title: 'Withdrawal Executed',
-            message: `Withdrawal of ${amountVal.numericAmount} SOL to ${toAddress.trim().slice(0, 8)}... confirmed on-chain!`,
+            message: `Withdrawal of ${amountVal.numericAmount} BTCR to ${toAddress.trim().slice(0, 8)}... confirmed on-chain!`,
             type: 'WITHDRAWAL',
             amount: amountVal.numericAmount,
             transactionSignature: txResult.signature,
@@ -118,7 +118,7 @@ async function POST(req) {
         });
 
         return successResponse(
-            `Successfully withdrew ${amountVal.numericAmount} SOL!`,
+            `Successfully withdrew ${amountVal.numericAmount} BTCR!`,
             {
                 txId: transaction.txId,
                 amount: transaction.amount,

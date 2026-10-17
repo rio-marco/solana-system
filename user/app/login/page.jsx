@@ -84,7 +84,7 @@ export default function LoginPage() {
                         Welcome Back
                     </h2>
                     <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
-                        Sign in to manage your SOL deposits and withdrawals
+                        Sign in to manage your deposits and withdrawals
                     </p>
                 </div>
 

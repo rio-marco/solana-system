@@ -41,6 +41,7 @@ async function POST(req) {
                 profilePhoto: user.profilePhoto || "",
                 memo: user.memo,
                 solBalance: user.solBalance,
+                btcrBalance: user.btcrBalance,
                 is2FAEnabled: false,
             },
         });

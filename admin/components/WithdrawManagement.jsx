@@ -175,7 +175,7 @@ export function WithdrawManagement() {
                             >
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>User Email</th>
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>ID / Memo</th>
-                                <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Amount (SOL)</th>
+                                <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Amount (BTCR)</th>
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>To Recipient Address</th>
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Tx Signature</th>
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Status</th>
@@ -212,7 +212,7 @@ export function WithdrawManagement() {
                                             <div style={{ color: '#94a3b8', fontFamily: 'monospace', fontSize: '0.78rem' }}>{id}</div>
                                             <div style={{ color: '#0D6EFD', fontWeight: 700, fontSize: '0.75rem' }}>Memo: {item.memo.id}</div>
                                         </td>
-                                        <td style={{ padding: '0.85rem 1rem', fontWeight: 800, color: '#0D6EFD' }}>-{item.amount} SOL</td>
+                                        <td style={{ padding: '0.85rem 1rem', fontWeight: 800, color: '#0D6EFD' }}>-{item.amount} BTCR</td>
                                         <td style={{ padding: '0.85rem 1rem' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                                                 <span style={{ fontFamily: 'monospace', color: '#94a3b8', fontSize: '0.75rem' }}>

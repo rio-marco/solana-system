@@ -116,7 +116,7 @@ export const WithdrawSection = () => {
                 <span className="solana-input-label" style={{ marginBottom: '0.3rem' }}>Current Balance</span>
                 <div className="font-mono" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#00C2FF', fontSize: '1.6rem', fontWeight: 800 }}>
                     <Wallet size={22} />
-                    <span>{balance} SOL</span>
+                    <span>{balance} BTCR</span>
                 </div>
             </div>
 
@@ -143,7 +143,7 @@ export const WithdrawSection = () => {
                     <label className="solana-input-label">Amount *</label>
                     <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                         <span className="font-mono" style={{ position: 'absolute', left: '1.1rem', fontWeight: 700, color: '#00C2FF', fontSize: '0.85rem', pointerEvents: 'none' }}>
-                            SOL
+                            BTCR
                         </span>
                         <input
                             type="text"

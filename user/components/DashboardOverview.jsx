@@ -50,7 +50,7 @@ export const DashboardOverview = ({ onNavigate }) => {
                     <span>Current Balance</span>
                 </div>
                 <div className="font-mono" style={{ color: '#ffffff', fontSize: '2.6rem', fontWeight: 900, marginTop: '0.5rem', lineHeight: 1.1 }}>
-                    {balance} <span style={{ fontSize: '1.2rem', color: '#14F195' }}>SOL</span>
+                    {balance} <span style={{ fontSize: '1.2rem', color: '#14F195' }}>BTCR</span>
                 </div>
                 <div style={{ marginTop: '1.25rem', display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
                     {quickActions.map((action) => {

@@ -79,7 +79,7 @@ export default function SignupPage() {
                         Sign Up
                     </h2>
                     <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
-                        Register to get a Solana Wallet and manage SOL
+                        Register to get a Solana Wallet and manage BTCR
                     </p>
                 </div>
 

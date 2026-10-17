@@ -27,7 +27,7 @@ const TransactionSchema = new mongoose.Schema(
         coin: {
             type: String,
             enum: Object.values(constants.COIN),
-            default: constants.COIN.SOL,
+            default: constants.COIN.BTCR,
         },
         amount: {
             type: Number,

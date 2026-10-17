@@ -19,7 +19,7 @@ export const DepositSection = () => {
     const [error, setError] = useState(null);
 
     const memo = user?.memo || '';
-    const balance = user?.solBalance !== undefined ? Number(user.solBalance).toFixed(8) : '0.00000000';
+    const balance = user?.btcrBalance !== undefined ? Number(user.btcrBalance).toFixed(8) : '0.00000000';
 
     const fetchAddress = async () => {
         try {
@@ -64,7 +64,7 @@ export const DepositSection = () => {
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                 <QrCode size={20} style={{ color: '#14F195' }} />
-                <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', margin: 0 }}>Deposit</h2>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', margin: 0 }}>By BTCR</h2>
             </div>
 
             <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.08)', marginBottom: '1rem' }} />
@@ -81,11 +81,11 @@ export const DepositSection = () => {
                 <span className="solana-input-label" style={{ marginBottom: '0.3rem' }}>Current Balance</span>
                 <div className="font-mono" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#14F195', fontSize: '1.2rem', fontWeight: 800 }}>
                     <Wallet size={20} />
-                    <span>{balance} SOL</span>
+                    <span>{balance} BTCR</span>
                 </div>
             </div>
 
-            {/* QR Code of admin-set SOL deposit address */}
+            {/* QR Code of admin-set deposit address */}
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', background: '#ffffff', color: "#000000", }}>
                 <div style={{ padding: '1rem' }}>
                     {address ? (

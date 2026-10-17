@@ -336,7 +336,7 @@ export function AdminTransactionTable({ refreshTrigger }) {
                         <tr style={{ background: 'rgba(10, 14, 26, 0.9)', color: '#94a3b8', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
                             <th style={{ padding: '0.9rem 1rem' }}>User Email</th>
                             <th style={{ padding: '0.9rem 1rem' }}>ID / Memo</th>
-                            <th style={{ padding: '0.9rem 1rem' }}>Amount (SOL)</th>
+                            <th style={{ padding: '0.9rem 1rem' }}>Amount (BTCR)</th>
                             <th style={{ padding: '0.9rem 1rem' }}>{activeTab === 'deposit' ? 'Platform Address' : 'To Recipient Address'}</th>
                             <th style={{ padding: '0.9rem 1rem' }}>Tx Signature</th>
                             <th style={{ padding: '0.9rem 1rem' }}>Status</th>
@@ -389,7 +389,7 @@ export function AdminTransactionTable({ refreshTrigger }) {
 
                                         {/* Amount */}
                                         <td style={{ padding: '0.9rem 1rem', fontWeight: 800, color: activeTab === 'deposit' ? '#14F195' : '#9945FF' }}>
-                                            {activeTab === 'deposit' ? '+' : '-'}{item.amount} SOL
+                                            {activeTab === 'deposit' ? '+' : '-'}{item.amount} BTCR
                                         </td>
 
                                         {/* Target Address */}

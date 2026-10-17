@@ -202,7 +202,7 @@ export const TransactionListTable = ({ type = 'withdraw' }) => {
                                             <span style={{ color: '#64748b' }} className="font-mono">-</span>
                                         )}
                                     </td>
-                                    <td className="font-mono" style={{ padding: '0.65rem 0.35rem', fontWeight: 700, color: '#fff', fontSize: '0.8rem' }}>{w.amount} SOL</td>
+                                    <td className="font-mono" style={{ padding: '0.65rem 0.35rem', fontWeight: 700, color: '#fff', fontSize: '0.8rem' }}>{w.amount} BTCR</td>
                                     <td style={{ padding: '0.65rem 0.35rem' }}>
                                         <span
                                             style={{

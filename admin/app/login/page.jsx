@@ -98,7 +98,7 @@ export default function AdminLoginPage() {
                         }}
                     >
                         <Shield size={16} style={{ color: '#E7F1FF' }} />
-                        <span>SOLANA SYSTEM - ADMIN PANEL</span>
+                        <span>ADMIN PANEL</span>
                     </div>
                     <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#000000', marginBottom: '0.35rem' }}>
                         Admin Portal Login

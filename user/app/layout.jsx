@@ -4,8 +4,8 @@ import { SocketProvider } from '../context/SocketContext';
 import { ToastProvider } from '../context/ToastContext';
 
 export const metadata = {
-    title: 'Solana SOL Deposit & Withdrawal System',
-    description: 'Enterprise Solana SOL Deposit and Withdrawal Demonstration Platform',
+    title: 'Solana Deposit & Withdrawal System',
+    description: 'Enterprise Solana Deposit and Withdrawal Demonstration Platform',
 };
 
 export default function RootLayout({ children }) {

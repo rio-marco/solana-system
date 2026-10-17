@@ -7,6 +7,7 @@ import { QrCode, Copy, Check, AlertCircle, Tag, Wallet } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { copyTextToClipboard } from '../lib/clipboard';
+import { PhantomDeposit } from './PhantomDeposit';
 
 export const DepositSection = () => {
     const { user } = useAuth();
@@ -152,10 +153,14 @@ export const DepositSection = () => {
                 </div>
             </div>
 
+            <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.08)', margin: '1.25rem 0' }} />
+
+            <PhantomDeposit />
+
             {/* Important Notice */}
             <div
                 style={{
-                    marginTop: '1rem',
+                    marginTop: '1.25rem',
                     background: 'rgba(239, 68, 68, 0.12)',
                     border: '1px solid rgba(239, 68, 68, 0.4)',
                     borderLeft: '4px solid #ef4444',

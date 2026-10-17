@@ -17,6 +17,7 @@ module.exports = {
     BCRYPT_SALT: 10,
 
     SESSION_MAX_AGE: 1000 * 60 * 60 * 24 * 365 * 10,
+    MAX_DEPOSIT_SOL: 10000,
 
     FULL_NAME_REGEX: /^[a-zA-Z\s]{2,60}$/,
     EMAIL_REGEX: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/,

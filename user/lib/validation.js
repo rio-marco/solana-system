@@ -1,6 +1,7 @@
 'use strict';
 
 const { PublicKey } = require('@solana/web3.js');
+const constants = require('./constants');
 
 const LAMPORTS_PER_SOL = 1000000000;
 
@@ -41,8 +42,8 @@ const validateAmount = (amount) => {
         return { isValid: false, error: 'Amount must be greater than 0' };
     };
 
-    if (num > 10000) {
-        return { isValid: false, error: 'Amount exceeds maximum allowable limit of 10,000 SOL' };
+    if (num > constants.MAX_DEPOSIT_SOL) {
+        return { isValid: false, error: `Amount exceeds maximum allowable limit of ${constants.MAX_DEPOSIT_SOL.toLocaleString()} SOL` };
     };
 
     const parts = String(amount).split('.');

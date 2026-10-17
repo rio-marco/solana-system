@@ -4,6 +4,7 @@ const messages = require('../../../../lib/messages');
 const { verifySession } = require('../../../../lib/session');
 const { errorResponse, successResponse, authErrorResponse, log1 } = require('../../../../lib/general');
 const Campaign = require('../../../../lib/models/campaign.model');
+const Activitie = require('../../../../lib/models/activitie.model');
 
 async function GET(req) {
     try {
@@ -17,10 +18,13 @@ async function GET(req) {
         const limit = Math.max(1, Math.min(100, parseInt(searchParams.get('limit') || '10', 10)));
         const skip = (page - 1) * limit;
 
-        const totalCount = await Campaign.countDocuments({});
+        const usedCampaignIds = await Activitie.distinct('campaign_id', { user_id: sessionAuth.userId });
+        const filter = { _id: { $nin: usedCampaignIds } };
+
+        const totalCount = await Campaign.countDocuments(filter);
         const totalPages = Math.ceil(totalCount / limit) || 0;
 
-        const campaigns = await Campaign.find({})
+        const campaigns = await Campaign.find(filter)
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)

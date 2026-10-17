@@ -4,21 +4,21 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import {
     Megaphone,
-    Gift,
-    MessageSquare,
     RefreshCw,
-    Calendar,
+    ChevronRight,
 } from 'lucide-react';
 import {
     DEFAULT_CURRENT_PAGE,
     DEFAULT_ITEM_PER_PAGE,
 } from './ui-constants.mjs';
 import { Pagination } from './Pagination';
+import { CampaignModal } from './CampaignModal';
 
 export const CampaignList = () => {
     const [campaigns, setCampaigns] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isFetchingPage, setIsFetchingPage] = useState(false);
+    const [selectedCampaign, setSelectedCampaign] = useState(null);
 
     const [pagination, setPagination] = useState({
         totalCount: 0,
@@ -77,6 +77,17 @@ export const CampaignList = () => {
         };
     };
 
+    const handleCampaignUsed = (campaignId) => {
+        setCampaigns(prev => {
+            const remaining = prev.filter(c => c._id !== campaignId);
+            if (remaining.length === 0 && pagination.currentPage > DEFAULT_CURRENT_PAGE) {
+                setPagination(p => ({ ...p, currentPage: p.currentPage - 1 }));
+            };
+            return remaining;
+        });
+        setPagination(p => ({ ...p, totalCount: Math.max(0, p.totalCount - 1) }));
+    };
+
     return (
         <div style={{ background: 'rgba(15, 20, 34, 0.85)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '24px', padding: '1.5rem 1.75rem', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -116,61 +127,29 @@ export const CampaignList = () => {
                         }}
                     >
                         {campaigns.map((c) => (
-                            <div
+                            <button
                                 key={c._id}
+                                type="button"
+                                onClick={() => setSelectedCampaign(c)}
                                 style={{
                                     background: 'rgba(7, 9, 14, 0.6)',
                                     border: '1px solid rgba(255, 255, 255, 0.08)',
                                     borderRadius: '18px',
                                     padding: '1.15rem',
                                     display: 'flex',
-                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
                                     gap: '0.75rem',
+                                    cursor: 'pointer',
+                                    textAlign: 'left',
+                                    transition: 'all 0.2s ease',
                                 }}
                             >
-                                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem' }}>
-                                    <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#ffffff', margin: 0, wordBreak: 'break-word' }}>
-                                        {c.name}
-                                    </h3>
-                                    <span
-                                        style={{
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            gap: '0.3rem',
-                                            padding: '0.2rem 0.6rem',
-                                            borderRadius: '20px',
-                                            background: 'rgba(245,158,11,0.15)',
-                                            border: '1px solid rgba(245,158,11,0.35)',
-                                            color: '#F59E0B',
-                                            fontSize: '0.72rem',
-                                            fontWeight: 800,
-                                            flexShrink: 0,
-                                        }}
-                                    >
-                                        <Gift size={12} />
-                                        {c.rewards} BTCR
-                                    </span>
-                                </div>
-
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', fontSize: '0.75rem', color: '#94a3b8' }}>
-                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
-                                        <MessageSquare size={13} style={{ color: '#14F195' }} />
-                                        {Array.isArray(c.comments) ? c.comments.length : 0} tasks
-                                    </span>
-                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }} className="font-mono">
-                                        <Calendar size={13} style={{ color: '#00C2FF' }} />
-                                        {c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '-'}
-                                    </span>
-                                </div>
-
-                                {Array.isArray(c.comments) && c.comments.length > 0 && (
-                                    <ul style={{ margin: 0, paddingLeft: '1.1rem', color: '#cbd5e1', fontSize: '0.78rem', lineHeight: 1.6 }}>
-                                        {c.comments.slice(0, 3).map((comment, idx) => (
-                                            <li key={idx} style={{ wordBreak: 'break-word' }}>{comment}</li>
-                                        ))}
-                                    </ul>
-                                )}
-                            </div>
+                                <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#ffffff', margin: 0, wordBreak: 'break-word' }}>
+                                    {c.name}
+                                </h3>
+                                <ChevronRight size={18} style={{ color: '#64748b', flexShrink: 0 }} />
+                            </button>
                         ))}
                     </div>
 
@@ -185,6 +164,15 @@ export const CampaignList = () => {
                         itemLabel="campaigns"
                     />
                 </>
+            )}
+
+            {selectedCampaign && (
+                <CampaignModal
+                    key={selectedCampaign._id}
+                    campaign={selectedCampaign}
+                    onClose={() => setSelectedCampaign(null)}
+                    onUsed={handleCampaignUsed}
+                />
             )}
         </div>
     );

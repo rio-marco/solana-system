@@ -38,4 +38,6 @@ const ActivitySchema = new mongoose.Schema(
     },
 );
 
+ActivitySchema.index({ user_id: 1, campaign_id: 1 }, { unique: true });
+
 module.exports = mongoose.models.Activitie || mongoose.model('Activitie', ActivitySchema);

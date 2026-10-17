@@ -82,7 +82,7 @@ function getTwoFABadge(twoFAStatus) {
 };
 
 function getTxStatusBadge(status) {
-    const st = status?.toUpperCase();
+    const st = Number(status);
     if (st === TRANSACTION_STATUS.CONFIRMED) {
         return <span style={{ ...STATUS_BADGE_STYLE, background: '#D1E7DD', color: '#198754', border: '1px solid #A3CFBB' }}>Confirmed</span>;
     };

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import axios from 'axios';
 import {
     X,
@@ -35,8 +36,13 @@ export const CampaignModal = ({ campaign, onClose, onUsed }) => {
     const [commentUrl, setCommentUrl] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
-    if (!campaign) return null;
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!campaign || !mounted) return null;
 
     const cardStyle = {
         background: 'rgba(7, 9, 14, 0.6)',
@@ -99,15 +105,30 @@ export const CampaignModal = ({ campaign, onClose, onUsed }) => {
         };
     };
 
-    return (
+    return createPortal(
         <div className="solana-modal-overlay" onClick={onClose}>
-            <div className="solana-modal-card" style={{ maxWidth: '560px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="solana-modal-card" style={{ maxWidth: '650px' }} onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem', marginBottom: '1.25rem', gap: '0.75rem' }}>
+                <div
+                    style={{
+                        position: 'sticky',
+                        top: 0,
+                        zIndex: 5,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        borderBottom: '1px solid rgba(255,255,255,0.1)',
+                        paddingBottom: '1.5rem',
+                        marginBottom: '1.25rem',
+                        background: 'var(--bg-card)',
+                        borderRadius: '24px 24px 0 0',
+                        gap: '0.75rem',
+                    }}
+                >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', minWidth: 0 }}>
                         <Megaphone style={{ color: '#F59E0B', flexShrink: 0 }} size={20} />
                         <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#fff', margin: 0, wordBreak: 'break-word' }}>
-                            {campaign.name}
+                            Campaign Details
                         </h3>
                     </div>
                     <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', flexShrink: 0 }}>
@@ -117,6 +138,15 @@ export const CampaignModal = ({ campaign, onClose, onUsed }) => {
 
                 {/* Details */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.75rem', marginBottom: '1.25rem' }}>
+                    <div style={cardStyle}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            <Gift size={13} />
+                            <span>Campaign Name</span>
+                        </div>
+                        <div style={{ color: '#ffffff', fontSize: '1rem', fontWeight: 800, marginTop: '0.35rem' }}>
+                            {campaign.name}
+                        </div>
+                    </div>
                     <div style={cardStyle}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                             <Gift size={13} />
@@ -132,23 +162,14 @@ export const CampaignModal = ({ campaign, onClose, onUsed }) => {
                             <span>Commits</span>
                         </div>
                         <div style={{ color: '#ffffff', fontSize: '1rem', fontWeight: 800, marginTop: '0.35rem' }}>
-                            {comments.length}
-                        </div>
-                    </div>
-                    <div style={cardStyle}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                            <Calendar size={13} />
-                            <span>Created</span>
-                        </div>
-                        <div style={{ color: '#ffffff', fontSize: '1rem', fontWeight: 800, marginTop: '0.35rem' }}>
-                            {campaign.createdAt ? new Date(campaign.createdAt).toLocaleDateString() : '-'}
+                            {selectedCommit ? 1 : 0}
                         </div>
                     </div>
                 </div>
 
                 {/* Random Commit / Task */}
-                <div style={{ marginBottom: '1.25rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+                <div style={{ marginBottom: '2rem', marginTop: '2rem' }}>
+                    {/* <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
                         <span className="solana-input-label" style={{ margin: 0 }}>Your Task (Commit)</span>
                         {comments.length > 1 && (
                             <button
@@ -161,7 +182,7 @@ export const CampaignModal = ({ campaign, onClose, onUsed }) => {
                                 <span>Shuffle</span>
                             </button>
                         )}
-                    </div>
+                    </div> */}
 
                     {selectedCommit ? (
                         <div style={{ ...cardStyle, borderColor: 'rgba(20, 241, 149, 0.25)', background: 'rgba(20, 241, 149, 0.06)', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.75rem' }}>
@@ -207,7 +228,16 @@ export const CampaignModal = ({ campaign, onClose, onUsed }) => {
                         <span>Each campaign can be used only once. After you submit, this campaign will no longer appear in your list and will be pending admin verification.</span>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+                    <div
+                        style={{
+                            display: 'flex',
+                            gap: '0.75rem',
+                            justifyContent: 'flex-end',
+                            borderTop: '1px solid rgba(255,255,255,0.1)',
+                            paddingTop: '1.8rem',
+                            marginTop: '2.25rem',
+                        }}
+                    >
                         <button type="button" onClick={onClose} className="solana-btn-outline" style={{ width: 'auto', padding: '0 1.25rem' }} disabled={submitting}>
                             Cancel
                         </button>
@@ -224,6 +254,7 @@ export const CampaignModal = ({ campaign, onClose, onUsed }) => {
                     </div>
                 </form>
             </div>
-        </div>
+        </div>,
+        document.body,
     );
 };

@@ -96,8 +96,8 @@ export const DepositSection = () => {
                         </div>
                     )}
                 </div>
-                <div style={{ fontSize: '0.8rem', paddingLeft: '1rem', paddingTop: '2rem' }}>
-                    Scan or copy your SOL deposit address. Always include the memo.
+                <div style={{ fontSize: '0.8rem', paddingLeft: '1rem', paddingRight: '1rem', paddingTop: '1.5rem' }}>
+                    Scan or copy your SOL deposit address. Always include the memo. Deposit SOL and receive BTCR in your wallet at a 1:1 ratio.
                 </div>
             </div>
 

@@ -5,6 +5,7 @@ import axios from 'axios';
 import { RefreshCw, ExternalLink, ListFilter, Copy, Check, ArrowDownLeft, ArrowUpRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { copyTextToClipboard } from '../lib/clipboard';
 import { getTransactionStatus } from './transaction-status.mjs';
+import { useSocket } from '../context/SocketContext';
 import {
     TRANSACTION_STATUS,
     DEFAULT_CURRENT_PAGE,
@@ -13,6 +14,7 @@ import {
 import { Pagination } from './Pagination';
 
 export const TransactionListTable = ({ type = 'withdraw' }) => {
+    const socket = useSocket();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isFetchingPage, setIsFetchingPage] = useState(false);
@@ -54,7 +56,7 @@ export const TransactionListTable = ({ type = 'withdraw' }) => {
                 setItems([]);
             };
         } catch (e) {
-            console.error('Failed to fetch transaction:', err);
+            console.error('Failed to fetch transaction:', e);
             setItems([]);
         } finally {
             setLoading(false);
@@ -65,6 +67,22 @@ export const TransactionListTable = ({ type = 'withdraw' }) => {
     useEffect(() => {
         fetchHistory();
     }, [fetchHistory]);
+
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleDepositConfirmed = () => {
+            if (isDeposit) {
+                fetchHistory();
+            };
+        };
+
+        socket.on('deposit_confirmed', handleDepositConfirmed);
+
+        return () => {
+            socket.off('deposit_confirmed', handleDepositConfirmed);
+        };
+    }, [socket, isDeposit, fetchHistory]);
 
     const handleCopyHash = async (hash, id) => {
         if (hash) {

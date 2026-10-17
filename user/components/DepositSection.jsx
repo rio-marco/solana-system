@@ -6,12 +6,14 @@ import { QRCodeSVG } from 'qrcode.react';
 import { QrCode, Copy, Check, AlertCircle, Tag, Wallet } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { useSocket } from '../context/SocketContext';
 import { copyTextToClipboard } from '../lib/clipboard';
-import { PhantomDeposit } from './PhantomDeposit';
+import { buildSolanaPayUrl } from '../lib/solana-client.mjs';
 
 export const DepositSection = () => {
-    const { user } = useAuth();
-    const { toastError } = useToast();
+    const { user, refreshUser } = useAuth();
+    const { toastError, toastSuccess } = useToast();
+    const socket = useSocket();
     const [address, setAddress] = useState('');
     const [fetchingAddr, setFetchingAddr] = useState(false);
     const [copiedAddress, setCopiedAddress] = useState(false);
@@ -20,6 +22,8 @@ export const DepositSection = () => {
 
     const memo = user?.memo || '';
     const balance = user?.btcrBalance !== undefined ? Number(user.btcrBalance).toFixed(8) : '0.00000000';
+
+    const payUrl = address ? buildSolanaPayUrl(address, { memo, label: 'BTCR Deposit' }) : '';
 
     const fetchAddress = async () => {
         try {
@@ -40,6 +44,21 @@ export const DepositSection = () => {
     useEffect(() => {
         fetchAddress();
     }, []);
+
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleDepositConfirmed = async (payload) => {
+            await refreshUser();
+            toastSuccess(`Deposit confirmed: +${payload?.amount ?? ''} SOL credited to your balance.`);
+        };
+
+        socket.on('deposit_confirmed', handleDepositConfirmed);
+
+        return () => {
+            socket.off('deposit_confirmed', handleDepositConfirmed);
+        };
+    }, [socket, refreshUser, toastSuccess]);
 
     const copyAddress = async () => {
         if (!address) return;
@@ -85,19 +104,19 @@ export const DepositSection = () => {
                 </div>
             </div>
 
-            {/* QR Code of admin-set deposit address */}
+            {/* QR Code — Solana Pay URL (address + memo) */}
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', background: '#ffffff', color: "#000000", }}>
                 <div style={{ padding: '1rem' }}>
-                    {address ? (
-                        <QRCodeSVG value={address} size={130} level="M" />
+                    {payUrl ? (
+                        <QRCodeSVG value={payUrl} size={130} level="M" />
                     ) : (
-                        <div style={{ width: 180, height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '0.8rem', textAlign: 'center' }}>
+                        <div style={{ width: 130, height: 130, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '0.8rem', textAlign: 'center' }}>
                             {fetchingAddr ? 'Loading address...' : 'No address configured'}
                         </div>
                     )}
                 </div>
-                <div style={{ fontSize: '0.8rem', paddingLeft: '1rem', paddingRight: '1rem', paddingTop: '1.5rem' }}>
-                    Scan or copy your SOL deposit address. Always include the memo. Deposit SOL and receive BTCR in your wallet at a 1:1 ratio.
+                <div style={{ fontSize: '0.8rem', padding: '1rem' }}>
+                    Scan this QR with any Solana Pay compatible wallet. The deposit address and your memo are filled automatically. Deposit SOL and receive BTCR in your wallet at a 1:1 ratio.
                 </div>
             </div>
 
@@ -154,8 +173,6 @@ export const DepositSection = () => {
             </div>
 
             <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.08)', margin: '1.25rem 0' }} />
-
-            <PhantomDeposit />
 
             {/* Important Notice */}
             <div

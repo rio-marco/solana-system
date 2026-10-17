@@ -92,3 +92,18 @@ export const isValidSolanaAddress = (address) => {
     if (!address || typeof address !== 'string') return false;
     return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address.trim());
 };
+
+export const buildSolanaPayUrl = (address, { memo, label, message, amount } = {}) => {
+    if (!address || typeof address !== 'string') return '';
+
+    const params = new URLSearchParams();
+
+    if (memo) params.set('memo', String(memo));
+    if (label) params.set('label', String(label));
+    if (message) params.set('message', String(message));
+    if (amount) params.set('amount', String(amount));
+
+    const query = params.toString();
+
+    return query ? `solana:${address.trim()}?${query}` : `solana:${address.trim()}`;
+};

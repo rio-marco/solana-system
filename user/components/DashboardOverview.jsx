@@ -1,12 +1,14 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { Wallet, ArrowDownLeft, ArrowUpRight, Megaphone, Tag, ShieldCheck, Hash } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { USER_STATUS } from './ui-constants.mjs';
 
-export const DashboardOverview = ({ onNavigate }) => {
+export const DashboardOverview = () => {
     const { user, config } = useAuth();
+    const router = useRouter();
 
     const balance = user?.btcrBalance !== undefined ? Number(user.btcrBalance).toFixed(8) : '0.00000000';
 
@@ -36,9 +38,9 @@ export const DashboardOverview = ({ onNavigate }) => {
     };
 
     const quickActions = [
-        { key: 'deposit', label: 'Deposit', icon: ArrowDownLeft, color: '#14F195' },
-        { key: 'withdraw', label: 'Withdraw', icon: ArrowUpRight, color: '#00C2FF' },
-        { key: 'campaign', label: 'Campaigns', icon: Megaphone, color: '#F59E0B' },
+        { href: '/deposit', label: 'Deposit', icon: ArrowDownLeft, color: '#14F195' },
+        { href: '/withdraw', label: 'Withdraw', icon: ArrowUpRight, color: '#00C2FF' },
+        { href: '/campaign', label: 'Campaigns', icon: Megaphone, color: '#F59E0B' },
     ];
 
     return (
@@ -57,9 +59,9 @@ export const DashboardOverview = ({ onNavigate }) => {
                         const Icon = action.icon;
                         return (
                             <button
-                                key={action.key}
+                                key={action.href}
                                 type="button"
-                                onClick={() => onNavigate(action.key)}
+                                onClick={() => router.push(action.href)}
                                 style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', padding: '0.6rem 1.1rem', borderRadius: '12px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#e2e8f0', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s ease' }}
                             >
                                 <Icon size={16} style={{ color: action.color }} />

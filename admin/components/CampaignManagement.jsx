@@ -249,6 +249,7 @@ export function CampaignManagement() {
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.84rem' }}>
                         <thead>
                             <tr style={{ background: '#F5F9FC', color: '#171D25', borderBottom: '1px solid #D8DFE4' }}>
+                                <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>#</th>
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Campaign Name</th>
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Rewards</th>
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Comments</th>
@@ -259,24 +260,27 @@ export function CampaignManagement() {
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: '#94a3b8' }}>
+                                    <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: '#94a3b8' }}>
                                         <div style={{ width: '32px', height: '32px', border: '3px solid rgba(13,110,253,0.3)', borderTop: '3px solid #0D6EFD', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 0.75rem' }} />
                                         <span>Fetching campaigns...</span>
                                     </td>
                                 </tr>
                             ) : campaigns.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
+                                    <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
                                         No campaigns found. Click &ldquo;New Campaign&rdquo; to create one.
                                     </td>
                                 </tr>
-                            ) : campaigns.map((campaign) => {
+                            ) : campaigns.map((campaign, index) => {
                                 const comments = Array.isArray(campaign.comments) ? campaign.comments : [];
                                 const firstComment = comments[0] || '';
                                 const extraCount = comments.length - 1;
 
                                 return (
                                     <tr key={campaign._id} style={{ borderBottom: '1px solid #DEE2E6', transition: 'background 0.15s' }} className="hover:bg-gray-50">
+                                        <td style={{ padding: '0.85rem 1rem' }}>
+                                            <div style={{ color: '#212529', fontWeight: 700 }}>{index + 1}</div>
+                                        </td>
                                         {/* Name */}
                                         <td style={{ padding: '0.85rem 1rem' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>

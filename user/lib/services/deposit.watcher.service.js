@@ -106,13 +106,9 @@ const extractMemoText = (instructions) => {
 
         if (inst.data) {
             try {
-                return Buffer.from(bs58.decode(inst.data)).toString('utf-8');
-            } catch (e) {
-                try {
-                    return Buffer.from(inst.data, 'base64').toString('utf-8');
-                } catch (e2) {
-                    continue;
-                };
+                return Buffer.from(bs58.decode(inst.data)).toString('utf8');
+            } catch (err) {
+                log1(['[Deposit Watcher] Failed to decode memo instruction:', err.message]);
             };
         };
     };
@@ -334,6 +330,8 @@ const processSignature = async (sigInfo, platformAddress) => {
         return registerRetry(scanKey, `RPC error fetching transaction ${signature}: ${err.message}`);
     };
 
+    log1(["tx process response object---------------------->", JSON.stringify(tx)]);
+
     if (!tx) {
         return registerRetry(scanKey, `Transaction ${signature} not yet indexed by RPC`);
     };
@@ -356,6 +354,8 @@ const processSignature = async (sigInfo, platformAddress) => {
 
     const rawMemo = extractMemoText(allInstructions);
     const cleanMemo = rawMemo ? String(rawMemo).trim() : '';
+
+    log1([`[Deposit Watcher] Extracted memo for ${signature}:`, cleanMemo || 'NONE']);
 
     if (!/^\d{8}$/.test(cleanMemo)) {
         scannedSignatures.add(scanKey);

@@ -166,7 +166,8 @@ export function DepositManagement() {
                                     borderBottom: '1px solid #D8DFE4'
                                 }}
                             >
-                                <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>User Email</th>
+                                <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>#</th>
+                                <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>User</th>
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>ID / Memo</th>
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Amount (BTCR)</th>
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Platform Address</th>
@@ -179,25 +180,29 @@ export function DepositManagement() {
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td colSpan={8} style={{ padding: '3rem', textAlign: 'center', color: '#6C757D' }}>
+                                    <td colSpan={9} style={{ padding: '3rem', textAlign: 'center', color: '#6C757D' }}>
                                         <div style={{ width: '32px', height: '32px', border: '3px solid rgba(20,241,149,0.2)', borderTop: '3px solid #14F195', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 0.75rem' }} />
                                         <span>Fetching deposits...</span>
                                     </td>
                                 </tr>
                             ) : items.length === 0 ? (
                                 <tr>
-                                    <td colSpan={8} style={{ padding: '3rem', textAlign: 'center', color: '#6C757D' }}>
+                                    <td colSpan={9} style={{ padding: '3rem', textAlign: 'center', color: '#6C757D' }}>
                                         No deposit transactions found.
                                     </td>
                                 </tr>
-                            ) : items.map((item) => {
+                            ) : items.map((item, index) => {
                                 const id = item.txId || item._id;
                                 const userEmail = item.userId?.email || 'N/A';
                                 const userName = item.userId?.fullName || '';
                                 const txSig = item.transactionSignature;
                                 const targetAddr = item.platformAddress || 'N/A';
+
                                 return (
                                     <tr key={item._id} style={{ borderBottom: '1px solid #DEE2E6', transition: 'background 0.15s' }} className="hover:bg-gray-50">
+                                        <td style={{ padding: '0.85rem 1rem' }}>
+                                            <div style={{ color: '#212529', fontWeight: 700 }}>{index + 1}</div>
+                                        </td>
                                         <td style={{ padding: '0.85rem 1rem' }}>
                                             <div style={{ color: '#212529', fontWeight: 600 }}>{userEmail}</div>
                                             {userName && <div style={{ color: '#6C757D', fontSize: '0.75rem' }}>{userName}</div>}

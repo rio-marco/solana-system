@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import moment from 'moment';
 import { RefreshCw, ExternalLink, ListFilter, Copy, Check, ArrowDownLeft, ArrowUpRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { copyTextToClipboard } from '../lib/clipboard';
 import { getTransactionStatus } from './transaction-status.mjs';
@@ -41,7 +42,6 @@ export const TransactionListTable = ({ type = 'withdraw' }) => {
             };
 
             const res = await axios.get(`${endpoint}`, { params });
-            // const res = await axios.get(`${endpoint}?page=${p}&limit=${limit}`);
             if (res.data && res.data?.flag && res.data?.data) {
                 const d = res.data.data;
 
@@ -112,7 +112,18 @@ export const TransactionListTable = ({ type = 'withdraw' }) => {
 
     return (
         <div style={{ background: 'rgba(15, 20, 34, 0.85)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '24px', padding: '1.5rem 1.75rem', marginTop: 0, boxShadow: '0 20px 40px rgba(0,0,0,0.5)', overflow: 'hidden' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <div
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '1rem',
+                    paddingBottom: '1.25rem',
+                    flexWrap: 'wrap',
+                    gap: '0.5rem',
+                    borderBottom: '1px solid rgba(255,255,255,0.08)',
+                }}
+            >
                 <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     {isDeposit ? (
                         <ArrowDownLeft size={20} style={{ color: '#14F195' }} />
@@ -144,33 +155,37 @@ export const TransactionListTable = ({ type = 'withdraw' }) => {
                                 borderBottom: '1px solid rgba(255,255,255,0.08)',
                             }}
                         >
-                            <th style={{ padding: '0.65rem 0.35rem', fontSize: '0.7rem', fontWeight: 700, width: '48%' }}>TX HASH</th>
-                            <th style={{ padding: '0.65rem 0.35rem', fontSize: '0.7rem', fontWeight: 700, width: '20%' }}>AMOUNT</th>
-                            <th style={{ padding: '0.65rem 0.35rem', fontSize: '0.7rem', fontWeight: 700, width: '18%' }}>STATUS</th>
-                            <th style={{ padding: '0.65rem 0.35rem', fontSize: '0.7rem', fontWeight: 700, width: '14%', textAlign: 'right' }}>DATE</th>
+                            <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>#</th>
+                            <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>TX HASH</th>
+                            <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>AMOUNT</th>
+                            <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>STATUS</th>
+                            <th style={{ padding: '0.9rem 1rem', fontWeight: 600, textAlign: 'center' }}>Date & Time</th>
                         </tr>
                     </thead>
                     <tbody>
                         {loading ? (
                             <tr>
-                                <td colSpan={4} style={{ padding: '3rem', textAlign: 'center', color: '#64748b', fontSize: '0.85rem' }}>
+                                <td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: '#64748b', fontSize: '0.85rem' }}>
                                     <div style={{ width: '32px', height: '32px', border: '3px solid rgba(153,69,255,0.3)', borderTop: '3px solid #9945FF', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 0.75rem' }} />
                                     <span>Loading transaction history...</span>
                                 </td>
                             </tr>
                         ) : items.length === 0 ? (
                             <tr>
-                                <td colSpan={4} style={{ padding: '3rem', textAlign: 'center', color: '#64748b', fontSize: '0.85rem' }} className="font-mono">
+                                <td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: '#64748b', fontSize: '0.85rem' }} className="font-mono">
                                     {emptyText}
                                 </td>
                             </tr>
-                        ) : items.map((w) => {
+                        ) : items.map((w, index) => {
                             const rowId = w.txId || w._id;
                             const { label, ...statusStyle } = getTransactionStatus(w.status);
 
                             return (
                                 <tr key={rowId} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                                    <td style={{ padding: '0.65rem 0.35rem' }}>
+                                    <td style={{ padding: '0.85rem 1rem' }}>
+                                        <div style={{ color: '#FFFFFF', fontWeight: 700 }}>{index + 1}</div>
+                                    </td>
+                                    <td style={{ padding: '0.85rem 1rem' }}>
                                         {w.transactionSignature ? (
                                             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', maxWidth: '100%', overflow: 'hidden' }}>
                                                 <a
@@ -220,8 +235,8 @@ export const TransactionListTable = ({ type = 'withdraw' }) => {
                                             <span style={{ color: '#64748b' }} className="font-mono">-</span>
                                         )}
                                     </td>
-                                    <td className="font-mono" style={{ padding: '0.65rem 0.35rem', fontWeight: 700, color: '#fff', fontSize: '0.8rem' }}>{w.amount} BTCR</td>
-                                    <td style={{ padding: '0.65rem 0.35rem' }}>
+                                    <td className="font-mono" style={{ padding: '0.85rem 1rem', fontWeight: 700, color: '#fff', fontSize: '0.8rem' }}>{w.amount} BTCR</td>
+                                    <td style={{ padding: '0.85rem 1rem' }}>
                                         <span
                                             style={{
                                                 padding: '0.2rem 0.5rem',
@@ -238,8 +253,8 @@ export const TransactionListTable = ({ type = 'withdraw' }) => {
                                             {label}
                                         </span>
                                     </td>
-                                    <td className="font-mono" style={{ padding: '0.65rem 0.35rem', color: '#94a3b8', fontSize: '0.72rem', textAlign: 'right' }}>
-                                        {w.createdAt ? new Date(w.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '-'}
+                                    <td style={{ padding: '0.85rem 1rem', color: '#94a3b8', fontSize: '0.72rem', textAlign: 'center' }}>
+                                        {moment(w.createdAt).format('MMM DD, YYYY HH:mm:ss A')}
                                     </td>
                                 </tr>
                             );

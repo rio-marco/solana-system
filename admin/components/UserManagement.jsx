@@ -241,6 +241,7 @@ export function UserManagement() {
                                     borderBottom: '1px solid #D8DFE4'
                                 }}
                             >
+                                <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>#</th>
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>User</th>
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Wallet Balance</th>
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Status</th>
@@ -251,23 +252,26 @@ export function UserManagement() {
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td colSpan={7} style={{ padding: '3rem', textAlign: 'center', color: '#94a3b8' }}>
+                                    <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: '#94a3b8' }}>
                                         <div style={{ width: '32px', height: '32px', border: '3px solid rgba(153,69,255,0.3)', borderTop: '3px solid #9945FF', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 0.75rem' }} />
                                         <span>Fetching users...</span>
                                     </td>
                                 </tr>
                             ) : users.length === 0 ? (
                                 <tr>
-                                    <td colSpan={7} style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
+                                    <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
                                         No users found matching your criteria.
                                     </td>
                                 </tr>
-                            ) : users.map((user) => (
+                            ) : users.map((user, index) => (
                                 <tr
                                     key={user._id}
                                     style={{ borderBottom: '1px solid #DEE2E6', transition: 'background 0.15s' }}
                                     className="hover:bg-gray-50"
                                 >
+                                    <td style={{ padding: '0.85rem 1rem' }}>
+                                        <div style={{ color: '#212529', fontWeight: 700 }}>{index + 1}</div>
+                                    </td>
                                     {/* User Info */}
                                     <td style={{ padding: '0.85rem 1rem' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>

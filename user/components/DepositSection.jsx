@@ -23,7 +23,7 @@ export const DepositSection = () => {
     const memo = user?.memo || '';
     const balance = user?.btcrBalance !== undefined ? Number(user.btcrBalance).toFixed(8) : '0.00000000';
 
-    const payUrl = address ? buildSolanaPayUrl(address, { memo, label: 'BTCR Deposit' }) : '';
+    const payUrl = address ? buildSolanaPayUrl(address, { memo, label: 'SOL Deposit' }) : '';
 
     const fetchAddress = async () => {
         try {

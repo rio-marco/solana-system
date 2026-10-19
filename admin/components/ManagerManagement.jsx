@@ -298,6 +298,7 @@ export function ManagerManagement() {
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.84rem' }}>
                         <thead>
                             <tr style={{ background: '#F5F9FC', color: '#171D25', borderBottom: '1px solid #D8DFE4' }}>
+                                <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>#</th>
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Manager</th>
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Phone</th>
                                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Status</th>
@@ -308,19 +309,22 @@ export function ManagerManagement() {
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: '#94a3b8' }}>
+                                    <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: '#94a3b8' }}>
                                         <div style={{ width: '32px', height: '32px', border: '3px solid rgba(13,110,253,0.3)', borderTop: '3px solid #0D6EFD', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 0.75rem' }} />
                                         <span>Fetching managers...</span>
                                     </td>
                                 </tr>
                             ) : managers.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
+                                    <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
                                         No managers found. Click &ldquo;New Manager&rdquo; to create one.
                                     </td>
                                 </tr>
-                            ) : managers.map((manager) => (
+                            ) : managers.map((manager, index) => (
                                 <tr key={manager._id} style={{ borderBottom: '1px solid #DEE2E6', transition: 'background 0.15s' }} className="hover:bg-gray-50">
+                                    <td style={{ padding: '0.85rem 1rem' }}>
+                                        <div style={{ color: '#212529', fontWeight: 700 }}>{index + 1}</div>
+                                    </td>
                                     {/* Manager */}
                                     <td style={{ padding: '0.85rem 1rem' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>

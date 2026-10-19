@@ -22,6 +22,7 @@ async function GET(req) {
                     memo: user.memo,
                     solBalance: user.solBalance,
                     btcrBalance: user.btcrBalance,
+                    availableWithdrawBalance: user.availableWithdrawBalance,
                     status: user.status,
                     is2FAEnabled: user.twoFAStatus === constants.TWOFA_STATUS.ENABLED,
                 },

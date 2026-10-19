@@ -80,6 +80,7 @@ async function POST(req) {
                     memo: updatedUser.memo,
                     solBalance: updatedUser.solBalance,
                     btcrBalance: updatedUser.btcrBalance,
+                    availableWithdrawBalance: updatedUser.availableWithdrawBalance,
                 },
             },
         );

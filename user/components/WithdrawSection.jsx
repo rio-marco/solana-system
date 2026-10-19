@@ -16,7 +16,7 @@ export const WithdrawSection = () => {
     const [success, setSuccess] = useState(null);
 
     const memo = user?.memo || '';
-    const balance = user?.btcrBalance !== undefined ? Number(user.btcrBalance).toFixed(8) : '0.00000000';
+    const availableWithdrawBalance = user?.availableWithdrawBalance !== undefined ? Number(user.availableWithdrawBalance).toFixed(8) : '0.00000000';
 
     const handleAmountChange = (e) => {
         let val = e.target.value.replace(/[^0-9.]/g, '');
@@ -68,9 +68,10 @@ export const WithdrawSection = () => {
                 setToAddress('');
                 setAmount('');
 
-                if (res.data.data && res.data.data.updatedBtcrBalance !== undefined) {
-                    updateUserData({ btcrBalance: res.data.data.updatedBtcrBalance });
-                };
+                updateUserData({
+                    btcrBalance: res.data.data.btcrBalance,
+                    availableWithdrawBalance: res.data.data.availableWithdrawBalance,
+                });
 
                 setTimeout(() => setSuccess(null), 3000);
             } else {
@@ -113,10 +114,10 @@ export const WithdrawSection = () => {
 
             {/* Current Balance */}
             <div style={{ marginBottom: '1.5rem' }}>
-                <span className="solana-input-label" style={{ marginBottom: '0.3rem' }}>Current Balance</span>
+                <span className="solana-input-label" style={{ marginBottom: '0.3rem' }}>Available Withdraw Balance</span>
                 <div className="font-mono" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#00C2FF', fontSize: '1.6rem', fontWeight: 800 }}>
                     <Wallet size={22} />
-                    <span>{balance} BTCR</span>
+                    <span>{availableWithdrawBalance} BTCR</span>
                 </div>
             </div>
 
@@ -142,8 +143,8 @@ export const WithdrawSection = () => {
                 <div className="form-group-custom">
                     <label className="solana-input-label">Amount *</label>
                     <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                        <span className="font-mono" style={{ position: 'absolute', left: '1.1rem', fontWeight: 700, color: '#00C2FF', fontSize: '0.85rem', pointerEvents: 'none' }}>
-                            BTCR
+                        <span className="font-mono" style={{ position: 'absolute', left: '1.1rem', fontWeight: 700, color: '#00C2FF', fontSize: '1rem', pointerEvents: 'none' }}>
+                            BTCR :
                         </span>
                         <input
                             type="text"
@@ -153,7 +154,7 @@ export const WithdrawSection = () => {
                             placeholder="Enter withdraw amount"
                             value={amount}
                             onChange={handleAmountChange}
-                            style={{ paddingLeft: '3.5rem' }}
+                            style={{ paddingLeft: '5.2rem' }}
                             required
                         />
                     </div>
@@ -177,7 +178,7 @@ export const WithdrawSection = () => {
                 {/* Submit Withdraw Button */}
                 <button
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || availableWithdrawBalance <= 0}
                     className="solana-btn-primary"
                     style={{ marginTop: '0.75rem' }}
                 >

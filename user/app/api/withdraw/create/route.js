@@ -36,9 +36,14 @@ async function POST(req) {
             return errorResponse(amountVal.error);
         };
 
-        const freshUser = await User.findById(user._id).lean();
-        if (!freshUser || (freshUser.btcrBalance || 0) < amountVal.numericAmount) {
-            const avail = freshUser ? freshUser.btcrBalance : 0;
+        const userdetails = await User.findById(user._id).lean();
+        if (!userdetails || (userdetails.availableWithdrawBalance || 0) < amountVal.numericAmount) {
+            const avail = userdetails ? userdetails.availableWithdrawBalance : 0;
+            return errorResponse(`Insufficient account balance. Available: ${avail} BTCR, Requested: ${amountVal.numericAmount} BTCR.`);
+        };
+
+        if (!userdetails || (userdetails.btcrBalance || 0) < amountVal.numericAmount) {
+            const avail = userdetails ? userdetails.btcrBalance : 0;
             return errorResponse(`Insufficient account balance. Available: ${avail} BTCR, Requested: ${amountVal.numericAmount} BTCR.`);
         };
 
@@ -96,7 +101,12 @@ async function POST(req) {
 
         const updatedUser = await User.findByIdAndUpdate(
             user._id,
-            { $inc: { btcrBalance: -amountVal.numericAmount } },
+            {
+                $inc: {
+                    btcrBalance: -amountVal.numericAmount,
+                    availableWithdrawBalance: -amountVal.numericAmount,
+                },
+            },
             { new: true }
         );
 
@@ -124,7 +134,8 @@ async function POST(req) {
                 amount: transaction.amount,
                 signature: transaction.transactionSignature,
                 status: transaction.status,
-                updatedBtcrBalance: updatedUser.btcrBalance,
+                btcrBalance: updatedUser.btcrBalance,
+                availableWithdrawBalance: updatedUser.availableWithdrawBalance,
                 explorerUrl: `https://explorer.solana.com/tx/${transaction.transactionSignature}?cluster=devnet`,
             },
         );

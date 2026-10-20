@@ -590,7 +590,7 @@ export function UserDetails({ userId }) {
                                                         )}
                                                     </td>
                                                     <td style={{ padding: '0.75rem 1rem', color: '#6C757D', fontSize: '0.8rem' }}>
-                                                        {moment(activity.createdAt).format('MMM DD, YYYY HH:mm')}
+                                                        {moment(activity.created_at).format('MMM DD, YYYY HH:mm')}
                                                     </td>
                                                 </tr>
                                             );

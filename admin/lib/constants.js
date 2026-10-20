@@ -98,6 +98,11 @@ module.exports = {
         FAILED: 2,
     },
 
+    REWARD_UNLOCKED_STATUS: {
+        PENDING: 0,
+        COMPLETE: 1,
+    },
+
     COUNTRY_PHONE_LENGTHS: {
         '+1': { min: 10, max: 10 },
         '+7': { min: 10, max: 10 },

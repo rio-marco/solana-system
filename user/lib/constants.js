@@ -74,4 +74,9 @@ module.exports = {
         VERIFIED: 1,
         FAILED: 2,
     },
+
+    REWARD_UNLOCKED_STATUS: {
+        PENDING: 0,
+        COMPLETE: 1,
+    },
 };

@@ -31,6 +31,7 @@
         "multer": "^2.4.0",
         "next": "14.2.15",
         "node-2fa": "^2.0.3",
+        "node-cron": "^4.6.0",
         "nodemailer": "^10.0.13",
         "qrcode.react": "^3.1.0",
         "react": "^18.3.1",

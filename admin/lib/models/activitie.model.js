@@ -32,9 +32,15 @@ const ActivitySchema = new mongoose.Schema(
             default: false,
             index: true,
         },
+        rewardUnlocked: {
+            type: Number,
+            enum: Object.values(constants.REWARD_UNLOCKED_STATUS),
+            default: constants.REWARD_UNLOCKED_STATUS.PENDING,
+        },
     },
     {
-        timestamps: true,
+        timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+        strict: false,
     },
 );
 

@@ -20,6 +20,7 @@ const {
 } = require('../solana');
 
 const { solToLamports, lamportsToSol } = require('../validation');
+const constants = require('../constants');
 const { log1, } = require('../general');
 const Wallet = require('../models/wallet.model');
 const Setting = require('../models/setting.model');
@@ -30,7 +31,7 @@ const hasPlatformAddress = async () => {
     const pubKey = await getPlatformPublicKeyAsync();
     if (pubKey) return true;
 
-    const walletRecord = await Wallet.findOne({ type: 'PLATFORM_DEPOSIT', isActive: true });
+    const walletRecord = await Wallet.findOne({ type: constants.WALLET_TYPE.PLATFORM_DEPOSIT, isActive: true });
     return !!walletRecord;
 };
 
@@ -39,12 +40,12 @@ const generateNewPlatformAddress = async () => {
     const newPubStr = newKeypair.publicKey.toBase58();
     const newPrivStr = bs58.encode(newKeypair.secretKey);
 
-    await Wallet.updateMany({ type: 'PLATFORM_DEPOSIT' }, { isActive: false });
+    await Wallet.updateMany({ type: constants.WALLET_TYPE.PLATFORM_DEPOSIT }, { isActive: false });
 
     await Wallet.create({
         publicKey: newPubStr,
-        network: process.env.SOLANA_NETWORK || 'devnet',
-        type: 'PLATFORM_DEPOSIT',
+        network: process.env.SOLANA_NETWORK || constants.WALLET_NETWORK.DEVNET,
+        type: constants.WALLET_TYPE.PLATFORM_DEPOSIT,
         isActive: true,
     });
 
@@ -58,7 +59,7 @@ const getPlatformReceivingAddress = async (autoGenerate = true) => {
     let pubKey = await getPlatformPublicKeyAsync();
 
     if (!pubKey) {
-        const walletRecord = await Wallet.findOne({ type: 'PLATFORM_DEPOSIT', isActive: true });
+        const walletRecord = await Wallet.findOne({ type: constants.WALLET_TYPE.PLATFORM_DEPOSIT, isActive: true });
         if (walletRecord) {
             pubKey = new PublicKey(walletRecord.publicKey);
         };

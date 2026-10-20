@@ -103,6 +103,23 @@ module.exports = {
         COMPLETE: 1,
     },
 
+    NOTIFICATION_TYPE: {
+        SYSTEM: 1,
+        DEPOSIT: 2,
+        WITHDRAWAL: 3,
+    },
+
+    WALLET_TYPE: {
+        PLATFORM_DEPOSIT: 1,
+        DEMO_SENDER: 2,
+    },
+
+    WALLET_NETWORK: {
+        DEVNET: 'devnet',
+        TESTNET: 'testnet',
+        MAINNET_BETA: 'mainnet-beta',
+    },
+
     COUNTRY_PHONE_LENGTHS: {
         '+1': { min: 10, max: 10 },
         '+7': { min: 10, max: 10 },

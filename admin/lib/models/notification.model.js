@@ -1,6 +1,7 @@
 'use strict';
 
 const mongoose = require('mongoose');
+const constants = require('../constants');
 
 const NotificationSchema = new mongoose.Schema(
     {
@@ -21,9 +22,9 @@ const NotificationSchema = new mongoose.Schema(
             trim: true,
         },
         type: {
-            type: String,
-            enum: ['DEPOSIT', 'WITHDRAWAL', 'SYSTEM'],
-            default: 'SYSTEM',
+            type: Number,
+            enum: Object.values(constants.NOTIFICATION_TYPE),
+            default: constants.NOTIFICATION_TYPE.SYSTEM,
         },
         amount: {
             type: Number,

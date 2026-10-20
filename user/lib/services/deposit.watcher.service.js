@@ -21,10 +21,6 @@ const MAX_PROCESS_RETRIES = parseInt(process.env.DEPOSIT_WATCHER_MAX_RETRIES || 
 const RPC_MAX_RETRIES = parseInt(process.env.DEPOSIT_WATCHER_RPC_RETRIES || '4', 10);
 const RPC_BASE_DELAY_MS = parseInt(process.env.DEPOSIT_WATCHER_RPC_BASE_DELAY_MS || '400', 10);
 
-const MAX_DEPOSIT_SOL = constants.MAX_DEPOSIT_SOL;
-
-const CURSOR_SETTING_KEY = 'DEPOSIT_WATCHER_CURSOR';
-
 const scannedSignatures = new Set();
 const pendingAttempts = new Map();
 let timer = null;
@@ -55,7 +51,7 @@ const withRpcRetry = async (fn, label = 'rpc') => {
 
 const getCursorMap = async () => {
     try {
-        const raw = await Setting.getVal(CURSOR_SETTING_KEY, '{}');
+        const raw = await Setting.getVal('DEPOSIT_WATCHER_CURSOR', '{}');
         const parsed = JSON.parse(raw || '{}');
         return parsed && typeof parsed === 'object' ? parsed : {};
     } catch (e) {
@@ -67,7 +63,7 @@ const saveCursor = async (addressStr, signature) => {
     try {
         const map = await getCursorMap();
         map[addressStr] = signature;
-        await Setting.setVal(CURSOR_SETTING_KEY, JSON.stringify(map), 'Last scanned signature per platform address for deposit watcher');
+        await Setting.setVal('DEPOSIT_WATCHER_CURSOR', JSON.stringify(map), 'Last scanned signature per platform address for deposit watcher');
     } catch (e) {
         log1(['[Deposit Watcher] Failed to persist cursor:', e.message]);
     };
@@ -213,7 +209,7 @@ const creditDeposit = async (params) => {
             userId: params.user._id,
             title: 'Deposit Confirmed',
             message: `Your deposit of ${amountSol} SOL has been verified & confirmed on Solana!`,
-            type: 'DEPOSIT',
+            type: constants.NOTIFICATION_TYPE.DEPOSIT,
             amount: amountSol,
             transactionSignature: params.signature,
             isRead: false,
@@ -310,7 +306,7 @@ const processSignature = async (sigInfo, platformAddress) => {
     };
 
     const amountSol = lamportsToSol(transfer.lamports);
-    if (amountSol <= 0 || amountSol > MAX_DEPOSIT_SOL) {
+    if (amountSol <= 0 || amountSol > constants.MAX_DEPOSIT_SOL) {
         scannedSignatures.add(scanKey);
         log1([`[Deposit Watcher] Skipped tx ${signature}: amount ${amountSol} SOL out of allowed range`]);
         return 'processed';

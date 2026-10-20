@@ -58,6 +58,23 @@ export const ACTIVITY_STATUS = {
     FAILED: 2,
 };
 
+export const NOTIFICATION_TYPE = {
+    SYSTEM: 1,
+    DEPOSIT: 2,
+    WITHDRAWAL: 3,
+};
+
+export const WALLET_TYPE = {
+    PLATFORM_DEPOSIT: 1,
+    DEMO_SENDER: 2,
+};
+
+export const WALLET_NETWORK = {
+    DEVNET: 'devnet',
+    TESTNET: 'testnet',
+    MAINNET_BETA: 'mainnet-beta',
+};
+
 export const COUNTRY_PHONE_LENGTHS = {
     '+1': { min: 10, max: 10 },
     '+7': { min: 10, max: 10 },

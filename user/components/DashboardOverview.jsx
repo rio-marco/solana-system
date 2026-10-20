@@ -1,14 +1,18 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Wallet, ArrowDownLeft, ArrowUpRight, Megaphone, Tag, ShieldCheck, Hash, Banknote } from 'lucide-react';
+import { Wallet, ArrowDownLeft, ArrowUpRight, Megaphone, Tag, ShieldCheck, Check, Copy, Hash, Banknote } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { USER_STATUS } from './ui-constants.mjs';
+import { copyTextToClipboard } from '../lib/clipboard';
+import { USER_STATUS, WALLET_NETWORK } from './ui-constants.mjs';
 
 export const DashboardOverview = () => {
     const { user, config } = useAuth();
     const router = useRouter();
+    const [copiedMemo, setCopiedMemo] = useState(false);
+
+    const memo = user?.memo || '';
 
     const balance = user?.btcrBalance !== undefined ? Number(user.btcrBalance).toFixed(8) : '0.00000000';
     const availableWithdrawBalance = user?.availableWithdrawBalance !== undefined ? Number(user.availableWithdrawBalance).toFixed(8) : '0.00000000';
@@ -43,6 +47,15 @@ export const DashboardOverview = () => {
         { href: '/withdraw', label: 'Withdraw', icon: ArrowUpRight, color: '#00C2FF' },
         { href: '/campaign', label: 'Campaigns', icon: Megaphone, color: '#F59E0B' },
     ];
+
+    const copyMemo = async () => {
+        if (!memo) return;
+        const ok = await copyTextToClipboard(memo);
+        if (ok) {
+            setCopiedMemo(true);
+            setTimeout(() => setCopiedMemo(false), 2000);
+        };
+    };
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -88,27 +101,81 @@ export const DashboardOverview = () => {
 
             {/* Account Details */}
             <div style={{ ...cardStyle, padding: '1.75rem' }}>
-                <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ffffff', margin: '0 0 1.25rem 0' }}>Account Details</h2>
+                <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ffffff', margin: '0 0 1.25rem 0' }}>
+                    Account Details
+                </h2>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
-                    <DetailRow icon={Tag} label="Memo Tag" value={user?.memo || '-'} mono />
-                    <DetailRow icon={Hash} label="Network" value={config?.network || 'devnet'} />
-                    <DetailRow icon={ShieldCheck} label="Account Status" value={statusText} valueColor={statusColor} />
-                    {/* <DetailRow icon={Wallet} label="Full Name" value={user?.fullName || '-'} /> */}
-                </div>
-            </div>
-        </div>
-    );
-};
+                    {/* Memo Tag */}
+                    <div
+                        style={{
+                            background: 'rgba(7, 9, 14, 0.6)',
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            borderRadius: '16px',
+                            padding: '0.9rem 1rem',
+                        }}
+                    >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            <Tag size={13} />
+                            <span>Memo Tag</span>
+                        </div>
+                        <div
+                            style={{
+                                position: 'relative',
+                                display: 'flex',
+                                alignItems: 'center',
+                            }}
+                        >
+                            <div className='font-mono' style={{ color: '#ffffff', fontSize: '0.95rem', fontWeight: 700, marginTop: '0.35rem', wordBreak: 'break-word' }}>
+                                {memo}
+                            </div>
+                            <button
+                                type="button"
+                                onClick={copyMemo}
+                                disabled={!memo}
+                                className={`input-inline-copy${copiedMemo ? ' copied' : ''}`}
+                            >
+                                {copiedMemo ? <Check size={14} /> : <Copy size={14} />}
+                                <span>{copiedMemo ? 'Copied' : 'Copy'}</span>
+                            </button>
+                        </div>
+                    </div>
 
-const DetailRow = ({ icon: Icon, label, value, mono, valueColor }) => {
-    return (
-        <div style={{ background: 'rgba(7, 9, 14, 0.6)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '16px', padding: '0.9rem 1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                <Icon size={13} />
-                <span>{label}</span>
-            </div>
-            <div className={mono ? 'font-mono' : ''} style={{ color: valueColor || '#ffffff', fontSize: '0.95rem', fontWeight: 700, marginTop: '0.35rem', wordBreak: 'break-word' }}>
-                {value}
+                    {/* Network */}
+                    <div
+                        style={{
+                            background: 'rgba(7, 9, 14, 0.6)',
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            borderRadius: '16px',
+                            padding: '0.9rem 1rem',
+                        }}
+                    >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            <Hash size={13} />
+                            <span>Network</span>
+                        </div>
+                        <div style={{ color: '#ffffff', fontSize: '0.95rem', fontWeight: 700, marginTop: '0.35rem', wordBreak: 'break-word' }}>
+                            {config?.network || WALLET_NETWORK.DEVNET}
+                        </div>
+                    </div>
+
+                    {/* Account Status */}
+                    <div
+                        style={{
+                            background: 'rgba(7, 9, 14, 0.6)',
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            borderRadius: '16px',
+                            padding: '0.9rem 1rem',
+                        }}
+                    >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            <ShieldCheck size={13} />
+                            <span>Account Status</span>
+                        </div>
+                        <div style={{ color: statusColor || '#ffffff', fontSize: '0.95rem', fontWeight: 700, marginTop: '0.35rem', wordBreak: 'break-word' }}>
+                            {statusText}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );

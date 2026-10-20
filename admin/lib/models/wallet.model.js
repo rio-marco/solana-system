@@ -1,6 +1,7 @@
 'use strict';
 
 const mongoose = require('mongoose');
+const constants = require('../constants');
 
 const WalletSchema = new mongoose.Schema(
     {
@@ -12,13 +13,13 @@ const WalletSchema = new mongoose.Schema(
         },
         network: {
             type: String,
-            default: 'devnet',
-            enum: ['devnet', 'testnet', 'mainnet-beta'],
+            enum: Object.values(constants.WALLET_NETWORK),
+            default: constants.WALLET_NETWORK.DEVNET,
         },
         type: {
-            type: String,
-            default: 'PLATFORM_DEPOSIT',
-            enum: ['PLATFORM_DEPOSIT', 'DEMO_SENDER'],
+            type: Number,
+            enum: Object.values(constants.WALLET_TYPE),
+            default: constants.WALLET_TYPE.PLATFORM_DEPOSIT,
         },
         isActive: {
             type: Boolean,
@@ -36,13 +37,13 @@ WalletSchema.index({
 });
 
 WalletSchema.statics.getOrCreatePlatformWallet = async function (publicKeyStr, networkName = 'devnet') {
-    let wallet = await this.findOne({ type: 'PLATFORM_DEPOSIT', isActive: true });
+    let wallet = await this.findOne({ type: constants.WALLET_TYPE.PLATFORM_DEPOSIT, isActive: true });
 
     if (!wallet && publicKeyStr) {
         wallet = await this.create({
             publicKey: publicKeyStr,
             network: networkName,
-            type: 'PLATFORM_DEPOSIT',
+            type: constants.WALLET_TYPE.PLATFORM_DEPOSIT,
             isActive: true,
         });
     } else if (wallet && publicKeyStr && wallet.publicKey !== publicKeyStr) {

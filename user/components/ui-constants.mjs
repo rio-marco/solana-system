@@ -31,3 +31,20 @@ export const ACTIVITY_STATUS = {
     VERIFIED: 1,
     FAILED: 2,
 };
+
+export const NOTIFICATION_TYPE = {
+    SYSTEM: 1,
+    DEPOSIT: 2,
+    WITHDRAWAL: 3,
+};
+
+export const WALLET_TYPE = {
+    PLATFORM_DEPOSIT: 1,
+    DEMO_SENDER: 2,
+};
+
+export const WALLET_NETWORK = {
+    DEVNET: 'devnet',
+    TESTNET: 'testnet',
+    MAINNET_BETA: 'mainnet-beta',
+};

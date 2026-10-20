@@ -146,7 +146,7 @@ export const TransactionListTable = ({ type = 'withdraw' }) => {
 
             {/* Table */}
             <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.82rem' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.82rem', minWidth: '880px', whiteSpace: 'nowrap' }}>
                     <thead>
                         <tr
                             style={{

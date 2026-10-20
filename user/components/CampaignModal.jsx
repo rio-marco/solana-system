@@ -143,7 +143,7 @@ export const CampaignModal = ({ campaign, onClose, onUsed }) => {
                             <Gift size={13} />
                             <span>Campaign Name</span>
                         </div>
-                        <div style={{ color: '#ffffff', fontSize: '1rem', fontWeight: 800, marginTop: '0.35rem' }}>
+                        <div style={{ color: '#ffffff', fontSize: '0.85rem', fontWeight: 600, marginTop: '0.35rem' }}>
                             {campaign.name}
                         </div>
                     </div>
@@ -152,7 +152,7 @@ export const CampaignModal = ({ campaign, onClose, onUsed }) => {
                             <Gift size={13} />
                             <span>Rewards</span>
                         </div>
-                        <div style={{ color: '#F59E0B', fontSize: '1rem', fontWeight: 800, marginTop: '0.35rem' }}>
+                        <div style={{ color: '#14F195', fontSize: '1rem', fontWeight: 800, marginTop: '0.35rem' }}>
                             {Number(campaign.rewards).toLocaleString(undefined, { maximumFractionDigits: 8 })} BTCR
                         </div>
                     </div>

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
-import { ArrowUpRight, Send, AlertCircle, CheckCircle, Tag, Wallet } from 'lucide-react';
+import { ArrowUpRight, Send, AlertCircle, CheckCircle, Tag, Wallet, Banknote } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 
@@ -114,9 +114,11 @@ export const WithdrawSection = () => {
 
             {/* Current Balance */}
             <div style={{ marginBottom: '1.5rem' }}>
-                <span className="solana-input-label" style={{ marginBottom: '0.3rem' }}>Available Withdraw Balance</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94a3b8', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <Banknote size={16} style={{ color: '#00C2FF' }} />
+                    <span>Available Withdraw Balance</span>
+                </div>
                 <div className="font-mono" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#00C2FF', fontSize: '1.6rem', fontWeight: 800 }}>
-                    <Wallet size={22} />
                     <span>{availableWithdrawBalance} BTCR</span>
                 </div>
             </div>

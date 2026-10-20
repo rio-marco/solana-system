@@ -1,6 +1,5 @@
 'use strict';
 
-const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
 const bs58 = require('bs58');
 
@@ -30,7 +29,6 @@ const scannedSignatures = new Set();
 const pendingAttempts = new Map();
 let timer = null;
 let isScanning = false;
-let transactionsSupported = true;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -53,18 +51,6 @@ const withRpcRetry = async (fn, label = 'rpc') => {
             attempt++;
         };
     };
-};
-
-const isDuplicateKeyError = (err) =>
-    !!err && (err.code === 11000 || err.codeName === 'DuplicateKey' || /E11000/.test(String(err.message)));
-
-const isTransactionUnsupportedError = (err) => {
-    const message = String(err?.message || '');
-    return (
-        err?.code === 20 ||
-        err?.codeName === 'IllegalOperation' ||
-        /Transaction numbers are only allowed|replica set member or mongos|does not support transactions/i.test(message)
-    );
 };
 
 const getCursorMap = async () => {
@@ -167,102 +153,55 @@ const extractIncomingTransfer = (tx, platformAddress) => {
     return { lamports: totalLamports, fromAddress };
 };
 
-const buildDepositDoc = ({ user, amountSol, fromAddress, platformAddress, signature, memo, slot, blockTime }) => ({
-    userId: user._id,
-    txId: `DEP-${uuidv4().toUpperCase()}`,
-    type: constants.TRX_TYPE.CREDIT,
-    coin: constants.COIN.BTCR,
-    memo: {
-        id: memo,
-        coin: constants.COIN.SOL,
-        amount: amountSol,
-        date: new Date(),
-        trx_id: signature,
-    },
-    amount: amountSol,
-    platformAddress,
-    fromAddress: fromAddress || '',
-    toAddress: platformAddress,
-    transactionSignature: signature,
-    status: constants.TRANSACTION_STATUS.CONFIRMED,
-    submittedAt: blockTime || new Date(),
-    confirmedAt: new Date(),
-    slot: slot || null,
-    blockTime: blockTime || null,
-});
-
-const runCreditingTransaction = async (depositDoc, userId, amountSol) => {
-    const session = await mongoose.startSession();
-
-    try {
-        await session.withTransaction(async () => {
-            await Transaction.create([depositDoc], { session });
-
-            const updateResult = await User.updateOne(
-                { _id: userId },
-                { $inc: { solBalance: amountSol, btcrBalance: amountSol } },
-                { session },
-            );
-
-            if (!updateResult || updateResult.matchedCount === 0) {
-                throw new Error('USER_NOT_FOUND');
-            };
-        });
-    } finally {
-        await session.endSession();
-    };
-};
-
-const creditDepositFallback = async (depositDoc, userId, amountSol) => {
-    let created;
-
-    try {
-        created = await Transaction.create(depositDoc);
-    } catch (err) {
-        if (isDuplicateKeyError(err)) return 'duplicate';
-        throw err;
-    };
-
-    const updateResult = await User.updateOne(
-        { _id: userId },
-        { $inc: { solBalance: amountSol, btcrBalance: amountSol } },
-    );
-
-    if (!updateResult || updateResult.matchedCount === 0) {
-        await Transaction.deleteOne({ _id: created._id });
-        return 'failed';
-    };
-
-    return 'credited';
-};
-
 const creditDeposit = async (params) => {
     const amountSol = lamportsToSol(params.lamports);
-    const depositDoc = buildDepositDoc({ ...params, amountSol });
+    const { user, fromAddress, platformAddress, signature, memo, slot, blockTime } = params
+
+    const depositDoc = {
+        userId: user._id,
+        txId: `DEP-${uuidv4().toUpperCase()}`,
+        type: constants.TRX_TYPE.CREDIT,
+        coin: constants.COIN.BTCR,
+        memo: {
+            id: memo,
+            coin: constants.COIN.SOL,
+            amount: amountSol,
+            date: new Date(),
+            trx_id: signature,
+        },
+        amount: amountSol,
+        description: `${amountSol} BTCR has been successfully credited to your wallet.`,
+        platformAddress,
+        fromAddress: fromAddress || '',
+        toAddress: platformAddress,
+        transactionSignature: signature,
+        status: constants.TRANSACTION_STATUS.CONFIRMED,
+        submittedAt: blockTime || new Date(),
+        confirmedAt: new Date(),
+        slot: slot || null,
+        blockTime: blockTime || null,
+    };
 
     let outcome = 'failed';
 
     try {
-        if (transactionsSupported) {
-            await runCreditingTransaction(depositDoc, params.user._id, amountSol);
-            outcome = 'credited';
-        } else {
-            outcome = await creditDepositFallback(depositDoc, params.user._id, amountSol);
-        };
-    } catch (err) {
-        if (isDuplicateKeyError(err)) {
-            return { status: 'duplicate' };
+        const trxCreated = await Transaction.create(depositDoc);
+
+        const updateResult = await User.updateOne(
+            { _id: params.user._id },
+            { $inc: { solBalance: amountSol, btcrBalance: amountSol } },
+        );
+
+        if (!updateResult || updateResult.matchedCount === 0) {
+            log1(['[Deposit Watcher] user update failed.']);
+            await Transaction.deleteOne({ _id: trxCreated._id });
+            return 'failed';
         };
 
-        if (isTransactionUnsupportedError(err)) {
-            transactionsSupported = false;
-            log1(['[Deposit Watcher] MongoDB deployment does not support transactions; using fallback crediting path.']);
-            outcome = await creditDepositFallback(depositDoc, params.user._id, amountSol);
-
-            if (outcome === 'duplicate') return { status: 'duplicate' };
-        } else {
-            throw err;
-        };
+        outcome = 'credited';
+    } catch (error) {
+        log1(['[Deposit Watcher] creditDeposit Error:', error]);
+        return 'failed';
     };
 
     if (outcome !== 'credited') {
@@ -389,12 +328,6 @@ const processSignature = async (sigInfo, platformAddress) => {
             blockTime: tx.blockTime ? new Date(tx.blockTime * 1000) : new Date(),
         });
 
-        if (result.status === 'duplicate') {
-            scannedSignatures.add(scanKey);
-            pendingAttempts.delete(scanKey);
-            return 'processed';
-        };
-
         if (result.status !== 'credited') {
             return registerRetry(scanKey, `Crediting returned status "${result.status}" for ${signature}`);
         };
@@ -498,15 +431,7 @@ const startDepositWatcher = () => {
     if (timer.unref) timer.unref();
 };
 
-const stopDepositWatcher = () => {
-    if (timer) {
-        clearInterval(timer);
-        timer = null;
-    };
-};
-
 module.exports = {
     startDepositWatcher,
-    stopDepositWatcher,
     scanOnce,
 };

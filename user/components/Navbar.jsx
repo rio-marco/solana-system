@@ -6,7 +6,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { useToast } from '../context/ToastContext';
-import { Coins, Bell, LogOut, Code, Wallet, User as UserIcon } from 'lucide-react';
+import { Coins, Bell, LogOut, Code, Wallet, Banknote, User as UserIcon } from 'lucide-react';
 import { ProfileModal } from './ProfileModal';
 import { NotificationsDrawer } from './NotificationsDrawer';
 import { TransactionDecoderModal } from './TransactionDecoderModal';
@@ -123,6 +123,26 @@ export const Navbar = () => {
                                 <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>Balance:</span>
                                 <span style={{ fontSize: '0.85rem', color: '#14F195', fontWeight: 800, fontFamily: 'monospace' }}>
                                     {(user.btcrBalance || 0).toFixed(8)} BTCR
+                                </span>
+                            </div>
+
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.4rem',
+                                    padding: '0.4rem 0.85rem',
+                                    borderRadius: '12px',
+                                    background: 'rgba(0, 194, 255, 0.08)',
+                                    border: '1px solid rgba(0, 194, 255, 0.25)',
+                                    boxShadow: '0 0 12px rgba(0, 194, 255, 0.08)',
+                                }}
+                                title="Available Withdraw Balance"
+                            >
+                                <Banknote size={16} style={{ color: '#00C2FF' }} />
+                                <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>Withdrawable:</span>
+                                <span style={{ fontSize: '0.85rem', color: '#00C2FF', fontWeight: 800, fontFamily: 'monospace' }}>
+                                    {(user.availableWithdrawBalance || 0).toFixed(8)} BTCR
                                 </span>
                             </div>
 

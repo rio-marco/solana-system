@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Wallet, ArrowDownLeft, ArrowUpRight, Megaphone, Tag, ShieldCheck, Hash } from 'lucide-react';
+import { Wallet, ArrowDownLeft, ArrowUpRight, Megaphone, Tag, ShieldCheck, Hash, Banknote } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { USER_STATUS } from './ui-constants.mjs';
 
@@ -11,6 +11,7 @@ export const DashboardOverview = () => {
     const router = useRouter();
 
     const balance = user?.btcrBalance !== undefined ? Number(user.btcrBalance).toFixed(8) : '0.00000000';
+    const availableWithdrawBalance = user?.availableWithdrawBalance !== undefined ? Number(user.availableWithdrawBalance).toFixed(8) : '0.00000000';
 
     const USER_STATUS_CONFIG = {
         [USER_STATUS.INACTIVE]: {
@@ -47,12 +48,25 @@ export const DashboardOverview = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {/* Balance Hero */}
             <div style={{ ...cardStyle, padding: '2rem', background: 'linear-gradient(135deg, rgba(153,69,255,0.18) 0%, rgba(20,241,149,0.10) 100%), rgba(15, 20, 34, 0.85)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94a3b8', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    <Wallet size={16} style={{ color: '#14F195' }} />
-                    <span>Current Balance</span>
-                </div>
-                <div className="font-mono" style={{ color: '#ffffff', fontSize: '2.6rem', fontWeight: 900, marginTop: '0.5rem', lineHeight: 1.1 }}>
-                    {balance} <span style={{ fontSize: '1.2rem', color: '#14F195' }}>BTCR</span>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5rem', marginTop: '0.5rem' }}>
+                    <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94a3b8', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            <Wallet size={16} style={{ color: '#14F195' }} />
+                            <span>Current Balance</span>
+                        </div>
+                        <div className="font-mono" style={{ color: '#14F195', fontSize: '2.6rem', fontWeight: 900, marginTop: '0.5rem', lineHeight: 1.1 }}>
+                            {balance} <span style={{ fontSize: '1.2rem', color: '#14F195' }}>BTCR</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94a3b8', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            <Banknote size={16} style={{ color: '#00C2FF' }} />
+                            <span>Available Withdraw Balance</span>
+                        </div>
+                        <div className="font-mono" style={{ color: '#00C2FF', fontSize: '2.6rem', fontWeight: 900, marginTop: '0.5rem', lineHeight: 1.1 }}>
+                            {availableWithdrawBalance} <span style={{ fontSize: '1.2rem', color: '#00C2FF' }}>BTCR</span>
+                        </div>
+                    </div>
                 </div>
                 <div style={{ marginTop: '1.25rem', display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
                     {quickActions.map((action) => {

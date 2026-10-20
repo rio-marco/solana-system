@@ -60,19 +60,26 @@ async function POST(req) {
         const platformPubKey = await getPlatformReceivingAddress(true);
         const platformAddressStr = platformPubKey ? platformPubKey.toBase58() : '';
 
-        const transaction = new Transaction({
+        const transaction = await Transaction.create({
             userId: user._id,
             txId,
             type: constants.TRX_TYPE.DEBIT,
             coin: constants.COIN.BTCR,
-            toAddress: toAddress.trim(),
-            memo: memoVal.cleanMemo,
+            memo: {
+                id: memoVal.cleanMemo,
+                coin: constants.COIN.BTCR,
+                amount: amountVal.numericAmount,
+                date: new Date(),
+                trx_id: "",
+            },
             amount: amountVal.numericAmount,
-            platformFee: Number(withdrawFee),
+            description: `${amountVal.numericAmount} BTCR has been successfully withdrawn from your wallet.`,
             platformAddress: platformAddressStr,
+            toAddress: toAddress.trim(),
+            platformFee: Number(withdrawFee),
             status: constants.TRANSACTION_STATUS.PENDING,
+            submittedAt: new Date(),
         });
-        await transaction.save();
 
         let txResult;
         try {
@@ -86,6 +93,7 @@ async function POST(req) {
             });
 
             transaction.transactionSignature = txResult.signature;
+            transaction.memo.trx_id = txResult.signature;
             transaction.fromAddress = txResult.fromAddress;
             transaction.status = constants.TRANSACTION_STATUS.CONFIRMED;
             transaction.confirmedAt = new Date();

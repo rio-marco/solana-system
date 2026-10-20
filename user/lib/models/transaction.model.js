@@ -16,7 +16,6 @@ const TransactionSchema = new mongoose.Schema(
             required: true,
             unique: true,
             trim: true,
-            index: true,
         },
         type: {
             type: Number,
@@ -33,6 +32,10 @@ const TransactionSchema = new mongoose.Schema(
             type: Number,
             required: true,
             min: 0.000000001,
+        },
+        description: {
+            type: String,
+            default: "",
         },
         platformFee: {
             type: Number,
@@ -79,10 +82,8 @@ const TransactionSchema = new mongoose.Schema(
         },
         transactionSignature: {
             type: String,
-            unique: true,
-            sparse: true,
             trim: true,
-            index: true,
+            default: '',
         },
         status: {
             type: Number,
@@ -122,7 +123,6 @@ TransactionSchema.index({
     type: 1,
     status: 1,
     createdAt: -1,
-    platformAddress: 1,
 });
 
 module.exports = mongoose.models.Transaction || mongoose.model('Transaction', TransactionSchema);

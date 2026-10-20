@@ -158,6 +158,7 @@ export const TransactionListTable = ({ type = 'withdraw' }) => {
                             <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>#</th>
                             <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>TX HASH</th>
                             <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>AMOUNT</th>
+                            <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>DESCRIPTION</th>
                             <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>STATUS</th>
                             <th style={{ padding: '0.9rem 1rem', fontWeight: 600, textAlign: 'center' }}>Date & Time</th>
                         </tr>
@@ -235,7 +236,16 @@ export const TransactionListTable = ({ type = 'withdraw' }) => {
                                             <span style={{ color: '#64748b' }} className="font-mono">-</span>
                                         )}
                                     </td>
-                                    <td className="font-mono" style={{ padding: '0.85rem 1rem', fontWeight: 700, color: '#fff', fontSize: '0.8rem' }}>{w.amount} BTCR</td>
+                                    <td className="font-mono" style={{ padding: '0.85rem 1rem', fontWeight: 700, color: '#fff', fontSize: '0.8rem' }}>
+                                        {w.amount} BTCR
+                                    </td>
+                                    <td className="font-mono" style={{ padding: '0.85rem 1rem', fontWeight: 700, color: '#fff', fontSize: '0.8rem' }}>
+                                        {w?.description ? (
+                                            <span>{w.description}</span>
+                                        ) : (
+                                            <span style={{ color: '#64748b' }} className="font-mono">-</span>
+                                        )}
+                                    </td>
                                     <td style={{ padding: '0.85rem 1rem' }}>
                                         <span
                                             style={{

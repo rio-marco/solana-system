@@ -82,17 +82,28 @@ export const Navbar = () => {
 
     return (
         <>
-            <nav className="dashboard-navbar" style={{ padding: '0.85rem 1.5rem', background: 'rgba(7, 9, 14, 0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', sticky: 'top', top: 0, zIndex: 100 }}>
-                <div style={{ maxWidth: '1500px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+            <nav
+                className="dashboard-navbar"
+                style={{
+                    padding: '1rem 1.5rem',
+                    background: 'rgba(7, 9, 14, 0.85)',
+                    backdropFilter: 'blur(16px)',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 100,
+                }}
+            >
+                <div className="dashboard-navbar-inner" style={{ maxWidth: '1500px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'right', flexWrap: 'nowrap', gap: '1rem', minWidth: 0 }}>
                     {/* Logo & User Panel Badge */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+                    {/* <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', minWidth: 0 }}>
                         <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'var(--solana-gradient)', padding: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'var(--solana-gradient)', padding: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                                 <div style={{ width: '100%', height: '100%', background: '#07090e', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <Coins size={20} style={{ color: '#14F195' }} />
                                 </div>
                             </div>
-                            <div>
+                            <div className="nav-brand-text">
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                     <span style={{ fontWeight: 900, fontSize: '1.15rem', letterSpacing: '0.5px', color: '#fff' }}>SOLANA SYSTEM</span>
                                 </div>
@@ -101,12 +112,13 @@ export const Navbar = () => {
                                 </span>
                             </div>
                         </Link>
-                    </div>
+                    </div> */}
 
                     {/* Right Action Menu */}
                     {user && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                        <div className="nav-right" style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'nowrap', flexShrink: 0 }}>
                             <div
+                                className="nav-pill"
                                 style={{
                                     display: 'flex',
                                     alignItems: 'center',
@@ -116,17 +128,19 @@ export const Navbar = () => {
                                     background: 'rgba(20, 241, 149, 0.08)',
                                     border: '1px solid rgba(20, 241, 149, 0.25)',
                                     boxShadow: '0 0 12px rgba(20, 241, 149, 0.08)',
+                                    flexShrink: 0,
                                 }}
                                 title="Wallet Balance"
                             >
                                 <Wallet size={16} style={{ color: '#14F195' }} />
-                                <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>Balance:</span>
-                                <span style={{ fontSize: '0.85rem', color: '#14F195', fontWeight: 800, fontFamily: 'monospace' }}>
+                                <span className="nav-pill-label" style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>Balance:</span>
+                                <span style={{ fontSize: '0.85rem', color: '#14F195', fontWeight: 800, fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
                                     {(user.btcrBalance || 0).toFixed(8)} BTCR
                                 </span>
                             </div>
 
                             <div
+                                className="nav-pill"
                                 style={{
                                     display: 'flex',
                                     alignItems: 'center',
@@ -136,12 +150,13 @@ export const Navbar = () => {
                                     background: 'rgba(0, 194, 255, 0.08)',
                                     border: '1px solid rgba(0, 194, 255, 0.25)',
                                     boxShadow: '0 0 12px rgba(0, 194, 255, 0.08)',
+                                    flexShrink: 0,
                                 }}
                                 title="Available Withdraw Balance"
                             >
                                 <Banknote size={16} style={{ color: '#00C2FF' }} />
-                                <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>Withdrawable:</span>
-                                <span style={{ fontSize: '0.85rem', color: '#00C2FF', fontWeight: 800, fontFamily: 'monospace' }}>
+                                <span className="nav-pill-label" style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>Withdrawable:</span>
+                                <span style={{ fontSize: '0.85rem', color: '#00C2FF', fontWeight: 800, fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
                                     {(user.availableWithdrawBalance || 0).toFixed(8)} BTCR
                                 </span>
                             </div>
@@ -149,18 +164,18 @@ export const Navbar = () => {
                             <button
                                 type="button"
                                 onClick={() => setShowDecoder(true)}
-                                className="solana-btn-outline"
-                                style={{ width: 'auto', padding: '0 0.85rem', height: '36px', fontSize: '0.8rem', color: '#00C2FF', borderColor: 'rgba(0,194,255,0.3)' }}
+                                className="solana-btn-outline nav-decoder"
+                                style={{ width: 'auto', padding: '0 0.85rem', height: '36px', fontSize: '0.8rem', color: '#00C2FF', borderColor: 'rgba(0,194,255,0.3)', flexShrink: 0 }}
                                 title="Decode Transaction"
                             >
                                 <Code size={15} />
-                                <span>Decoder</span>
+                                <span className="nav-decoder-text">Decoder</span>
                             </button>
 
                             <button
                                 type="button"
                                 onClick={() => setShowNotifications(true)}
-                                style={{ position: 'relative', padding: '0.5rem', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', cursor: 'pointer' }}
+                                style={{ position: 'relative', padding: '0.5rem', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', cursor: 'pointer', flexShrink: 0 }}
                             >
                                 <Bell size={18} />
                                 {unreadCount > 0 && (
@@ -173,26 +188,27 @@ export const Navbar = () => {
                             <button
                                 type="button"
                                 onClick={() => setShowProfile(true)}
-                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.35rem 0.85rem', borderRadius: '30px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', cursor: 'pointer' }}
+                                className="nav-profile"
+                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.35rem 0.85rem', borderRadius: '30px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', cursor: 'pointer', flexShrink: 0 }}
                             >
                                 {user.profilePhoto ? (
                                     <img
                                         src={`/${user.profilePhoto.startsWith('/') ? user.profilePhoto.slice(1) : user.profilePhoto}`}
                                         alt="Profile"
-                                        style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #9945FF' }}
+                                        style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #9945FF', flexShrink: 0 }}
                                     />
                                 ) : (
-                                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(153,69,255,0.3)', color: '#14F195', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700 }}>
+                                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(153,69,255,0.3)', color: '#14F195', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, flexShrink: 0 }}>
                                         {user.fullName ? user.fullName[0].toUpperCase() : 'U'}
                                     </div>
                                 )}
-                                <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{user.fullName || user.email}</span>
+                                <span className="nav-profile-name" style={{ fontSize: '0.8rem', fontWeight: 600, whiteSpace: 'nowrap' }}>{user.fullName || user.email}</span>
                             </button>
 
                             <button
                                 type="button"
                                 onClick={logout}
-                                style={{ padding: '0.5rem', borderRadius: '10px', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: '#fca5a5', cursor: 'pointer' }}
+                                style={{ padding: '0.5rem', borderRadius: '10px', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: '#fca5a5', cursor: 'pointer', flexShrink: 0 }}
                                 title="Sign Out"
                             >
                                 <LogOut size={18} />

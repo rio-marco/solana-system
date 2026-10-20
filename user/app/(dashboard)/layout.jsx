@@ -27,13 +27,14 @@ export default function DashboardLayout({ children }) {
 
     return (
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-dark)' }}>
-            <Navbar />
-
             <div className="user-dashboard-shell">
                 <Sidebar />
 
-                <main className="user-content">
-                    {children}
+                <main>
+                    <Navbar />
+                    <div className="user-content">
+                        {children}
+                    </div>
                 </main>
             </div>
         </div>

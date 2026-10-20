@@ -408,6 +408,11 @@ body {
     border-radius: 3px;
 }
 
+.user-dashboard-shell > main {
+    flex: 1;
+    min-width: 0;
+}
+
 .user-sidebar-brand {
     display: flex;
     align-items: center;

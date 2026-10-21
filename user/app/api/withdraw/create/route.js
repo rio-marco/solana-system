@@ -73,7 +73,7 @@ async function POST(req) {
                 trx_id: "",
             },
             amount: amountVal.numericAmount,
-            description: `${amountVal.numericAmount} BTCR has been successfully withdrawn from your wallet.`,
+            description: `${amountVal.numericAmount} BTCR deducted for withdrawal.`,
             platformAddress: platformAddressStr,
             toAddress: toAddress.trim(),
             platformFee: Number(withdrawFee),

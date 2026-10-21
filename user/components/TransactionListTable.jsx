@@ -145,7 +145,7 @@ export const TransactionListTable = ({ type = 'withdraw' }) => {
             </div>
 
             {/* Table */}
-            <div style={{ overflowX: 'auto' }}>
+            <div className="tx-table-scroll" style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.82rem', minWidth: '880px', whiteSpace: 'nowrap' }}>
                     <thead>
                         <tr

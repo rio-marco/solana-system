@@ -166,7 +166,7 @@ const creditDeposit = async (params) => {
             trx_id: signature,
         },
         amount: amountSol,
-        description: `${amountSol} BTCR has been successfully credited to your wallet.`,
+        description: `${amountSol} BTCR credited via QR code.`,
         platformAddress,
         fromAddress: fromAddress || '',
         toAddress: platformAddress,

@@ -6,6 +6,7 @@ import { Wallet, ArrowDownLeft, ArrowUpRight, Megaphone, Tag, ShieldCheck, Check
 import { useAuth } from '../context/AuthContext';
 import { copyTextToClipboard } from '../lib/clipboard';
 import { USER_STATUS, WALLET_NETWORK } from './ui-constants.mjs';
+import { UnlockTimerList } from './UnlockTimerList';
 
 export const DashboardOverview = () => {
     const { user, config } = useAuth();
@@ -177,6 +178,9 @@ export const DashboardOverview = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Unlock Transaction Timer List */}
+            <UnlockTimerList />
         </div>
     );
 };

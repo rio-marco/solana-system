@@ -50,7 +50,7 @@ async function POST(req) {
                 memo: updatedUser.memo,
                 solBalance: updatedUser.solBalance,
                 btcrBalance: updatedUser.btcrBalance,
-                availableWithdrawBalance: user.availableWithdrawBalance,
+                availableWithdrawBalance: updatedUser.availableWithdrawBalance,
                 is2FAEnabled: true,
             },
         });

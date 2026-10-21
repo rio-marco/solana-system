@@ -10,7 +10,7 @@ const cookieParser = require('cookie-parser');
 const next = require('next');
 const connectDB = require('./lib/db');
 const { log1 } = require("./lib/general");
-const { initCronJobs } = require('./lib/services/reward.unlock.cron.service');
+const { initCronJobs } = require('./lib/services/cron.service');
 
 const PORT = parseInt(process.env.PORT || '3001', 10);
 const dev = process.env.NODE_ENV !== 'production';

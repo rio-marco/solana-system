@@ -98,7 +98,7 @@ module.exports = {
         FAILED: 2,
     },
 
-    REWARD_UNLOCKED_STATUS: {
+    TRX_UNLOCKED_STATUS: {
         PENDING: 0,
         COMPLETE: 1,
     },

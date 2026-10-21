@@ -40,7 +40,6 @@ export const CampaignList = () => {
             };
 
             const res = await axios.get('/api/campaign/list', { params });
-            // const res = await axios.get(`/api/campaign/list?page=${p}&limit=${limit}`);
             if (res.data && res.data.flag && res.data.data) {
                 const d = res.data.data;
 

@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { copyTextToClipboard } from '../lib/clipboard';
+import { ACTIVITY_STATUS } from './ui-constants.mjs';
+import { ActivityStatusBadge } from './ActivityStatusBadge';
 
 const pickRandomCommit = (comments) => {
     if (!Array.isArray(comments) || comments.length === 0) return null;
@@ -32,10 +34,15 @@ export const CampaignModal = ({ campaign, onClose, onUsed }) => {
         [campaign],
     );
 
+    const activityStatus = campaign?.status ?? null;
+    const isSubmitted = activityStatus !== null && activityStatus !== undefined;
+    const submittedUrl = campaign?.comment_url || '';
+
     const [selectedCommit, setSelectedCommit] = useState(() => pickRandomCommit(comments));
     const [commentUrl, setCommentUrl] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [copiedUrl, setCopiedUrl] = useState(false);
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -50,6 +57,14 @@ export const CampaignModal = ({ campaign, onClose, onUsed }) => {
         borderRadius: '16px',
         padding: '0.9rem 1rem',
     };
+
+    const infoMessage = !isSubmitted
+        ? 'Each campaign can be used only once. After you submit, this campaign stays in your list with a Pending status until verification.'
+        : activityStatus === ACTIVITY_STATUS.PENDING
+            ? 'You have already submitted this campaign. The submitted URL is locked and cannot be changed. Your submission is pending verification.'
+            : activityStatus === ACTIVITY_STATUS.VERIFIED
+                ? 'This campaign has been verified. The submitted URL is locked and cannot be changed.'
+                : 'Your submission for this campaign was rejected. The submitted URL is locked and cannot be changed.';
 
     const handleShuffle = () => {
         if (comments.length <= 1) return;
@@ -70,8 +85,19 @@ export const CampaignModal = ({ campaign, onClose, onUsed }) => {
         };
     };
 
+    const handleCopySubmittedUrl = async () => {
+        if (!submittedUrl) return;
+        const ok = await copyTextToClipboard(submittedUrl);
+        if (ok) {
+            setCopiedUrl(true);
+            setTimeout(() => setCopiedUrl(false), 2000);
+        };
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (isSubmitted) return;
 
         const trimmed = commentUrl.trim();
         if (!trimmed) {
@@ -93,7 +119,7 @@ export const CampaignModal = ({ campaign, onClose, onUsed }) => {
 
             if (res.data && res.data.flag) {
                 toastSuccess(res.data.msg || 'Campaign submitted successfully.');
-                if (onUsed) onUsed(campaign._id);
+                if (onUsed) onUsed(campaign._id, res.data?.data?.status ?? ACTIVITY_STATUS.PENDING, trimmed);
                 onClose();
             } else {
                 toastError(res.data?.msg || 'Failed to submit campaign.');
@@ -165,6 +191,19 @@ export const CampaignModal = ({ campaign, onClose, onUsed }) => {
                             {selectedCommit ? 1 : 0}
                         </div>
                     </div>
+                    <div style={cardStyle}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            <Info size={13} />
+                            <span>Status</span>
+                        </div>
+                        <div style={{ marginTop: '0.35rem' }}>
+                            {isSubmitted ? (
+                                <ActivityStatusBadge status={activityStatus} />
+                            ) : (
+                                <span style={{ color: '#94a3b8', fontSize: '0.85rem', fontWeight: 600 }}>Not Submitted</span>
+                            )}
+                        </div>
+                    </div>
                 </div>
 
                 {/* Random Commit / Task */}
@@ -208,50 +247,68 @@ export const CampaignModal = ({ campaign, onClose, onUsed }) => {
                 {/* Submit proof */}
                 <form onSubmit={handleSubmit}>
                     <div className="form-group-custom">
-                        <label className="solana-input-label">Paste your commit / comment URL</label>
-                        <div className="solana-input-icon-wrapper">
-                            <Link2 className="input-svg-icon" />
-                            <input
-                                type="url"
-                                className="solana-input-field"
-                                placeholder="https://..."
-                                value={commentUrl}
-                                onChange={(e) => setCommentUrl(e.target.value)}
-                                disabled={submitting}
-                                required
-                            />
+                        <label className="solana-input-label">
+                            {isSubmitted ? 'Submitted comment URL' : 'Paste your commit / comment URL'}
+                        </label>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                            <div className="solana-input-icon-wrapper" style={{ flex: 1, minWidth: 0 }}>
+                                <Link2 className="input-svg-icon" />
+                                <input
+                                    type="url"
+                                    className="solana-input-field"
+                                    placeholder="https://..."
+                                    value={isSubmitted ? submittedUrl : commentUrl}
+                                    onChange={(e) => setCommentUrl(e.target.value)}
+                                    disabled={isSubmitted || submitting}
+                                    readOnly={isSubmitted}
+                                    required={!isSubmitted}
+                                />
+                            </div>
+
+                            {isSubmitted && submittedUrl ? (
+                                <button
+                                    type="button"
+                                    onClick={handleCopySubmittedUrl}
+                                    title="Copy submitted URL"
+                                    style={{ background: 'none', border: 'none', color: copiedUrl ? '#14F195' : '#94a3b8', cursor: 'pointer', flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                                >
+                                    {copiedUrl ? <Check size={16} /> : <Copy size={16} />}
+                                </button>
+                            ) : null}
                         </div>
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', color: '#94a3b8', fontSize: '0.75rem', lineHeight: 1.45, marginBottom: '1.25rem' }}>
                         <Info size={14} style={{ color: '#00C2FF', flexShrink: 0, marginTop: '2px' }} />
-                        <span>Each campaign can be used only once. After you submit, this campaign will no longer appear in your list and will be pending admin verification.</span>
+                        <span>{infoMessage}</span>
                     </div>
 
-                    <div
-                        style={{
-                            display: 'flex',
-                            gap: '0.75rem',
-                            justifyContent: 'flex-end',
-                            borderTop: '1px solid rgba(255,255,255,0.1)',
-                            paddingTop: '1.8rem',
-                            marginTop: '2.25rem',
-                        }}
-                    >
-                        <button type="button" onClick={onClose} className="solana-btn-outline" style={{ width: 'auto', padding: '0 1.25rem' }} disabled={submitting}>
-                            Cancel
-                        </button>
-                        <button type="submit" className="solana-btn-primary" style={{ width: 'auto', padding: '0 1.25rem' }} disabled={submitting}>
-                            {submitting ? (
-                                <span>Submitting...</span>
-                            ) : (
-                                <>
-                                    <Send size={15} />
-                                    <span>Submit &amp; Use</span>
-                                </>
-                            )}
-                        </button>
-                    </div>
+                    {!isSubmitted ? (
+                        <div
+                            style={{
+                                display: 'flex',
+                                gap: '0.75rem',
+                                justifyContent: 'flex-end',
+                                borderTop: '1px solid rgba(255,255,255,0.1)',
+                                paddingTop: '1.8rem',
+                                marginTop: '2.25rem',
+                            }}
+                        >
+                            <button type="button" onClick={onClose} className="solana-btn-outline" style={{ width: 'auto', padding: '0 1.25rem' }} disabled={submitting}>
+                                Cancel
+                            </button>
+                            <button type="submit" className="solana-btn-primary" style={{ width: 'auto', padding: '0 1.25rem' }} disabled={submitting}>
+                                {submitting ? (
+                                    <span>Submitting...</span>
+                                ) : (
+                                    <>
+                                        <Send size={15} />
+                                        <span>Submit &amp; Use</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    ) : null}
                 </form>
             </div>
         </div>,

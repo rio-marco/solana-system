@@ -2,17 +2,20 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import moment from 'moment';
 import {
     Megaphone,
     RefreshCw,
     ChevronRight,
 } from 'lucide-react';
 import {
+    ACTIVITY_STATUS,
     DEFAULT_CURRENT_PAGE,
     DEFAULT_ITEM_PER_PAGE,
 } from './ui-constants.mjs';
 import { Pagination } from './Pagination';
 import { CampaignModal } from './CampaignModal';
+import { ActivityStatusBadge } from './ActivityStatusBadge';
 
 export const CampaignList = () => {
     const [campaigns, setCampaigns] = useState([]);
@@ -77,15 +80,16 @@ export const CampaignList = () => {
         };
     };
 
-    const handleCampaignUsed = (campaignId) => {
-        setCampaigns(prev => {
-            const remaining = prev.filter(c => c._id !== campaignId);
-            if (remaining.length === 0 && pagination.currentPage > DEFAULT_CURRENT_PAGE) {
-                setPagination(p => ({ ...p, currentPage: p.currentPage - 1 }));
-            };
-            return remaining;
-        });
-        setPagination(p => ({ ...p, totalCount: Math.max(0, p.totalCount - 1) }));
+    const handleCampaignUsed = (campaignId, status, commentUrl) => {
+        setCampaigns(prev => prev.map(c => (
+            c._id === campaignId
+                ? {
+                    ...c,
+                    status: status === undefined || status === null ? ACTIVITY_STATUS.PENDING : status,
+                    comment_url: commentUrl || c.comment_url,
+                }
+                : c
+        )));
     };
 
     return (
@@ -126,31 +130,67 @@ export const CampaignList = () => {
                             transition: 'opacity 0.2s ease',
                         }}
                     >
-                        {campaigns.map((c) => (
-                            <button
-                                key={c._id}
-                                type="button"
-                                onClick={() => setSelectedCampaign(c)}
-                                style={{
-                                    background: 'rgba(7, 9, 14, 0.6)',
-                                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                                    borderRadius: '18px',
-                                    padding: '1.15rem',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    gap: '0.75rem',
-                                    cursor: 'pointer',
-                                    textAlign: 'left',
-                                    transition: 'all 0.2s ease',
-                                }}
-                            >
-                                <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#ffffff', margin: 0, wordBreak: 'break-word' }}>
-                                    {c.name}
-                                </h3>
-                                <ChevronRight size={18} style={{ color: '#64748b', flexShrink: 0 }} />
-                            </button>
-                        ))}
+                        {campaigns.map((c) => {
+                            const isSubmitted = c.status !== null && c.status !== undefined;
+
+                            return (
+                                <button
+                                    key={c._id}
+                                    type="button"
+                                    onClick={() => setSelectedCampaign(c)}
+                                    style={{
+                                        background: 'rgba(7, 9, 14, 0.6)',
+                                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                                        borderRadius: '18px',
+                                        padding: '1.15rem',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'stretch',
+                                        justifyContent: 'space-between',
+                                        gap: '0.85rem',
+                                        cursor: 'pointer',
+                                        textAlign: 'left',
+                                        transition: 'all 0.2s ease',
+                                    }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
+                                        <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#ffffff', margin: 0, wordBreak: 'break-word' }}>
+                                            {c.name}
+                                        </h3>
+                                        <ChevronRight size={18} style={{ color: '#64748b', flexShrink: 0 }} />
+                                    </div>
+
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                        {isSubmitted ? (
+                                            <ActivityStatusBadge status={c.status} />
+                                        ) : (
+                                            <span
+                                                style={{
+                                                    padding: '0.2rem 0.5rem',
+                                                    borderRadius: '20px',
+                                                    fontSize: '0.68rem',
+                                                    fontWeight: 700,
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '0.4px',
+                                                    whiteSpace: 'nowrap',
+                                                    background: 'rgba(148,163,184,0.12)',
+                                                    color: '#94a3b8',
+                                                    border: '1px solid rgba(148,163,184,0.25)',
+                                                }}
+                                            >
+                                                Available
+                                            </span>
+                                        )}
+
+                                        {isSubmitted && c.submitted_at ? (
+                                            <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600 }}>
+                                                Submitted {moment(c.submitted_at).format('MMM DD, YYYY')}
+                                            </span>
+                                        ) : null}
+                                    </div>
+                                </button>
+                            );
+                        })}
                     </div>
 
                     {/* Pagination */}

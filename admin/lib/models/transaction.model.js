@@ -85,11 +85,6 @@ const TransactionSchema = new mongoose.Schema(
             trim: true,
             default: '',
         },
-        status: {
-            type: Number,
-            enum: Object.values(constants.TRANSACTION_STATUS),
-            default: constants.TRANSACTION_STATUS.PENDING,
-        },
         requestedAt: {
             type: Date,
             default: Date.now,
@@ -111,6 +106,16 @@ const TransactionSchema = new mongoose.Schema(
         blockTime: {
             type: Date,
             default: null,
+        },
+        trxUnlocked: {
+            type: Number,
+            enum: Object.values(constants.TRX_UNLOCKED_STATUS),
+            default: constants.TRX_UNLOCKED_STATUS.PENDING,
+        },
+        status: {
+            type: Number,
+            enum: Object.values(constants.TRANSACTION_STATUS),
+            default: constants.TRANSACTION_STATUS.PENDING,
         },
     },
     {

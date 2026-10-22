@@ -157,14 +157,14 @@ export const UnlockTimerList = () => {
                     <tbody>
                         {loading ? (
                             <tr>
-                                <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: '#64748b', fontSize: '0.85rem' }}>
+                                <td colSpan={8} style={{ padding: '3rem', textAlign: 'center', color: '#64748b', fontSize: '0.85rem' }}>
                                     <div style={{ width: '32px', height: '32px', border: '3px solid rgba(153,69,255,0.3)', borderTop: '3px solid #9945FF', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 0.75rem' }} />
                                     <span>Loading unlocking transactions...</span>
                                 </td>
                             </tr>
                         ) : items.length === 0 ? (
                             <tr>
-                                <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: '#64748b', fontSize: '0.85rem' }} className="font-mono">
+                                <td colSpan={8} style={{ padding: '3rem', textAlign: 'center', color: '#64748b', fontSize: '0.85rem' }} className="font-mono">
                                     No transactions are waiting to unlock.
                                 </td>
                             </tr>
